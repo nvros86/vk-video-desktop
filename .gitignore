@@ -1,0 +1,51 @@
+## Ignore NuGet packages
+**/[Pp]ackages/
+*.nupkg
+**/[Tt]emp/
+**/[Bb]in/
+**/[Oo]bj/
+**/[Dd]ebug/
+**/[Rr]elease/
+
+## Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+## Build results
+[Dd]ebugPublic/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+## NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+## Rider
+.idea/
+*.sln.iml
+
+## VS Code
+.vscode/
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## App specific
+*.appxbundle
+*.msixbundle
+*.appinstaller

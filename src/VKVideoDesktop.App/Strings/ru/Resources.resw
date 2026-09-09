@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve">
+    <value>VK Video Desktop</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Поиск видео, каналов и авторов</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Главная</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="MyVideos" xml:space="preserve">
+    <value>Мои видео</value>
+  </data>
+  <data name="Subscriptions" xml:space="preserve">
+    <value>Подписки</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>Избранное</value>
+  </data>
+  <data name="Playlists" xml:space="preserve">
+    <value>Плейлисты</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>История</value>
+  </data>
+  <data name="Downloads" xml:space="preserve">
+    <value>Загрузки</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Скачать</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Пауза</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Повторить</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Открыть</value>
+  </data>
+  <data name="OpenFolder" xml:space="preserve">
+    <value>Открыть папку</value>
+  </data>
+  <data name="DownloadComplete" xml:space="preserve">
+    <value>Загрузка завершена</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>Загрузка не удалась</value>
+  </data>
+  <data name="InsufficientSpace" xml:space="preserve">
+    <value>Недостаточно свободного места</value>
+  </data>
+  <data name="NoInternet" xml:space="preserve">
+    <value>Нет подключения. Скачанные видео доступны офлайн.</value>
+  </data>
+</root>
