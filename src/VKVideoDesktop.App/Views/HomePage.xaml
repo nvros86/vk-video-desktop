@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="VKVideoDesktop.App.Views.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VKVideoDesktop.App.Views"
+    xmlns:vm="using:VKVideoDesktop.App.ViewModels"
+    Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,0,80">
+        <StackPanel Spacing="24" Margin="24,16">
+
+            <!-- Continue Watching -->
+            <StackPanel Visibility="{x:Bind ViewModel.HasHistory, Mode=OneWay}">
+                <TextBlock Text="Продолжить просмотр" Style="{StaticResource SubtitleTextBlockStyle}"
+                           Margin="0,0,0,12" />
+                <ItemsControl ItemsSource="{x:Bind ViewModel.HistoryEntries}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:HistoryEntryViewModel">
+                            <Button HorizontalAlignment="Left" Margin="0,0,12,0"
+                                    Click="OnHistoryItemClick" Tag="{x:Bind VideoId}">
+                                <Grid Width="200">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0" Height="112" CornerRadius="4,4,0,0">
+                                        <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
+                                        <TextBlock Text="{x:Bind DurationText}" HorizontalAlignment="Right"
+                                                   VerticalAlignment="Bottom" Background="#CC000000"
+                                                   Foreground="White" FontSize="11" Padding="4,2"
+                                                   Margin="0,0,4,4" CornerRadius="2" />
+                                        <ProgressBar Value="{x:Bind Progress}" Maximum="100"
+                                                     HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                                     Width="200" Height="3" Background="Transparent" />
+                                    </Grid>
+                                    <StackPanel Grid.Row="1" Margin="0,8,0,0">
+                                        <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
+                                                   TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                                        <TextBlock Text="{x:Bind Author}" TextWrapping="NoWrap"
+                                                   TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="12" />
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Recommended Channels -->
+            <StackPanel>
+                <Grid>
+                    <TextBlock Text="Рекомендуемые каналы" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <Button Content="Все" HorizontalAlignment="Right" Style="{StaticResource TextButtonStyle}" />
+                </Grid>
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Channels}" Margin="0,12,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="16" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ChannelViewModel">
+                            <StackPanel Width="140" HorizontalAlignment="Left">
+                                <Ellipse Width="80" Height="80" HorizontalAlignment="Center">
+                                    <Ellipse.Fill>
+                                        <ImageBrush ImageSource="{x:Bind AvatarUrl}" Stretch="UniformToFill" />
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                                <TextBlock Text="{x:Bind Name}" TextAlignment="Center"
+                                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                           FontWeight="SemiBold" Margin="0,8,0,0" />
+                                <TextBlock Text="{x:Bind SubscriberCountText}" TextAlignment="Center"
+                                           Opacity="0.6" FontSize="12" />
+                                <Button Content="Подписаться" HorizontalAlignment="Center"
+                                        Margin="0,8,0,0" Style="{StaticResource AccentButtonStyle}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Recommendations -->
+            <StackPanel>
+                <Grid>
+                    <TextBlock Text="Рекомендации для вас" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <Button Content="Все" HorizontalAlignment="Right" Style="{StaticResource TextButtonStyle}" />
+                </Grid>
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Recommendations}" Margin="0,12,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:VideoViewModel">
+                            <Button HorizontalAlignment="Left" Margin="0,0,12,12"
+                                    Click="OnVideoItemClick" Tag="{x:Bind Id}">
+                                <Grid Width="280">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0" Height="158" CornerRadius="4,4,0,0">
+                                        <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
+                                        <TextBlock Text="{x:Bind DurationText}" HorizontalAlignment="Right"
+                                                   VerticalAlignment="Bottom" Background="#CC000000"
+                                                   Foreground="White" FontSize="11" Padding="4,2"
+                                                   Margin="0,0,4,4" CornerRadius="2" />
+                                    </Grid>
+                                    <StackPanel Grid.Row="1" Margin="0,8,0,0">
+                                        <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
+                                                   TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                                        <TextBlock Text="{x:Bind Author}" TextWrapping="NoWrap"
+                                                   TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="12" />
+                                        <TextBlock Text="{x:Bind ViewCountText}" Opacity="0.5" FontSize="11" />
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

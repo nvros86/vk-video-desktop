@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Enums;
+using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Core.Models;
 
 namespace VKVideoDesktop.App.ViewModels;
@@ -11,6 +11,7 @@ public sealed class MainViewModel : ViewModelBase
 {
     private readonly SearchService _searchService;
     private readonly VideoService _videoService;
+    private readonly IHistoryService _historyService;
     private readonly ILogger<MainViewModel> _logger;
 
     private string _searchQuery = string.Empty;
@@ -20,14 +21,13 @@ public sealed class MainViewModel : ViewModelBase
     public MainViewModel(
         SearchService searchService,
         VideoService videoService,
+        IHistoryService historyService,
         ILogger<MainViewModel> logger)
     {
         _searchService = searchService;
         _videoService = videoService;
+        _historyService = historyService;
         _logger = logger;
-
-        SearchCommand = new AsyncRelayCommand(ExecuteSearchAsync);
-        NavigateCommand = new RelayCommand<string>(Navigate);
     }
 
     public string SearchQuery
@@ -48,23 +48,49 @@ public sealed class MainViewModel : ViewModelBase
         set => SetProperty(ref _currentSection, value);
     }
 
-    public ObservableCollection<Video> Videos { get; } = new();
-    public ObservableCollection<Video> Recommendations { get; } = new();
+    public bool HasHistory => HistoryEntries.Count > 0;
 
-    public ICommand SearchCommand { get; }
-    public ICommand NavigateCommand { get; }
+    public ObservableCollection<VideoViewModel> Videos { get; } = new();
+    public ObservableCollection<VideoViewModel> Recommendations { get; } = new();
+    public ObservableCollection<ChannelViewModel> Channels { get; } = new();
+    public ObservableCollection<HistoryEntryViewModel> HistoryEntries { get; } = new();
+    public ObservableCollection<VideoViewModel> SearchResults { get; } = new();
 
-    public async Task LoadAsync()
+    public async Task LoadRecommendationsAsync()
     {
         try
         {
             IsLoading = true;
+
             var recommendations = await _searchService.GetRecommendationsAsync();
             Recommendations.Clear();
             foreach (var video in recommendations)
             {
-                Recommendations.Add(video);
+                var vm = new VideoViewModel();
+                vm.UpdateFrom(video);
+                Recommendations.Add(vm);
             }
+
+            // Load history
+            var history = await _historyService.GetAllAsync();
+            HistoryEntries.Clear();
+            foreach (var entry in history.Take(10))
+            {
+                HistoryEntries.Add(new HistoryEntryViewModel
+                {
+                    VideoId = entry.VideoId,
+                    Title = entry.Title,
+                    Author = entry.Author,
+                    ThumbnailUrl = entry.ThumbnailUrl,
+                    DurationText = FormatDuration(entry.Duration),
+                    LastPositionText = $"Продолжить с {FormatDuration(entry.LastPosition)}",
+                    Progress = entry.Duration.TotalSeconds > 0
+                        ? entry.LastPosition.TotalSeconds / entry.Duration.TotalSeconds * 100
+                        : 0
+                });
+            }
+
+            OnPropertyChanged(nameof(HasHistory));
         }
         catch (Exception ex)
         {
@@ -76,24 +102,23 @@ public sealed class MainViewModel : ViewModelBase
         }
     }
 
-    private async Task ExecuteSearchAsync()
+    public async Task SearchAsync(string query)
     {
-        if (string.IsNullOrWhiteSpace(SearchQuery))
-            return;
-
         try
         {
             IsLoading = true;
-            var result = await _searchService.SearchAsync(SearchQuery);
-            Videos.Clear();
+            var result = await _searchService.SearchAsync(query);
+            SearchResults.Clear();
             foreach (var video in result.Videos)
             {
-                Videos.Add(video);
+                var vm = new VideoViewModel();
+                vm.UpdateFrom(video);
+                SearchResults.Add(vm);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Search failed for '{Query}'", SearchQuery);
+            _logger.LogError(ex, "Search failed for '{Query}'", query);
         }
         finally
         {
@@ -101,65 +126,10 @@ public sealed class MainViewModel : ViewModelBase
         }
     }
 
-    private void Navigate(string? section)
+    private static string FormatDuration(TimeSpan duration)
     {
-        if (!string.IsNullOrEmpty(section))
-        {
-            CurrentSection = section;
-        }
-    }
-}
-
-public sealed class AsyncRelayCommand : ICommand
-{
-    private readonly Func<Task> _execute;
-    private bool _isExecuting;
-
-    public AsyncRelayCommand(Func<Task> execute)
-    {
-        _execute = execute;
-    }
-
-    public event EventHandler? CanExecuteChanged;
-
-    public bool CanExecute(object? parameter) => !_isExecuting;
-
-    public async void Execute(object? parameter)
-    {
-        if (_isExecuting) return;
-        _isExecuting = true;
-        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-
-        try
-        {
-            await _execute();
-        }
-        finally
-        {
-            _isExecuting = false;
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
-    }
-}
-
-public sealed class RelayCommand<T> : ICommand
-{
-    private readonly Action<T?> _execute;
-
-    public RelayCommand(Action<T?> execute)
-    {
-        _execute = execute;
-    }
-
-    public event EventHandler? CanExecuteChanged;
-
-    public bool CanExecute(object? parameter) => true;
-
-    public void Execute(object? parameter)
-    {
-        if (parameter is T typed)
-            _execute(typed);
-        else
-            _execute(default);
+        return duration.TotalHours >= 1
+            ? $"{(int)duration.TotalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}"
+            : $"{(int)duration.TotalMinutes}:{duration.Seconds:D2}";
     }
 }

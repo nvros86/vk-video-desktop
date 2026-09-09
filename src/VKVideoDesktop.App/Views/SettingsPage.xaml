@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="VKVideoDesktop.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,16,24,80" Spacing="24" MaxWidth="600" HorizontalAlignment="Center">
+
+            <TextBlock Text="Настройки" Style="{StaticResource TitleTextBlockStyle}" />
+
+            <!-- General -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="Общие" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Язык" VerticalAlignment="Center" />
+                    <ComboBox SelectedIndex="0" Width="150">
+                        <ComboBoxItem Content="Русский" />
+                        <ComboBoxItem Content="English" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Тема" VerticalAlignment="Center" />
+                    <ComboBox SelectedIndex="0" Width="150">
+                        <ComboBoxItem Content="Тёмная" />
+                        <ComboBoxItem Content="Светлая" />
+                        <ComboBoxItem Content="Системная" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Запуск с Windows" VerticalAlignment="Center" />
+                    <ToggleSwitch IsOn="False" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Сворачивать в трей" VerticalAlignment="Center" />
+                    <ToggleSwitch IsOn="True" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Уведомления" VerticalAlignment="Center" />
+                    <ToggleSwitch IsOn="True" />
+                </StackPanel>
+            </StackPanel>
+
+            <Divider />
+
+            <!-- Video -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="Видео" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Качество по умолчанию" VerticalAlignment="Center" />
+                    <ComboBox SelectedIndex="2" Width="150">
+                        <ComboBoxItem Content="240p" />
+                        <ComboBoxItem Content="360p" />
+                        <ComboBoxItem Content="480p" />
+                        <ComboBoxItem Content="720p" />
+                        <ComboBoxItem Content="1080p" />
+                        <ComboBoxItem Content="1440p" />
+                        <ComboBoxItem Content="2160p" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Автовоспроизведение" VerticalAlignment="Center" />
+                    <ToggleSwitch IsOn="True" />
+                </StackPanel>
+            </StackPanel>
+
+            <Divider />
+
+            <!-- Downloads -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Папка загрузок" VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="C:\Users\Videos\VK Video" Opacity="0.6"
+                                   VerticalAlignment="Center" />
+                        <Button Content="Изменить" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Макс. одновременных загрузок" VerticalAlignment="Center" />
+                    <ComboBox SelectedIndex="1" Width="80">
+                        <ComboBoxItem Content="1" />
+                        <ComboBoxItem Content="2" />
+                        <ComboBoxItem Content="3" />
+                        <ComboBoxItem Content="4" />
+                        <ComboBoxItem Content="5" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Ограничение скорости" VerticalAlignment="Center" />
+                    <ComboBox SelectedIndex="0" Width="150">
+                        <ComboBoxItem Content="Без ограничений" />
+                        <ComboBoxItem Content="512 КБ/с" />
+                        <ComboBoxItem Content="1 МБ/с" />
+                        <ComboBoxItem Content="2 МБ/с" />
+                        <ComboBoxItem Content="5 МБ/с" />
+                        <ComboBoxItem Content="10 МБ/с" />
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Количество повторных попыток" VerticalAlignment="Center" />
+                    <NumberBox Value="3" Minimum="0" Maximum="10" Width="80" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Автовозобновление при запуске" VerticalAlignment="Center" />
+                    <ToggleSwitch IsOn="True" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Уведомления о загрузках" VerticalAlignment="Center" />
+                    <ToggleSwitch IsOn="True" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Удалять .part при отмене" VerticalAlignment="Center" />
+                    <ToggleSwitch IsOn="True" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Способ загрузки" VerticalAlignment="Center" />
+                    <ComboBox SelectedIndex="0" Width="250">
+                        <ComboBoxItem Content="Показывать выбор качества" />
+                        <ComboBoxItem Content="Использовать последнее качество" />
+                        <ComboBoxItem Content="Использовать максимальное качество" />
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+
+            <Divider />
+
+            <!-- Cache -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="Кэш" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <StackPanel>
+                        <TextBlock Text="Очистить кэш изображений" />
+                        <TextBlock Text="Миниатюры и аватары каналов" Opacity="0.5" FontSize="12" />
+                    </StackPanel>
+                    <Button Content="Очистить" Click="OnClearCacheClick" />
+                </StackPanel>
+            </StackPanel>
+
+            <Divider />
+
+            <!-- About -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="О приложении" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="VK Video Desktop v1.0.0" Opacity="0.6" />
+                <TextBlock Text="Production-ready Windows client for VK Video" Opacity="0.4" FontSize="12" />
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>
