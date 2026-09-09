@@ -14,16 +14,10 @@
 
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}" />
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <TextBlock Text="{x:Bind ViewModel.ActiveDownloadsText, Mode=OneWay}"
-                           VerticalAlignment="Center" Opacity="0.6" FontSize="12" />
-                <Button Content="Очистить завершённые" Style="{StaticResource TextButtonStyle}"
-                        Click="OnClearCompletedClick" />
-            </StackPanel>
         </Grid>
 
         <StackPanel x:Name="EmptyState" Grid.Row="1" HorizontalAlignment="Center"
-                    VerticalAlignment="Center" Spacing="12" Visibility="Collapsed">
+                    VerticalAlignment="Center" Spacing="12">
             <FontIcon Glyph="&#xE896;" FontSize="48" Opacity="0.3" />
             <TextBlock Text="Нет загрузок" Opacity="0.5" TextAlignment="Center" />
             <TextBlock Text="Скачивайте видео, и они появятся здесь."
@@ -46,41 +40,25 @@
                         <Grid Grid.Column="0" Width="120" Height="68" CornerRadius="4"
                               Margin="0,0,12,0">
                             <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
-                            <TextBlock Text="{x:Bind QualityText}" HorizontalAlignment="Right"
-                                       VerticalAlignment="Top" Background="#CC000000"
-                                       Foreground="White" FontSize="10" Padding="3,1"
-                                       Margin="0,3,3,0" CornerRadius="2" />
                         </Grid>
 
-                        <Grid Grid.Column="1" VerticalAlignment="Center">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" Text="{x:Bind Title}" TextWrapping="NoWrap"
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
                                        TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
-                            <TextBlock Grid.Row="1" Text="{x:Bind StatusText}" Opacity="0.6"
-                                       FontSize="12" />
-                            <ProgressBar Grid.Row="2" Value="{x:Bind Progress}" Maximum="100"
+                            <TextBlock Text="{x:Bind StatusText}" Opacity="0.6" FontSize="12" />
+                            <ProgressBar Value="{x:Bind Progress}" Maximum="100"
                                          Margin="0,4,0,4" />
-                            <TextBlock Grid.Row="3" Text="{x:Bind ProgressText}" Opacity="0.5"
-                                       FontSize="11" />
-                        </Grid>
+                            <TextBlock Text="{x:Bind ProgressText}" Opacity="0.5" FontSize="11" />
+                        </StackPanel>
 
                         <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="4"
                                     Margin="12,0,0,0">
-                            <Button Content="⏸" ToolTipService.ToolTip="Пауза"
-                                    Click="OnPauseClick" Tag="{x:Bind DownloadId}"
-                                    Visibility="{x:Bind IsPauseVisible}" />
-                            <Button Content="▶" ToolTipService.ToolTip="Продолжить"
-                                    Click="OnResumeClick" Tag="{x:Bind DownloadId}"
-                                    Visibility="{x:Bind IsResumeVisible}" />
-                            <Button Content="✕" ToolTipService.ToolTip="Отмена"
-                                    Click="OnCancelClick" Tag="{x:Bind DownloadId}"
-                                    Visibility="{x:Bind IsCancelVisible}" />
+                            <Button Content="⏸" Click="OnPauseClick"
+                                    Tag="{x:Bind DownloadId}" />
+                            <Button Content="▶" Click="OnResumeClick"
+                                    Tag="{x:Bind DownloadId}" />
+                            <Button Content="✕" Click="OnCancelClick"
+                                    Tag="{x:Bind DownloadId}" />
                         </StackPanel>
                     </Grid>
                 </DataTemplate>

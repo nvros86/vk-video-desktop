@@ -1,3 +1,5 @@
+using VKVideoDesktop.Core.Enums;
+
 namespace VKVideoDesktop.Core.Models;
 
 public sealed class Video
@@ -29,7 +31,7 @@ public sealed class Channel
     public bool IsSubscribed { get; set; }
 }
 
-public sealed class Playlist
+public sealed record Playlist
 {
     public string Id { get; init; } = string.Empty;
     public string Title { get; init; } = string.Empty;

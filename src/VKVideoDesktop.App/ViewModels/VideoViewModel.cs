@@ -9,14 +9,16 @@ namespace VKVideoDesktop.App.ViewModels;
 
 public sealed class VideoViewModel : ViewModelBase
 {
-    private readonly VideoService _videoService;
-    private readonly IFavoritesService _favoritesService;
-    private readonly DownloadService _downloadService;
-    private readonly ILogger<VideoViewModel> _logger;
+    private readonly VideoService? _videoService;
+    private readonly IFavoritesService? _favoritesService;
+    private readonly DownloadService? _downloadService;
+    private readonly ILogger<VideoViewModel>? _logger;
 
     private Video? _currentVideo;
     private bool _isLoading;
     private bool _isFavorite;
+
+    public VideoViewModel() { }
 
     public VideoViewModel(
         VideoService videoService,
@@ -29,6 +31,12 @@ public sealed class VideoViewModel : ViewModelBase
         _downloadService = downloadService;
         _logger = logger;
     }
+
+    public string Id { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Author { get; set; } = string.Empty;
+    public string ThumbnailUrl { get; set; } = string.Empty;
+    public string DurationText { get; set; } = string.Empty;
 
     public VideoDisplayViewModel CurrentVideo { get; } = new();
     public ObservableCollection<VideoDisplayViewModel> RelatedVideos { get; } = new();
@@ -45,8 +53,19 @@ public sealed class VideoViewModel : ViewModelBase
         set => SetProperty(ref _isFavorite, value);
     }
 
+    public void UpdateFrom(Video video)
+    {
+        Id = video.Id;
+        Title = video.Title;
+        Author = video.ChannelName ?? string.Empty;
+        ThumbnailUrl = video.ThumbnailUrl;
+        DurationText = FormatDuration(video.Duration);
+    }
+
     public async Task LoadVideoAsync(string videoId)
     {
+        if (_videoService == null || _favoritesService == null || _logger == null) return;
+
         try
         {
             IsLoading = true;
@@ -82,7 +101,7 @@ public sealed class VideoViewModel : ViewModelBase
 
     public async Task ToggleFavoriteAsync()
     {
-        if (_currentVideo == null) return;
+        if (_currentVideo == null || _favoritesService == null) return;
 
         if (IsFavorite)
         {
@@ -106,7 +125,7 @@ public sealed class VideoViewModel : ViewModelBase
 
     public async Task StartDownloadAsync()
     {
-        if (_currentVideo == null) return;
+        if (_currentVideo == null || _downloadService == null) return;
 
         var options = await _downloadService.GetAvailableDownloadsAsync(_currentVideo);
         var best = options.OrderByDescending(o => o.Size).FirstOrDefault();
@@ -115,6 +134,13 @@ public sealed class VideoViewModel : ViewModelBase
         {
             await _downloadService.StartDownloadAsync(_currentVideo, best);
         }
+    }
+
+    private static string FormatDuration(TimeSpan duration)
+    {
+        return duration.TotalHours >= 1
+            ? $"{(int)duration.TotalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}"
+            : $"{(int)duration.TotalMinutes}:{duration.Seconds:D2}";
     }
 }
 

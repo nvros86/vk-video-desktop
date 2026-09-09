@@ -1,5 +1,7 @@
 using VKVideoDesktop.Application.Services;
+using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Models;
+using Xunit;
 
 namespace VKVideoDesktop.Tests.Unit;
 

@@ -1,3 +1,4 @@
+using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Models;
 
 namespace VKVideoDesktop.Core.Interfaces;

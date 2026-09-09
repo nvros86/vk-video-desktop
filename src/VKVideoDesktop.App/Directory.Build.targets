@@ -1,0 +1,13 @@
+﻿<Project>
+  <Target Name="MarkupCompilePass1" />
+  <Target Name="MarkupCompilePass2" />
+  <Target Name="_OnXamlPreCompileError" />
+  <Target Name="VerifyXbfOutputs" />
+  <Target Name="AddDefaultXamlLinkMetadata" />
+  <Target Name="CleanGeneratedXbfContent" BeforeTargets="CopyFilesToOutputDirectory">
+    <ItemGroup>
+      <GeneratedXamlSrc Remove="@(GeneratedXamlSrc)" />
+      <Content Remove="@(Content)" Condition="$([System.String]::new('%(FullPath)').EndsWith('.xbf'))" />
+    </ItemGroup>
+  </Target>
+</Project>

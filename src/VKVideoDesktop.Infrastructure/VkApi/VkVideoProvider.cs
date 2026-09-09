@@ -77,11 +77,11 @@ public sealed class VkVideoProvider : IVideoProvider
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkUserResult>>(
+            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkUserListResult>>(
                 $"{BaseUrl}/users.get?user_id={channelId}&fields=photo_200,photo_400_orig,description,subscriptions_count",
                 cancellationToken);
 
-            var user = response?.Response?.FirstOrDefault();
+            var user = response?.Response?.Items?.FirstOrDefault();
             if (user == null) return null;
 
             return new Channel
@@ -115,7 +115,8 @@ public sealed class VkVideoProvider : IVideoProvider
                 $"{BaseUrl}/video.get?count=20",
                 cancellationToken);
 
-            return response?.Response?.Items?.Select(MapVideo)?.ToList() ?? Array.Empty<Video>();
+            IReadOnlyList<Video> result = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
+            return result;
         }
         catch (Exception ex)
         {
@@ -134,7 +135,8 @@ public sealed class VkVideoProvider : IVideoProvider
                 $"{BaseUrl}/video.get?owner_id={channelId}&count=20",
                 cancellationToken);
 
-            return response?.Response?.Items?.Select(MapVideo)?.ToList() ?? Array.Empty<Video>();
+            IReadOnlyList<Video> result2 = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
+            return result2;
         }
         catch (Exception ex)
         {
@@ -229,5 +231,11 @@ public sealed class VkVideoProvider : IVideoProvider
         public string? Photo400Orig { get; set; }
         public string? Description { get; set; }
         public long? SubscriptionsCount { get; set; }
+    }
+
+    private sealed class VkUserListResult
+    {
+        public int Count { get; set; }
+        public List<VkUserResult>? Items { get; set; }
     }
 }

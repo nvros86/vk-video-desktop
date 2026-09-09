@@ -3,6 +3,7 @@ using Moq;
 using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Core.Models;
 using VKVideoDesktop.Infrastructure.Download;
+using Xunit;
 
 namespace VKVideoDesktop.Tests.Unit;
 
@@ -16,50 +17,56 @@ public class DownloadEngineTests
     }
 
     [Fact]
-    public void ValidateUrl_InvalidUrl_ThrowsArgumentException()
+    public async Task ValidateUrl_InvalidUrl_ReturnsErrorResult()
     {
         var engine = new DownloadEngine(_loggerMock.Object);
 
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await engine.DownloadAsync(
-                "not-a-url",
-                "test.mp4",
-                "test.mp4.part",
-                null,
-                null,
-                CancellationToken.None));
+        var result = await engine.DownloadAsync(
+            "not-a-url",
+            "test.mp4",
+            "test.mp4.part",
+            null,
+            null,
+            CancellationToken.None);
+
+        Assert.False(result.IsSuccess);
+        Assert.NotNull(result.ErrorMessage);
     }
 
     [Fact]
-    public void ValidateUrl_FileUrl_ThrowsArgumentException()
+    public async Task ValidateUrl_FileUrl_ReturnsErrorResult()
     {
         var engine = new DownloadEngine(_loggerMock.Object);
 
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await engine.DownloadAsync(
-                "file:///C:/test.mp4",
-                "test.mp4",
-                "test.mp4.part",
-                null,
-                null,
-                CancellationToken.None));
+        var result = await engine.DownloadAsync(
+            "file:///C:/test.mp4",
+            "test.mp4",
+            "test.mp4.part",
+            null,
+            null,
+            CancellationToken.None);
+
+        Assert.False(result.IsSuccess);
+        Assert.NotNull(result.ErrorMessage);
     }
 
     [Theory]
     [InlineData("ftp://example.com/file.mp4")]
     [InlineData("javascript:alert(1)")]
-    public void ValidateUrl_UnsupportedScheme_ThrowsArgumentException(string url)
+    public async Task ValidateUrl_UnsupportedScheme_ReturnsErrorResult(string url)
     {
         var engine = new DownloadEngine(_loggerMock.Object);
 
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await engine.DownloadAsync(
-                url,
-                "test.mp4",
-                "test.mp4.part",
-                null,
-                null,
-                CancellationToken.None));
+        var result = await engine.DownloadAsync(
+            url,
+            "test.mp4",
+            "test.mp4.part",
+            null,
+            null,
+            CancellationToken.None);
+
+        Assert.False(result.IsSuccess);
+        Assert.NotNull(result.ErrorMessage);
     }
 }
 

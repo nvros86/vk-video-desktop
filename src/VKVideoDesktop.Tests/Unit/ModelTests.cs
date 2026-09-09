@@ -1,5 +1,6 @@
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Models;
+using Xunit;
 
 namespace VKVideoDesktop.Tests.Unit;
 
@@ -104,6 +105,7 @@ public class ModelTests
         var isActive = status == DownloadStatus.Queued
             || status == DownloadStatus.Downloading
             || status == DownloadStatus.Resolving
+            || status == DownloadStatus.Paused
             || status == DownloadStatus.Retrying;
 
         Assert.Equal(expected, isActive);

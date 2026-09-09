@@ -1,3 +1,5 @@
+using VKVideoDesktop.Core.Enums;
+
 namespace VKVideoDesktop.Core.Models;
 
 public sealed class DownloadTask
@@ -6,7 +8,7 @@ public sealed class DownloadTask
     public string VideoId { get; init; } = string.Empty;
     public string Title { get; init; } = string.Empty;
     public string ThumbnailUrl { get; init; } = string.Empty;
-    public string SourceUrl { get; init; } = string.Empty;
+    public string SourceUrl { get; set; } = string.Empty;
     public string DestinationPath { get; init; } = string.Empty;
     public string TemporaryPath { get; init; } = string.Empty;
     public string? Quality { get; init; }

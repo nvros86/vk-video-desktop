@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
+using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Core.Models;
@@ -10,7 +11,6 @@ public sealed class VideoViewModel_Service : ViewModelBase
 {
     private readonly VideoService _videoService;
     private readonly IFavoritesService _favoritesService;
-    private readonly IDownloadService _downloadService;
     private readonly ILogger<VideoViewModel_Service> _logger;
 
     private Video? _currentVideo;
@@ -20,17 +20,15 @@ public sealed class VideoViewModel_Service : ViewModelBase
     public VideoViewModel_Service(
         VideoService videoService,
         IFavoritesService favoritesService,
-        IDownloadService downloadService,
         ILogger<VideoViewModel_Service> logger)
     {
         _videoService = videoService;
         _favoritesService = favoritesService;
-        _downloadService = downloadService;
         _logger = logger;
     }
 
-    public VideoViewModel CurrentVideo { get; } = new();
-    public ObservableCollection<VideoViewModel> RelatedVideos { get; } = new();
+    public VideoDisplayViewModel CurrentVideo { get; } = new();
+    public ObservableCollection<VideoDisplayViewModel> RelatedVideos { get; } = new();
 
     public bool IsLoading
     {
@@ -57,15 +55,14 @@ public sealed class VideoViewModel_Service : ViewModelBase
             CurrentVideo.UpdateFrom(video);
             IsFavorite = await _favoritesService.IsFavoriteAsync(videoId);
 
-            // Load related videos
             if (!string.IsNullOrEmpty(video.ChannelId))
             {
                 var related = await _videoService.GetChannelVideosAsync(video.ChannelId);
                 RelatedVideos.Clear();
                 foreach (var v in related.Where(v => v.Id != videoId).Take(10))
                 {
-                    var vm = new VideoViewModel();
-                    vm.UpdateFromRelated(v);
+                    var vm = new VideoDisplayViewModel();
+                    vm.UpdateFrom(v);
                     RelatedVideos.Add(vm);
                 }
             }
@@ -103,23 +100,4 @@ public sealed class VideoViewModel_Service : ViewModelBase
             IsFavorite = true;
         }
     }
-
-    public async Task StartDownloadAsync()
-    {
-        if (_currentVideo == null) return;
-
-        var options = await _downloadService.GetAvailableDownloadsAsync(_currentVideo);
-        var best = options.OrderByDescending(o => o.Size).FirstOrDefault();
-
-        if (best != null)
-        {
-            await _downloadService.StartDownloadAsync(_currentVideo, best);
-        }
-    }
-}
-
-public interface IDownloadService
-{
-    Task<IReadOnlyList<DownloadOption>> GetAvailableDownloadsAsync(Video video, CancellationToken cancellationToken = default);
-    Task<DownloadTask?> StartDownloadAsync(Video video, DownloadOption option, CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Core.Models;
 

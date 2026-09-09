@@ -10,7 +10,7 @@ using VKVideoDesktop.Infrastructure.VkApi;
 
 namespace VKVideoDesktop.App;
 
-public partial class App : Application
+public partial class App : Microsoft.UI.Xaml.Application
 {
     private readonly IHost _host;
     public static IServiceProvider Services { get; private set; } = null!;

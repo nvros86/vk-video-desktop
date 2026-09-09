@@ -20,8 +20,9 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250112002" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250310001" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+    <PackageReference Include="System.Security.Permissions" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
