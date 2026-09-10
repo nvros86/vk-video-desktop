@@ -24,6 +24,15 @@
                         <DataTemplate x:DataType="vm:HistoryEntryViewModel">
                             <Button HorizontalAlignment="Left" Margin="0,0,12,0"
                                     Click="OnHistoryItemClick" Tag="{x:Bind VideoId}">
+                                <Button.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Text="Смотреть" Click="OnContextHistoryPlay" Tag="{x:Bind VideoId}" />
+                                        <MenuFlyoutItem Text="Добавить в избранное" Click="OnContextHistoryFavorite" Tag="{x:Bind VideoId}" />
+                                        <MenuFlyoutSeparator />
+                                        <MenuFlyoutItem Text="Удалить из истории" Click="OnContextHistoryRemove" Tag="{x:Bind VideoId}" />
+                                        <MenuFlyoutItem Text="Открыть в VK" Click="OnContextHistoryOpenInVk" Tag="{x:Bind VideoId}" />
+                                    </MenuFlyout>
+                                </Button.ContextFlyout>
                                 <Grid Width="200">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -101,6 +110,15 @@
                         <DataTemplate x:DataType="vm:VideoViewModel">
                             <Button HorizontalAlignment="Left" Margin="0,0,12,12"
                                     Click="OnVideoItemClick" Tag="{x:Bind Id}">
+                                <Button.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Text="Смотреть" Click="OnContextPlay" Tag="{x:Bind Id}" />
+                                        <MenuFlyoutItem Text="Добавить в избранное" Click="OnContextFavorite" Tag="{x:Bind Id}" />
+                                        <MenuFlyoutItem Text="Скачать" Click="OnContextDownload" Tag="{x:Bind Id}" />
+                                        <MenuFlyoutSeparator />
+                                        <MenuFlyoutItem Text="Открыть в VK" Click="OnContextOpenInVk" Tag="{x:Bind Id}" />
+                                    </MenuFlyout>
+                                </Button.ContextFlyout>
                                 <Grid Width="280">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />

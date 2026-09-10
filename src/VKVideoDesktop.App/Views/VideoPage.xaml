@@ -119,6 +119,8 @@
                     <Button Content="➕ Плейлист" />
                     <Button Content="⬇ Скачать" Click="OnDownloadClick" />
                     <Button Content="↗ Поделиться" />
+                    <Button Content="🌐 WebView2" Click="OnWebViewFallbackClick"
+                            ToolTipService.ToolTip="Открыть в WebView2" />
                 </StackPanel>
 
                 <!-- Description -->

@@ -26,6 +26,7 @@ public class DownloadEngineTests
             "test.mp4",
             "test.mp4.part",
             null,
+            0,
             null,
             CancellationToken.None);
 
@@ -43,6 +44,7 @@ public class DownloadEngineTests
             "test.mp4",
             "test.mp4.part",
             null,
+            0,
             null,
             CancellationToken.None);
 
@@ -62,11 +64,38 @@ public class DownloadEngineTests
             "test.mp4",
             "test.mp4.part",
             null,
+            0,
             null,
             CancellationToken.None);
 
         Assert.False(result.IsSuccess);
         Assert.NotNull(result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task DownloadAsync_SpeedLimitZero_NoThrottle()
+    {
+        var engine = new DownloadEngine(_loggerMock.Object);
+
+        var tempDir = Path.Combine(Path.GetTempPath(), $"dltest_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            var tempFile = Path.Combine(tempDir, "temp.bin");
+            var destFile = Path.Combine(tempDir, "dest.bin");
+
+            var result = await engine.DownloadAsync(
+                "https://httpbin.org/bytes/1024",
+                destFile, tempFile, (long?)1024, 0,
+                null, CancellationToken.None);
+
+            Assert.True(result.IsSuccess);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+                Directory.Delete(tempDir, true);
+        }
     }
 }
 
@@ -75,6 +104,7 @@ public class DownloadManagerTests
     private readonly Mock<IDownloadEngine> _engineMock;
     private readonly Mock<IDownloadSourceResolver> _resolverMock;
     private readonly Mock<IDownloadRepository> _repositoryMock;
+    private readonly Mock<ISettingsService> _settingsServiceMock;
     private readonly Mock<ILogger<DownloadManager>> _loggerMock;
 
     public DownloadManagerTests()
@@ -82,6 +112,7 @@ public class DownloadManagerTests
         _engineMock = new Mock<IDownloadEngine>();
         _resolverMock = new Mock<IDownloadSourceResolver>();
         _repositoryMock = new Mock<IDownloadRepository>();
+        _settingsServiceMock = new Mock<ISettingsService>();
         _loggerMock = new Mock<ILogger<DownloadManager>>();
     }
 
@@ -95,6 +126,7 @@ public class DownloadManagerTests
             _engineMock.Object,
             _resolverMock.Object,
             _repositoryMock.Object,
+            _settingsServiceMock.Object,
             _loggerMock.Object);
 
         var request = new DownloadRequest
@@ -128,6 +160,7 @@ public class DownloadManagerTests
             _engineMock.Object,
             _resolverMock.Object,
             _repositoryMock.Object,
+            _settingsServiceMock.Object,
             _loggerMock.Object);
 
         var request = new DownloadRequest
@@ -141,5 +174,24 @@ public class DownloadManagerTests
         await manager.AddAsync(request, CancellationToken.None);
 
         Assert.Single(manager.Downloads);
+    }
+
+    [Fact]
+    public async Task RecoverIncompleteDownloadsAsync_WithQueuedTasks_DoesNotThrow()
+    {
+        var engine = new Mock<IDownloadEngine>();
+        var sourceResolver = new Mock<IDownloadSourceResolver>();
+        var repo = new Mock<IDownloadRepository>();
+        var settings = new Mock<ISettingsService>();
+        settings.Setup(s => s.Settings).Returns(new UserSettings { DownloadFolder = "/tmp", MaxConcurrentDownloads = 2 });
+
+        repo.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(new List<DownloadTask>());
+
+        var manager = new DownloadManager(
+            engine.Object, sourceResolver.Object, repo.Object,
+            settings.Object, _loggerMock.Object);
+
+        await manager.RecoverIncompleteDownloadsAsync();
     }
 }

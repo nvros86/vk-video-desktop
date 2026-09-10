@@ -32,6 +32,13 @@
                          Checked="OnFilterChanged" Style="{StaticResource FilterRadioButtonStyle}" />
             <RadioButton Content="Авторы" Tag="Authors"
                          Checked="OnFilterChanged" Style="{StaticResource FilterRadioButtonStyle}" />
+            <ComboBox x:Name="SortComboBox" MinWidth="160" Margin="16,0,0,0"
+                      SelectedIndex="0" SelectionChanged="OnSortChanged">
+                <ComboBoxItem Content="По релевантности" Tag="Relevance" />
+                <ComboBoxItem Content="По дате" Tag="Date" />
+                <ComboBoxItem Content="По просмотрам" Tag="Views" />
+                <ComboBoxItem Content="По длительности" Tag="Duration" />
+            </ComboBox>
         </StackPanel>
 
         <!-- Results -->

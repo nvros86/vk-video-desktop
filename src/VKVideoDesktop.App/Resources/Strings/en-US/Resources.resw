@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppName" xml:space="preserve">
+    <value>VK Video Desktop</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="Playlists" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="Downloads" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="Fullscreen" xml:space="preserve">
+    <value>Fullscreen</value>
+  </data>
+  <data name="MiniPlayer" xml:space="preserve">
+    <value>Mini Player</value>
+  </data>
+  <data name="PiP" xml:space="preserve">
+    <value>Picture in Picture</value>
+  </data>
+  <data name="AddToFavorites" xml:space="preserve">
+    <value>Add to Favorites</value>
+  </data>
+  <data name="RemoveFromFavorites" xml:space="preserve">
+    <value>Remove from Favorites</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Quality" xml:space="preserve">
+    <value>Quality</value>
+  </data>
+  <data name="Speed" xml:space="preserve">
+    <value>Speed</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="OpenInBrowser" xml:space="preserve">
+    <value>Open in Browser</value>
+  </data>
+  <data name="Share" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="CopyLink" xml:space="preserve">
+    <value>Copy Link</value>
+  </data>
+  <data name="NetworkError" xml:space="preserve">
+    <value>Network error. Check your internet connection.</value>
+  </data>
+  <data name="AuthError" xml:space="preserve">
+    <value>Authentication error. Please log in to VK again.</value>
+  </data>
+  <data name="VideoUnavailable" xml:space="preserve">
+    <value>Video unavailable. It may have been deleted or hidden.</value>
+  </data>
+  <data name="ServerError" xml:space="preserve">
+    <value>VK server error. Try again later.</value>
+  </data>
+  <data name="StorageError" xml:space="preserve">
+    <value>Storage error. Check available disk space.</value>
+  </data>
+  <data name="DownloadComplete" xml:space="preserve">
+    <value>Download complete</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>Download failed</value>
+  </data>
+  <data name="NoResults" xml:space="preserve">
+    <value>No results found</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search videos...</value>
+  </data>
+  <data name="MiniPlayerTitle" xml:space="preserve">
+    <value>Mini Player</value>
+  </data>
+  <data name="TrayShow" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="CacheCleared" xml:space="preserve">
+    <value>Cache cleared</value>
+  </data>
+  <data name="LoginSuccess" xml:space="preserve">
+    <value>Login successful</value>
+  </data>
+  <data name="LoginStep1" xml:space="preserve">
+    <value>Click the button to login via VK</value>
+  </data>
+  <data name="LoginStep2" xml:space="preserve">
+    <value>Paste the link from browser</value>
+  </data>
+  <data name="TokenInvalid" xml:space="preserve">
+    <value>Invalid token. Please try again.</value>
+  </data>
+  <data name="PlaylistCreated" xml:space="preserve">
+    <value>Playlist created</value>
+  </data>
+  <data name="PlaylistDeleted" xml:space="preserve">
+    <value>Playlist deleted</value>
+  </data>
+  <data name="HistoryCleared" xml:space="preserve">
+    <value>History cleared</value>
+  </data>
+  <data name="FavoritesCleared" xml:space="preserve">
+    <value>Favorites cleared</value>
+  </data>
+  <data name="Recommendations" xml:space="preserve">
+    <value>Recommendations</value>
+  </data>
+  <data name="Popular" xml:space="preserve">
+    <value>Popular</value>
+  </data>
+  <data name="RecentlyWatched" xml:space="preserve">
+    <value>Recently Watched</value>
+  </data>
+  <data name="OpenVK" xml:space="preserve">
+    <value>Open in VK</value>
+  </data>
+  <data name="ClearSearch" xml:space="preserve">
+    <value>Clear search</value>
+  </data>
+</root>

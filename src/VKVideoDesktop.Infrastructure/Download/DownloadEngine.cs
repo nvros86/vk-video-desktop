@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Interfaces;
@@ -22,6 +23,7 @@ public sealed class DownloadEngine : IDownloadEngine
         string destinationPath,
         string temporaryPath,
         long? totalBytes,
+        long speedLimitBytesPerSecond,
         IProgress<DownloadProgress>? progress,
         CancellationToken cancellationToken)
     {
@@ -32,6 +34,17 @@ public sealed class DownloadEngine : IDownloadEngine
         try
         {
             ValidateUrl(sourceUrl);
+
+            if (!HasEnoughDiskSpace(destinationPath, totalBytes))
+            {
+                return new DownloadResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "Недостаточно свободного места на диске",
+                    ErrorType = ErrorType.InsufficientSpace,
+                    BytesWritten = 0
+                };
+            }
 
             var directory = Path.GetDirectoryName(temporaryPath);
             if (!string.IsNullOrEmpty(directory))
@@ -100,6 +113,17 @@ public sealed class DownloadEngine : IDownloadEngine
                 await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
                 downloadedBytes += bytesRead;
 
+                if (downloadedBytes % (1024 * 1024) < bytesRead)
+                {
+                    var drivePath = Path.GetPathRoot(temporaryPath) ?? "C:\\";
+                    var drive = new DriveInfo(drivePath);
+                    if (drive.AvailableFreeSpace < 1024 * 1024)
+                    {
+                        _logger.LogWarning("Disk space critically low during download");
+                        break;
+                    }
+                }
+
                 var elapsedMs = stopwatch.ElapsedMilliseconds;
                 if (elapsedMs > 0)
                 {
@@ -111,6 +135,13 @@ public sealed class DownloadEngine : IDownloadEngine
                 var speed = speedSamples.Count > 0
                     ? speedSamples.Sum(s => s.bytes) / (stopwatch.Elapsed.TotalSeconds)
                     : 0;
+
+                if (speedLimitBytesPerSecond > 0 && speed > speedLimitBytesPerSecond)
+                {
+                    var delayMs = (int)((bytesRead / (double)speedLimitBytesPerSecond) * 1000);
+                    if (delayMs > 0)
+                        await Task.Delay(delayMs, cancellationToken);
+                }
 
                 var progressPercent = totalBytes > 0
                     ? (double)downloadedBytes / totalBytes.Value * 100
@@ -187,6 +218,22 @@ public sealed class DownloadEngine : IDownloadEngine
                 ErrorType = ErrorType.UnknownError,
                 BytesWritten = downloadedBytes
             };
+        }
+    }
+
+    private static bool HasEnoughDiskSpace(string path, long? requiredBytes)
+    {
+        if (!requiredBytes.HasValue) return true;
+
+        try
+        {
+            var drive = new DriveInfo(Path.GetPathRoot(path) ?? "C:\\");
+            var safetyMargin = 1024 * 1024;
+            return drive.AvailableFreeSpace > requiredBytes.Value + safetyMargin;
+        }
+        catch
+        {
+            return true;
         }
     }
 

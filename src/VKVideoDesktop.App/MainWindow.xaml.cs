@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -223,11 +224,55 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    public void ShowError(string message, int autoHideMs = 5000)
+    {
+        DispatcherQueue.TryEnqueue(async () =>
+        {
+            ErrorBannerText.Text = message;
+            ErrorBanner.Visibility = Visibility.Visible;
+
+            if (autoHideMs > 0)
+            {
+                await Task.Delay(autoHideMs);
+                ErrorBanner.Visibility = Visibility.Collapsed;
+            }
+        });
+    }
+
+    private void OnCloseErrorBanner(object sender, RoutedEventArgs e)
+    {
+        ErrorBanner.Visibility = Visibility.Collapsed;
+    }
+
     public void NavigateToHome()
     {
         DispatcherQueue.TryEnqueue(() =>
         {
             ContentFrame.Navigate(typeof(HomePage));
         });
+    }
+
+    internal async Task HandleDeepLinkAsync(DeepLinkResult result)
+    {
+        switch (result.Type)
+        {
+            case DeepLinkType.Video:
+                if (string.IsNullOrEmpty(result.VideoId)) break;
+                var videoService = App.Services.GetRequiredService<VideoService>();
+                var video = await videoService.GetVideoAsync(result.VideoId);
+                if (video != null)
+                    ContentFrame.Navigate(typeof(VideoPage), video);
+                break;
+
+            case DeepLinkType.Search:
+                if (string.IsNullOrEmpty(result.Query)) break;
+                ContentFrame.Navigate(typeof(SearchPage), result.Query);
+                break;
+
+            case DeepLinkType.Channel:
+                if (string.IsNullOrEmpty(result.ChannelId)) break;
+                ContentFrame.Navigate(typeof(ChannelPage), result.ChannelId);
+                break;
+        }
     }
 }

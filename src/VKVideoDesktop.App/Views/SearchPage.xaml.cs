@@ -90,6 +90,15 @@ public sealed partial class SearchPage : Page
         }
     }
 
+    private void OnSortChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var query = SearchBox.Text?.Trim();
+        if (!string.IsNullOrEmpty(query))
+        {
+            _ = ViewModel.SearchAsync(query);
+        }
+    }
+
     private void OnVideoClick(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Tag is string videoId)

@@ -132,7 +132,26 @@ public sealed partial class VideoPage : Page
             MediaPlayerElement.Visibility = Visibility.Collapsed;
             ThumbnailImage.Visibility = Visibility.Visible;
             PlayButton.Visibility = Visibility.Visible;
+            NavigateToWebViewFallback();
         });
+    }
+
+    private void OnWebViewFallbackClick(object sender, RoutedEventArgs e)
+    {
+        NavigateToWebViewFallback();
+    }
+
+    private void NavigateToWebViewFallback()
+    {
+        if (ViewModel.CurrentVideo != null && !string.IsNullOrEmpty(ViewModel.CurrentVideo.PlaybackUrl))
+        {
+            Frame.Navigate(typeof(WebViewVideoPage), new Video
+            {
+                Id = ViewModel.CurrentVideo.Id,
+                Title = ViewModel.CurrentVideo.Title,
+                PlaybackUrl = ViewModel.CurrentVideo.PlaybackUrl
+            });
+        }
     }
 
     private void OnCurrentStateChanged(object? sender, object e)

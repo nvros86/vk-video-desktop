@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppName" xml:space="preserve">
+    <value>VK Video Desktop</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Главная</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="Favorites" xml:space="preserve">
+    <value>Избранное</value>
+  </data>
+  <data name="Playlists" xml:space="preserve">
+    <value>Плейлисты</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>История</value>
+  </data>
+  <data name="Downloads" xml:space="preserve">
+    <value>Загрузки</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Воспроизвести</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Пауза</value>
+  </data>
+  <data name="Fullscreen" xml:space="preserve">
+    <value>Полный экран</value>
+  </data>
+  <data name="MiniPlayer" xml:space="preserve">
+    <value>Мини-плеер</value>
+  </data>
+  <data name="PiP" xml:space="preserve">
+    <value>Картинка в картинке</value>
+  </data>
+  <data name="AddToFavorites" xml:space="preserve">
+    <value>В избранное</value>
+  </data>
+  <data name="RemoveFromFavorites" xml:space="preserve">
+    <value>Убрать из избранного</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Скачать</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>ОК</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Quality" xml:space="preserve">
+    <value>Качество</value>
+  </data>
+  <data name="Speed" xml:space="preserve">
+    <value>Скорость</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Следующее</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Предыдущее</value>
+  </data>
+  <data name="OpenInBrowser" xml:space="preserve">
+    <value>Открыть в браузере</value>
+  </data>
+  <data name="Share" xml:space="preserve">
+    <value>Поделиться</value>
+  </data>
+  <data name="CopyLink" xml:space="preserve">
+    <value>Копировать ссылку</value>
+  </data>
+  <data name="NetworkError" xml:space="preserve">
+    <value>Ошибка сети. Проверьте подключение к интернету.</value>
+  </data>
+  <data name="AuthError" xml:space="preserve">
+    <value>Ошибка авторизации. Пожалуйста, войдите в VK снова.</value>
+  </data>
+  <data name="VideoUnavailable" xml:space="preserve">
+    <value>Видео недоступно. Возможно, оно было удалено или скрыто.</value>
+  </data>
+  <data name="ServerError" xml:space="preserve">
+    <value>Ошибка сервера VK. Попробуйте позже.</value>
+  </data>
+  <data name="StorageError" xml:space="preserve">
+    <value>Ошибка сохранения. Проверьте свободное место на диске.</value>
+  </data>
+  <data name="DownloadComplete" xml:space="preserve">
+    <value>Загрузка завершена</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>Загрузка не удалась</value>
+  </data>
+  <data name="NoResults" xml:space="preserve">
+    <value>Ничего не найдено</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Загрузка...</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Поиск видео...</value>
+  </data>
+  <data name="MiniPlayerTitle" xml:space="preserve">
+    <value>Mini Player</value>
+  </data>
+  <data name="TrayShow" xml:space="preserve">
+    <value>Показать</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="CacheCleared" xml:space="preserve">
+    <value>Кэш очищен</value>
+  </data>
+  <data name="LoginSuccess" xml:space="preserve">
+    <value>Вход выполнен успешно</value>
+  </data>
+  <data name="LoginStep1" xml:space="preserve">
+    <value>Нажмите кнопку для входа через VK</value>
+  </data>
+  <data name="LoginStep2" xml:space="preserve">
+    <value>Вставьте ссылку из браузера</value>
+  </data>
+  <data name="TokenInvalid" xml:space="preserve">
+    <value>Неверный токен. Попробуйте снова.</value>
+  </data>
+  <data name="PlaylistCreated" xml:space="preserve">
+    <value>Плейлист создан</value>
+  </data>
+  <data name="PlaylistDeleted" xml:space="preserve">
+    <value>Плейлист удалён</value>
+  </data>
+  <data name="HistoryCleared" xml:space="preserve">
+    <value>История очищена</value>
+  </data>
+  <data name="FavoritesCleared" xml:space="preserve">
+    <value>Избранное очищено</value>
+  </data>
+  <data name="Recommendations" xml:space="preserve">
+    <value>Рекомендации</value>
+  </data>
+  <data name="Popular" xml:space="preserve">
+    <value>Популярное</value>
+  </data>
+  <data name="RecentlyWatched" xml:space="preserve">
+    <value>Недавно просмотренное</value>
+  </data>
+  <data name="OpenVK" xml:space="preserve">
+    <value>Открыть в VK</value>
+  </data>
+  <data name="ClearSearch" xml:space="preserve">
+    <value>Очистить поиск</value>
+  </data>
+</root>

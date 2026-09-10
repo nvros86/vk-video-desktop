@@ -11,5 +11,7 @@ public sealed partial class MainWindow
     internal TextBlock MiniPlayerTitle = null!;
     internal Grid DownloadsPanel = null!;
     internal AutoSuggestBox SearchBox = null!;
+    internal Grid ErrorBanner = null!;
+    internal TextBlock ErrorBannerText = null!;
     internal void InitializeComponent() { }
 }

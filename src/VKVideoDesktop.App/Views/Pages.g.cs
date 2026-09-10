@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 
 namespace VKVideoDesktop.App.Views;
 
@@ -10,6 +11,7 @@ public sealed partial class HomePage
 
 public sealed partial class SearchPage
 {
+    internal ComboBox SortComboBox = null!;
     internal void InitializeComponent() { }
 }
 
@@ -83,5 +85,26 @@ public sealed partial class LoginPage
     internal Button SubmitTokenButton = null!;
     internal TextBlock ErrorText = null!;
     internal TextBlock LoadingText = null!;
+    internal void InitializeComponent() { }
+}
+
+public sealed partial class ChannelPage
+{
+    internal Image BannerImage = null!;
+    internal ImageBrush AvatarBrush = null!;
+    internal TextBlock ChannelNameText = null!;
+    internal TextBlock ChannelUsernameText = null!;
+    internal TextBlock SubscriberCountText = null!;
+    internal TextBlock DescriptionText = null!;
+    internal ItemsControl ChannelVideos = null!;
+    internal void InitializeComponent() { }
+}
+
+public sealed partial class WebViewVideoPage
+{
+    internal Button BackButton = null!;
+    internal TextBlock TitleText = null!;
+    internal Button OpenInBrowserButton = null!;
+    internal Microsoft.UI.Xaml.Controls.WebView2 WebView = null!;
     internal void InitializeComponent() { }
 }

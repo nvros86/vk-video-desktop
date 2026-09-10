@@ -11,6 +11,7 @@ public sealed class DownloadManager : IDownloadManager
     private readonly IDownloadEngine _engine;
     private readonly IDownloadSourceResolver _sourceResolver;
     private readonly IDownloadRepository _repository;
+    private readonly ISettingsService _settingsService;
     private readonly ILogger<DownloadManager> _logger;
     private readonly ConcurrentDictionary<string, DownloadTask> _downloads = new();
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _cancellations = new();
@@ -20,12 +21,14 @@ public sealed class DownloadManager : IDownloadManager
         IDownloadEngine engine,
         IDownloadSourceResolver sourceResolver,
         IDownloadRepository repository,
+        ISettingsService settingsService,
         ILogger<DownloadManager> logger,
         int maxConcurrent = 2)
     {
         _engine = engine;
         _sourceResolver = sourceResolver;
         _repository = repository;
+        _settingsService = settingsService;
         _logger = logger;
         _concurrencySemaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
     }
@@ -148,6 +151,26 @@ public sealed class DownloadManager : IDownloadManager
         }
     }
 
+    public async Task RecoverIncompleteDownloadsAsync()
+    {
+        var allTasks = await _repository.GetAllAsync();
+        var incomplete = allTasks.Where(t =>
+            t.Status == DownloadStatus.Downloading ||
+            t.Status == DownloadStatus.Resolving ||
+            t.Status == DownloadStatus.Retrying);
+
+        foreach (var task in incomplete)
+        {
+            task.Status = DownloadStatus.Queued;
+            await _repository.UpdateStatusAsync(task.Id, DownloadStatus.Queued);
+
+            if (_downloads.TryAdd(task.Id, task))
+            {
+                _ = ProcessDownloadAsync(task.Id);
+            }
+        }
+    }
+
     private async Task ProcessDownloadAsync(string downloadId)
     {
         await _concurrencySemaphore.WaitAsync();
@@ -205,6 +228,7 @@ public sealed class DownloadManager : IDownloadManager
                 task.DestinationPath,
                 task.TemporaryPath,
                 task.TotalBytes,
+                _settingsService.Settings.SpeedLimit,
                 progress,
                 cts.Token);
 

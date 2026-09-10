@@ -25,6 +25,7 @@ public interface IDownloadManager
         string downloadId,
         bool deleteFile,
         CancellationToken cancellationToken);
+    Task RecoverIncompleteDownloadsAsync();
     int ActiveDownloadsCount { get; }
     event EventHandler<DownloadTask>? DownloadProgressChanged;
     event EventHandler<DownloadTask>? DownloadCompleted;
@@ -38,6 +39,7 @@ public interface IDownloadEngine
         string destinationPath,
         string temporaryPath,
         long? totalBytes,
+        long speedLimitBytesPerSecond,
         IProgress<DownloadProgress>? progress,
         CancellationToken cancellationToken);
 }

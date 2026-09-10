@@ -94,7 +94,17 @@
                 </NavigationView.MenuItems>
 
                 <Grid>
-                    <Frame x:Name="ContentFrame" />
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel x:Name="OfflineBanner" Grid.Row="0" Background="#FFFFC107" Padding="12,6"
+                                HorizontalAlignment="Stretch" Visibility="Collapsed">
+                        <TextBlock Text="Нет подключения. Скачанные видео доступны офлайн." FontSize="12" />
+                    </StackPanel>
+
+                    <Frame x:Name="ContentFrame" Grid.Row="1" />
                 </Grid>
             </NavigationView>
         </Grid>
@@ -132,6 +142,22 @@
                     <FontIcon Glyph="&#xE8BB;" FontSize="14" />
                 </Button>
             </StackPanel>
+        </Grid>
+
+        <!-- Error Banner -->
+        <Grid x:Name="ErrorBanner" Grid.Row="1" HorizontalAlignment="Stretch"
+              VerticalAlignment="Top" Padding="12,8"
+              Background="#FFE53935" Foreground="White"
+              Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="ErrorBannerText" Grid.Column="0" VerticalAlignment="Center"
+                       FontSize="13" TextWrapping="Wrap" />
+            <Button Grid.Column="1" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets"
+                    Background="Transparent" Foreground="White"
+                    Click="OnCloseErrorBanner" />
         </Grid>
 
         <!-- Downloads Panel -->

@@ -143,6 +143,37 @@ public class HistoryServiceTests
         var entries = await service.GetAllAsync();
         Assert.Empty(entries);
     }
+
+    [Fact]
+    public async Task SaveOrUpdateAsync_EmptyVideoId_DoesNotThrow()
+    {
+        var service = new HistoryService();
+        await service.SaveOrUpdateAsync(new HistoryEntry
+        {
+            VideoId = "",
+            Title = "Test",
+            Author = "Author"
+        });
+        var history = await service.GetAllAsync();
+        Assert.Single(history);
+    }
+
+    [Fact]
+    public async Task SaveOrUpdateAsync_DuplicateVideo_UpdatesTimestamp()
+    {
+        var service = new HistoryService();
+        var entry = new HistoryEntry
+        {
+            VideoId = "v1",
+            Title = "Test",
+            Author = "Author",
+            LastViewed = DateTime.UtcNow
+        };
+        await service.SaveOrUpdateAsync(entry);
+        await service.SaveOrUpdateAsync(entry);
+        var history = await service.GetAllAsync();
+        Assert.Single(history);
+    }
 }
 
 public class FavoritesServiceTests
@@ -196,6 +227,45 @@ public class FavoritesServiceTests
         });
 
         Assert.True(await service.IsFavoriteAsync("123"));
+    }
+
+    [Fact]
+    public async Task AddAsync_EmptyVideoId_DoesNotThrow()
+    {
+        var service = new FavoritesService();
+        await service.AddAsync(new FavoriteEntry
+        {
+            VideoId = "",
+            Title = "Test",
+            Author = "Author"
+        });
+        var favs = await service.GetAllAsync();
+        Assert.Single(favs);
+    }
+
+    [Fact]
+    public async Task AddAsync_DuplicateVideo_DoesNotThrow()
+    {
+        var service = new FavoritesService();
+        var entry = new FavoriteEntry
+        {
+            VideoId = "v1",
+            Title = "Test",
+            Author = "Author"
+        };
+        await service.AddAsync(entry);
+        await service.AddAsync(entry);
+        var favs = await service.GetAllAsync();
+        Assert.Single(favs);
+    }
+
+    [Fact]
+    public async Task RemoveAsync_NonexistentId_DoesNotThrow()
+    {
+        var service = new FavoritesService();
+        await service.RemoveAsync("nonexistent");
+        var favs = await service.GetAllAsync();
+        Assert.Empty(favs);
     }
 }
 
