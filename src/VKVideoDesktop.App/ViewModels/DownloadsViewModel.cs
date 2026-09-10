@@ -76,6 +76,16 @@ public sealed class DownloadsViewModel : ViewModelBase
         {
             Downloads.Remove(item);
         }
+        await Task.CompletedTask;
+    }
+
+    public async Task RetryAllFailedAsync()
+    {
+        var failed = Downloads.Where(d => d.Status == DownloadStatus.Failed).ToList();
+        foreach (var item in failed)
+        {
+            await _downloadService.RetryAsync(item.DownloadId);
+        }
     }
 
     private void OnProgressChanged(object? sender, DownloadTask task)

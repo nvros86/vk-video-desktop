@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
+using VKVideoDesktop.App.ViewModels;
 using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Data.Database;
@@ -144,6 +145,12 @@ public partial class App : Microsoft.UI.Xaml.Application
                 services.AddTransient<DownloadService>();
 
                 services.AddSingleton<MainWindow>();
+
+                services.AddSingleton<MainViewModel>();
+                services.AddSingleton<VideoViewModel>();
+                services.AddSingleton<DownloadsViewModel>();
+
+                services.AddSingleton<NotificationService>();
             })
             .Build();
 

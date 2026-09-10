@@ -194,7 +194,7 @@ public sealed partial class VideoPage : Page
 
     private void OnPlaybackCompleted(object? sender, EventArgs e)
     {
-        DispatcherQueue.TryEnqueue(async () =>
+        DispatcherQueue.TryEnqueue(() =>
         {
             var nextId = _playbackService.GetNextVideoId();
             if (nextId != null)

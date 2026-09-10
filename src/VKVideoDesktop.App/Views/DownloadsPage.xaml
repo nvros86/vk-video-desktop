@@ -15,8 +15,12 @@
 
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}" />
-            <Button Content="Очистить завершённые" HorizontalAlignment="Right"
-                    Style="{StaticResource TextButtonStyle}" Click="OnClearCompletedClick" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Content="Повторить все" Style="{StaticResource TextButtonStyle}"
+                        Click="OnDownloadAllClick" />
+                <Button Content="Очистить завершённые" Style="{StaticResource TextButtonStyle}"
+                        Click="OnClearCompletedClick" />
+            </StackPanel>
         </Grid>
 
         <TextBlock Grid.Row="1" Text="Активные" Style="{StaticResource SubtitleTextBlockStyle}"

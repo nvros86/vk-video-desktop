@@ -43,4 +43,9 @@ public sealed partial class DownloadsPage : Page
     {
         await ViewModel.ClearCompletedAsync();
     }
+
+    private async void OnDownloadAllClick(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.RetryAllFailedAsync();
+    }
 }
