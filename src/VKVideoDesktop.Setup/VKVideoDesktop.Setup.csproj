@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>VKVideoDesktopSetup</AssemblyName>
+    <RootNamespace>VKVideoDesktop.Setup</RootNamespace>
+    <Version>1.0.0</Version>
+    <AssemblyTitle>VK Video Desktop Installer</AssemblyTitle>
+    <Description>Installer for VK Video Desktop</Description>
+    <NoWarn>CS1591;NU1603;NU1605</NoWarn>
+    <ApplicationIcon>..\VKVideoDesktop.App\Assets\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\VKVideoDesktop.App\Assets\icon.ico" Link="icon.ico" />
+    <EmbeddedResource Include="..\..\VKVideoDesktop-win-x64.zip" Link="app.zip" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="app.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
