@@ -11,7 +11,7 @@ public static class SetupLogger
     {
         var logDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "VKVideoDesktop", "Logs");
+            "VKVideoDesktop", "log");
         Directory.CreateDirectory(logDir);
         _logPath = Path.Combine(logDir, $"setup-{DateTime.Now:yyyy-MM-dd_HHmmss}.log");
     }

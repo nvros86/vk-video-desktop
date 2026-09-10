@@ -7,6 +7,13 @@
 **/[Dd]ebug/
 **/[Rr]elease/
 
+## Build outputs
+publish/
+publish-setup/
+VKVideoDesktop-win-x64.zip
+VKVideoDesktop-Setup-*.exe
+installer.zip
+
 ## Visual Studio
 .vs/
 *.suo

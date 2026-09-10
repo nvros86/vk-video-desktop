@@ -698,7 +698,7 @@ SOFTWARE."
 
     private void CreateDesktopShortcut()
     {
-        var exePath = Path.Combine(_installPath, "VKVideoDesktop.exe");
+        var exePath = Path.Combine(_installPath, "VKVideoDesktop.App.exe");
         if (!File.Exists(exePath))
         {
             SetupLogger.Warn($"Файл не найден, ярлык не создан: {exePath}");
@@ -712,7 +712,7 @@ SOFTWARE."
 
     private void CreateStartMenuShortcut()
     {
-        var exePath = Path.Combine(_installPath, "VKVideoDesktop.exe");
+        var exePath = Path.Combine(_installPath, "VKVideoDesktop.App.exe");
         if (!File.Exists(exePath))
         {
             SetupLogger.Warn($"Файл не найден, ярлык не создан: {exePath}");
@@ -770,7 +770,7 @@ $link.Save()";
 
     private void RegisterProtocol()
     {
-        var exePath = Path.Combine(_installPath, "VKVideoDesktop.exe");
+        var exePath = Path.Combine(_installPath, "VKVideoDesktop.App.exe");
         if (!File.Exists(exePath))
         {
             SetupLogger.Warn($"Файл не найден, протокол не зарегистрирован: {exePath}");
@@ -798,7 +798,7 @@ $link.Save()";
 
     private void RegisterUninstallEntry()
     {
-        var exePath = Path.Combine(_installPath, "VKVideoDesktop.exe");
+        var exePath = Path.Combine(_installPath, "VKVideoDesktop.App.exe");
         var uninstallExe = Path.Combine(_installPath, "VKVideoDesktopSetup.exe");
 
         try
@@ -883,7 +883,7 @@ $link.Save()";
         {
             if (launchCheck.Checked)
             {
-                var exePath = Path.Combine(_installPath, "VKVideoDesktop.exe");
+                var exePath = Path.Combine(_installPath, "VKVideoDesktop.App.exe");
                 if (File.Exists(exePath))
                     Process.Start(new ProcessStartInfo(exePath) { UseShellExecute = true });
             }

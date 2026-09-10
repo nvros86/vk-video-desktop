@@ -116,7 +116,7 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         var logDir = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "VKVideoDesktop", "Logs");
+            "VKVideoDesktop", "log");
         System.IO.Directory.CreateDirectory(logDir);
 
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
@@ -139,7 +139,7 @@ public partial class App : Microsoft.UI.Xaml.Application
                 services.AddHttpClient();
                 var logPath = System.IO.Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "VKVideoDesktop", "Logs", "log-.txt");
+                    "VKVideoDesktop", "log", "app-.log");
 
                 services.AddLogging(builder =>
                 {

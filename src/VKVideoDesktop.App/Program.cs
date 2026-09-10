@@ -35,7 +35,7 @@ static class Program
         {
             var logDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "VKVideoDesktop", "Logs");
+                "VKVideoDesktop", "log");
             Directory.CreateDirectory(logDir);
 
             var crashPath = Path.Combine(logDir, $"startup-crash-{DateTime.Now:yyyy-MM-dd_HHmmss}.log");

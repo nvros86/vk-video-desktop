@@ -39,7 +39,7 @@ public static class Uninstaller
             SetupLogger.Info($"Путь установки: {installPath}");
 
             SetupLogger.Info("Остановка процессов...");
-            foreach (var proc in Process.GetProcessesByName("VKVideoDesktop"))
+            foreach (var proc in Process.GetProcessesByName("VKVideoDesktop.App"))
             {
                 try
                 {
