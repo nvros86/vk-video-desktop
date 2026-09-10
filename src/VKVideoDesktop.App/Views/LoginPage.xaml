@@ -10,18 +10,32 @@
             <TextBlock Text="Вход в VK Video" Style="{StaticResource TitleTextBlockStyle}"
                        HorizontalAlignment="Center" />
 
-            <TextBlock Text="Для использования приложения необходима авторизация через VK."
+            <TextBlock x:Name="Step1Text"
+                       Text="1. Нажмите кнопку ниже, чтобы открыть страницу авторизации VK"
                        TextWrapping="Wrap" HorizontalAlignment="Center" Opacity="0.7" />
 
-            <Button Content="Войти через VK" HorizontalAlignment="Center"
+            <Button x:Name="LoginButton" Content="Войти через VK" HorizontalAlignment="Center"
                     Style="{StaticResource AccentButtonStyle}" Click="OnLoginClick"
                     Padding="32,12" />
+
+            <TextBlock x:Name="Step2Text"
+                       Text="2. После авторизации скопируйте URL из адресной строки браузера и вставьте его сюда"
+                       TextWrapping="Wrap" HorizontalAlignment="Center" Opacity="0.7"
+                       Visibility="Collapsed" />
+
+            <TextBox x:Name="TokenInput" PlaceholderText="Вставьте URL или токен сюда..."
+                     Visibility="Collapsed" />
+
+            <Button x:Name="SubmitTokenButton" Content="Войти" HorizontalAlignment="Center"
+                    Style="{StaticResource AccentButtonStyle}" Click="OnSubmitTokenClick"
+                    Padding="32,12" Visibility="Collapsed" />
 
             <TextBlock x:Name="ErrorText" Text="" Foreground="Red"
                        HorizontalAlignment="Center" Visibility="Collapsed" />
 
-            <TextBlock Text="После нажатия 'Войти' откроется браузер. Скопируйте токен из адресной строки после '#'."
-                       TextWrapping="Wrap" HorizontalAlignment="Center" Opacity="0.5" FontSize="12" />
+            <TextBlock x:Name="LoadingText" Text="Проверка токена..."
+                       HorizontalAlignment="Center" Opacity="0.5"
+                       Visibility="Collapsed" />
         </StackPanel>
     </Grid>
 </Page>

@@ -62,16 +62,29 @@ public sealed class MainViewModel : ViewModelBase
         {
             IsLoading = true;
 
-            var recommendations = await _searchService.GetRecommendationsAsync();
-            Recommendations.Clear();
-            foreach (var video in recommendations)
+            try
             {
-                var vm = new VideoViewModel();
-                vm.UpdateFrom(video);
-                Recommendations.Add(vm);
+                var recommendations = await _searchService.GetRecommendationsAsync();
+                Recommendations.Clear();
+                foreach (var video in recommendations)
+                {
+                    var vm = new VideoViewModel();
+                    vm.UpdateFrom(video);
+                    Recommendations.Add(vm);
+                }
+            }
+            catch
+            {
+                var popular = await _searchService.GetPopularAsync();
+                Recommendations.Clear();
+                foreach (var video in popular)
+                {
+                    var vm = new VideoViewModel();
+                    vm.UpdateFrom(video);
+                    Recommendations.Add(vm);
+                }
             }
 
-            // Load history
             var history = await _historyService.GetAllAsync();
             HistoryEntries.Clear();
             foreach (var entry in history.Take(10))

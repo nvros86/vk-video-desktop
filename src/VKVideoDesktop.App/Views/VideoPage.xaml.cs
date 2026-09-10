@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -69,6 +70,10 @@ public sealed partial class VideoPage : Page
                     Duration = ViewModel.CurrentVideo.Duration
                 },
                 url);
+
+            var queueIds = new List<string> { ViewModel.CurrentVideo.Id };
+            queueIds.AddRange(ViewModel.RelatedVideos.Select(v => v.Id).Where(id => id != ViewModel.CurrentVideo.Id));
+            _playbackService.SetQueue(queueIds, 0);
         }
         catch (Exception)
         {

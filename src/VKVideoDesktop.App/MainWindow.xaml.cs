@@ -129,10 +129,20 @@ public sealed partial class MainWindow : Window
 
     private void OnMiniPlayerPrevClick(object sender, RoutedEventArgs e)
     {
+        var prevId = _playbackService.GetPreviousVideoId();
+        if (prevId != null)
+        {
+            ContentFrame.Navigate(typeof(VideoPage), prevId);
+        }
     }
 
     private void OnMiniPlayerNextClick(object sender, RoutedEventArgs e)
     {
+        var nextId = _playbackService.GetNextVideoId();
+        if (nextId != null)
+        {
+            ContentFrame.Navigate(typeof(VideoPage), nextId);
+        }
     }
 
     private void OnMiniPlayerFullscreenClick(object sender, RoutedEventArgs e)
@@ -150,5 +160,13 @@ public sealed partial class MainWindow : Window
     private void OnMiniPlayerCloseClick(object sender, RoutedEventArgs e)
     {
         MiniPlayerBar.Visibility = Visibility.Collapsed;
+    }
+
+    public void NavigateToHome()
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            ContentFrame.Navigate(typeof(HomePage));
+        });
     }
 }

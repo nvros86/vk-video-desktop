@@ -9,6 +9,7 @@ public sealed class PlaybackService
     public PlaybackState State => _state;
 
     public event EventHandler<PlaybackState>? StateChanged;
+    public event EventHandler<string>? VideoChanged;
 
     public void UpdateState(Video video, string playbackUrl)
     {
@@ -17,6 +18,7 @@ public sealed class PlaybackService
         _state.Position = TimeSpan.Zero;
         _state.IsPlaying = true;
         StateChanged?.Invoke(this, _state);
+        VideoChanged?.Invoke(this, video.Id);
     }
 
     public void TogglePlayPause()
@@ -37,4 +39,46 @@ public sealed class PlaybackService
         _state.IsMuted = volume == 0;
         StateChanged?.Invoke(this, _state);
     }
+
+    public void SetQueue(IReadOnlyList<string> videoIds, int startIndex = 0)
+    {
+        _state.Queue.Clear();
+        _state.Queue.AddRange(videoIds);
+        _state.CurrentQueueIndex = startIndex;
+        StateChanged?.Invoke(this, _state);
+    }
+
+    public void ClearQueue()
+    {
+        _state.Queue.Clear();
+        _state.CurrentQueueIndex = -1;
+        _state.CurrentVideoId = null;
+        _state.IsPlaying = false;
+        StateChanged?.Invoke(this, _state);
+    }
+
+    public string? GetNextVideoId()
+    {
+        if (_state.Queue.Count == 0) return null;
+        if (_state.CurrentQueueIndex < _state.Queue.Count - 1)
+        {
+            _state.CurrentQueueIndex++;
+            return _state.Queue[_state.CurrentQueueIndex];
+        }
+        return null;
+    }
+
+    public string? GetPreviousVideoId()
+    {
+        if (_state.Queue.Count == 0) return null;
+        if (_state.CurrentQueueIndex > 0)
+        {
+            _state.CurrentQueueIndex--;
+            return _state.Queue[_state.CurrentQueueIndex];
+        }
+        return null;
+    }
+
+    public bool HasNext => _state.Queue.Count > 0 && _state.CurrentQueueIndex < _state.Queue.Count - 1;
+    public bool HasPrevious => _state.Queue.Count > 0 && _state.CurrentQueueIndex > 0;
 }

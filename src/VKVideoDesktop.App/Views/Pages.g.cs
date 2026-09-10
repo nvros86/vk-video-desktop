@@ -75,6 +75,12 @@ public sealed partial class SettingsPage
 
 public sealed partial class LoginPage
 {
+    internal TextBlock Step1Text = null!;
+    internal Button LoginButton = null!;
+    internal TextBlock Step2Text = null!;
+    internal TextBox TokenInput = null!;
+    internal Button SubmitTokenButton = null!;
     internal TextBlock ErrorText = null!;
+    internal TextBlock LoadingText = null!;
     internal void InitializeComponent() { }
 }
