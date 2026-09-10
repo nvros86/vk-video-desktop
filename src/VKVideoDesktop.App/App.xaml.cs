@@ -206,40 +206,43 @@ public partial class App : Microsoft.UI.Xaml.Application
         {
             DebugLog("StartupAsync - starting host...");
             await _host.StartAsync();
-            DebugLog("StartupAsync - host started, loading settings...");
+            DebugLog("StartupAsync - host started");
 
-            ISettingsService settingsService;
+            DebugLog("StartupAsync - loading settings...");
             try
             {
-                settingsService = Services.GetRequiredService<ISettingsService>();
-                DebugLog("StartupAsync - ISettingsService resolved");
-            }
-            catch (Exception ex)
-            {
-                DebugLog($"StartupAsync - FAILED to resolve ISettingsService: {ex}");
-                return;
-            }
-
-            try
-            {
+                var settingsService = Services.GetRequiredService<ISettingsService>();
+                DebugLog("StartupAsync - ISettingsService resolved, calling LoadAsync...");
+                await Task.Delay(100);
                 await settingsService.LoadAsync();
-                DebugLog("StartupAsync - settings loaded, creating window...");
+                DebugLog("StartupAsync - settings loaded OK");
             }
             catch (Exception ex)
             {
-                DebugLog($"StartupAsync - FAILED to load settings: {ex}");
-                return;
+                DebugLog($"StartupAsync - settings FAILED (non-fatal): {ex.GetType().Name}: {ex.Message}");
             }
 
+            DebugLog("StartupAsync - creating window...");
             _mainWindow = Services.GetRequiredService<MainWindow>();
             DebugLog("StartupAsync - MainWindow resolved, activating...");
             _mainWindow.Activate();
-            DebugLog($"StartupAsync - MainWindow activated, Handle={_mainWindow.AppWindow?.Id}");
+            DebugLog("StartupAsync - MainWindow activated");
             _mainWindow.Closed += OnMainWindowClosed;
 
             DebugLog("StartupAsync - initializing tray icon...");
             InitializeTrayIcon();
-            DebugLog("StartupAsync - tray icon initialized, done!");
+            DebugLog("StartupAsync - done!");
+
+            DebugLog("StartupAsync - creating window...");
+            _mainWindow = Services.GetRequiredService<MainWindow>();
+            DebugLog("StartupAsync - MainWindow resolved, activating...");
+            _mainWindow.Activate();
+            DebugLog("StartupAsync - MainWindow activated");
+            _mainWindow.Closed += OnMainWindowClosed;
+
+            DebugLog("StartupAsync - initializing tray icon...");
+            InitializeTrayIcon();
+            DebugLog("StartupAsync - done!");
 
             if (arguments?.StartsWith("vkvideo://") == true || arguments?.StartsWith("vkvideo:") == true)
             {
