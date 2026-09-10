@@ -166,11 +166,14 @@ public class InstallerForm : Form
 
         _statusLabel = new Label
         {
-            Font = new Font("Segoe UI", 9f),
+            Font = new Font("Segoe UI", 8.5f),
             ForeColor = SubtextColor,
-            AutoSize = true,
-            Location = new Point(240, 442),
-            Visible = false
+            AutoSize = false,
+            Size = new Size(440, 30),
+            Location = new Point(240, 440),
+            Visible = false,
+            TextAlign = ContentAlignment.MiddleLeft,
+            AutoEllipsis = true
         };
         Controls.Add(_statusLabel);
 
@@ -483,7 +486,12 @@ SOFTWARE."
     private void DoInstall(CancellationToken ct)
     {
         SetProgress("Проверка Windows App Runtime...", 3);
-        EnsureWindowsAppRuntimeInstalled(ct);
+        var winrtOk = EnsureWindowsAppRuntimeInstalled(ct);
+        if (!winrtOk)
+        {
+            SetProgress("Windows App Runtime не установлен (приложение может потребовать его позже)...", 8);
+            Thread.Sleep(1500);
+        }
 
         SetProgress("Извлечение файлов...", 10);
         Directory.CreateDirectory(_installPath);
@@ -547,11 +555,30 @@ SOFTWARE."
             var runtimeDll = Path.Combine(systemDir, "Microsoft.WindowsAppRuntime.dll");
             if (File.Exists(runtimeDll)) return true;
 
+            var systemDirX86 = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            if (!string.IsNullOrEmpty(systemDirX86))
+            {
+                var runtimeDllX86 = Path.Combine(systemDirX86, "Microsoft.WindowsAppRuntime.dll");
+                if (File.Exists(runtimeDllX86)) return true;
+            }
+
+            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var dynamicDir = Path.Combine(localAppData, "Microsoft", "WindowsAppRuntime");
+            if (Directory.Exists(dynamicDir)) return true;
+
             using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
                 @"SOFTWARE\Microsoft\Windows App Runtime");
             if (key != null)
             {
                 var version = key.GetValue("Version")?.ToString();
+                if (!string.IsNullOrEmpty(version)) return true;
+            }
+
+            using var keyWow = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+                @"SOFTWARE\WOW6432Node\Microsoft\Windows App Runtime");
+            if (keyWow != null)
+            {
+                var version = keyWow.GetValue("Version")?.ToString();
                 if (!string.IsNullOrEmpty(version)) return true;
             }
 
@@ -563,40 +590,47 @@ SOFTWARE."
         }
     }
 
-    private void EnsureWindowsAppRuntimeInstalled(CancellationToken ct)
+    private bool EnsureWindowsAppRuntimeInstalled(CancellationToken ct)
     {
-        if (IsWindowsAppRuntimeInstalled()) return;
+        if (IsWindowsAppRuntimeInstalled()) return true;
 
-        var tempFile = Path.Combine(Path.GetTempPath(), $"VKSetup_WinRT_{Guid.NewGuid():N}.exe");
+        var tempFile = Path.Combine(Path.GetTempPath(), $"VKSetup_WinRT_{Guid.NewGuid():N}.msixinstaller");
         try
         {
             SetProgress("Скачивание Windows App Runtime...", 5);
             using (var client = new System.Net.Http.HttpClient())
             {
                 client.Timeout = TimeSpan.FromMinutes(5);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("VKVideoDesktop/1.0");
                 var data = client.GetByteArrayAsync(
                     "https://aka.ms/windowsappruntimeinstall-x64", ct).GetAwaiter().GetResult();
                 File.WriteAllBytes(tempFile, data);
             }
 
-            SetProgress("Установка Windows App Runtime...", 8);
-            var psi = new ProcessStartInfo(tempFile, "--quiet --accept-license")
+            SetProgress("Установка Windows App Runtime... (может потребовать подтверждение)", 8);
+            var psi = new ProcessStartInfo(tempFile, "--quiet --accept-license --force")
             {
-                UseShellExecute = true
+                UseShellExecute = true,
+                Verb = "runas"
             };
             using var proc = Process.Start(psi)!;
             proc.WaitForExit(300_000);
+            var exitCode = proc.ExitCode;
 
-            if (!IsWindowsAppRuntimeInstalled())
-                throw new Exception("Не удалось установить Windows App Runtime.");
+            if (exitCode == 0 || exitCode == 0x80070005)
+            {
+                if (IsWindowsAppRuntimeInstalled()) return true;
+            }
+
+            return IsWindowsAppRuntimeInstalled();
         }
         catch (OperationCanceledException)
         {
             throw;
         }
-        catch (Exception ex)
+        catch
         {
-            throw new Exception($"Ошибка установки Windows App Runtime: {ex.Message}", ex);
+            return false;
         }
         finally
         {
