@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace VKVideoDesktop.App;
 
@@ -19,8 +20,17 @@ static class Program
         try
         {
             WriteDebugLog("Calling InitializeComWrappers...");
-            WinRT.ComWrappersSupport.InitializeComWrappers();
-            WriteDebugLog("InitializeComWrappers done, starting Application...");
+            try
+            {
+                WinRT.ComWrappersSupport.InitializeComWrappers();
+                WriteDebugLog("InitializeComWrappers done");
+            }
+            catch (Exception ex)
+            {
+                WriteDebugLog($"InitializeComWrappers FAILED (continuing): {ex.GetType().Name}: {ex.Message}");
+            }
+            WriteDebugLog("starting Application...");
+
             Microsoft.UI.Xaml.Application.Start((p) =>
             {
                 WriteDebugLog("Application.Start callback");
@@ -30,20 +40,84 @@ static class Program
 
                 WriteDebugLog("Creating App and building DI...");
                 var app = new App();
-                WriteDebugLog("DI ready, creating MainWindow synchronously...");
+                WriteDebugLog("DI ready, creating window synchronously...");
 
-                WriteDebugLog("Step 1: new MainWindow()...");
-                var window = new MainWindow();
-                WriteDebugLog("Step 2: MainWindow created, calling SetupUI...");
-                window.SetupUI();
-                WriteDebugLog("Step 3: SetupUI done, setting Title...");
-                window.Title = "VK Video Desktop";
-                WriteDebugLog("Step 4: Title set, activating...");
-                window.Activate();
-                WriteDebugLog("Step 5: MainWindow activated!");
+                MainWindow? window = null;
+                bool windowOk = false;
+
+                try
+                {
+                    WriteDebugLog("Step 1: new MainWindow()...");
+                    window = new MainWindow();
+                    WriteDebugLog("Step 1 OK");
+                }
+                catch (Exception ex)
+                {
+                    WriteDebugLog($"Step 1 FAILED (managed): {ex.GetType().Name}: {ex.Message}");
+                }
+
+                if (window == null)
+                {
+                    WriteDebugLog("MainWindow failed, trying plain Window...");
+                    try
+                    {
+                        window = new MainWindow();
+                        WriteDebugLog("Second MainWindow attempt OK");
+                    }
+                    catch
+                    {
+                        WriteDebugLog("Both MainWindow attempts failed, creating plain Window");
+                    }
+                }
+
+                if (window != null)
+                {
+                    try
+                    {
+                        WriteDebugLog("Step 2: SetupUI...");
+                        window.SetupUI();
+                        WriteDebugLog("Step 2 OK");
+
+                        WriteDebugLog("Step 3: Title...");
+                        window.Title = "VK Video Desktop";
+                        WriteDebugLog("Step 3 OK");
+
+                        WriteDebugLog("Step 4: Activate...");
+                        window.Activate();
+                        WriteDebugLog("Step 4 OK - MainWindow activated!");
+                        windowOk = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteDebugLog($"Setup/Activate FAILED: {ex.GetType().Name}: {ex.Message}");
+                    }
+                }
+
+                if (!windowOk)
+                {
+                    WriteDebugLog("All window attempts failed. Creating minimal Window...");
+                    try
+                    {
+                        var w = new Microsoft.UI.Xaml.Window();
+                        w.Title = "VK Video Desktop";
+                        w.Content = new TextBlock
+                        {
+                            Text = "VK Video Desktop is loading...\nIf you see this, MainWindow creation failed.",
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        w.Activate();
+                        WriteDebugLog("Minimal Window activated!");
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteDebugLog($"Minimal Window FAILED: {ex.GetType().Name}: {ex.Message}");
+                    }
+                }
 
                 WriteDebugLog("Starting async host + settings...");
-                _ = app.StartupAsync(window);
+                if (window != null)
+                    _ = app.StartupAsync(window);
                 WriteDebugLog("Application.Start callback done");
             });
         }
