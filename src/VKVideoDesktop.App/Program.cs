@@ -17,28 +17,6 @@ static class Program
     {
         try
         {
-            if (!IsWindowsAppRuntimeAvailable())
-            {
-                WriteStartupCrashLog(new DllNotFoundException(
-                    "Windows App Runtime не установлен. Установите его: https://aka.ms/windowsappsdk/1.7/1.7.260224002/windowsappruntimeinstall-x64.exe"));
-
-                MessageBox(IntPtr.Zero,
-                    "Windows App Runtime не установлен.\n\n" +
-                    "VK Video Desktop требует Windows App Runtime 1.7.\n\n" +
-                    "Нажмите OK для открытия страницы загрузки.",
-                    "VK Video Desktop — ошибка запуска",
-                    0x00000010);
-
-                try
-                {
-                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
-                        "https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads-archive")
-                    { UseShellExecute = true });
-                }
-                catch { }
-                return;
-            }
-
             WinRT.ComWrappersSupport.InitializeComWrappers();
             Microsoft.UI.Xaml.Application.Start((p) =>
             {
@@ -51,43 +29,34 @@ static class Program
         catch (Exception ex)
         {
             WriteStartupCrashLog(ex);
-            throw;
-        }
-    }
 
-    private static bool IsWindowsAppRuntimeAvailable()
-    {
-        try
-        {
-            var systemDir = Environment.GetFolderPath(Environment.SpecialFolder.System);
-            var runtimeDll = Path.Combine(systemDir, "Microsoft.WindowsAppRuntime.dll");
-            if (File.Exists(runtimeDll)) return true;
+            var isRuntimeMissing = ex is DllNotFoundException
+                || (ex.InnerException is DllNotFoundException)
+                || ex.Message.Contains("WindowsAppRuntime", StringComparison.OrdinalIgnoreCase)
+                || ex.Message.Contains("WinRT", StringComparison.OrdinalIgnoreCase)
+                || ex.Message.Contains("Windows App Runtime", StringComparison.OrdinalIgnoreCase);
 
-            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var dynamicDir = Path.Combine(localAppData, "Microsoft", "WindowsAppRuntime");
-            if (Directory.Exists(dynamicDir)) return true;
-
-            using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\Microsoft\Windows App Runtime");
-            if (key != null)
+            if (isRuntimeMissing)
             {
-                var version = key.GetValue("Version")?.ToString();
-                if (!string.IsNullOrEmpty(version)) return true;
-            }
+                MessageBox(IntPtr.Zero,
+                    "Windows App Runtime не установлен или повреждён.\n\n" +
+                    "VK Video Desktop требует Windows App Runtime 1.7.\n\n" +
+                    "Нажмите OK для открытия страницы загрузки.",
+                    "VK Video Desktop — ошибка запуска",
+                    0x00000010);
 
-            using var keyWow = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\WOW6432Node\Microsoft\Windows App Runtime");
-            if (keyWow != null)
+                try
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                        "https://aka.ms/windowsappsdk/1.7/1.7.260224002/windowsappruntimeinstall-x64.exe")
+                    { UseShellExecute = true });
+                }
+                catch { }
+            }
+            else
             {
-                var version = keyWow.GetValue("Version")?.ToString();
-                if (!string.IsNullOrEmpty(version)) return true;
+                throw;
             }
-
-            return false;
-        }
-        catch
-        {
-            return false;
         }
     }
 
@@ -116,6 +85,12 @@ static class Program
                 sb.AppendLine();
                 sb.AppendLine($"Внутреннее: {ex.InnerException.GetType().FullName}");
                 sb.AppendLine($"Сообщение: {ex.InnerException.Message}");
+                if (ex.InnerException.InnerException != null)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine($"Внутреннее (2): {ex.InnerException.InnerException.GetType().FullName}");
+                    sb.AppendLine($"Сообщение: {ex.InnerException.InnerException.Message}");
+                }
             }
             sb.AppendLine();
             sb.AppendLine($"Стек:");

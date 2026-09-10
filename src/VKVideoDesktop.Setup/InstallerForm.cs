@@ -627,6 +627,40 @@ SOFTWARE."
                 if (!string.IsNullOrEmpty(version)) return true;
             }
 
+            var windowsApps = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                "WindowsApps");
+            if (Directory.Exists(windowsApps))
+            {
+                try
+                {
+                    foreach (var dir in Directory.GetDirectories(windowsApps, "Microsoft.WindowsAppRuntime*"))
+                        return true;
+                    foreach (var dir in Directory.GetDirectories(windowsApps, "Microsoft.WindowsAppRuntime.1*"))
+                        return true;
+                }
+                catch { }
+            }
+
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo("powershell",
+                    "-NoProfile -NonInteractive -Command \"Get-AppxPackage -Name '*WindowsAppRuntime*' | Select-Object -First 1 -ExpandProperty Version\"")
+                {
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
+                using var proc = System.Diagnostics.Process.Start(psi);
+                if (proc != null)
+                {
+                    var output = proc.StandardOutput.ReadToEnd().Trim();
+                    proc.WaitForExit(10000);
+                    if (!string.IsNullOrEmpty(output)) return true;
+                }
+            }
+            catch { }
+
             return false;
         }
         catch
