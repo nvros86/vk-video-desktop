@@ -212,14 +212,34 @@ public partial class App : Microsoft.UI.Xaml.Application
             try
             {
                 var settingsService = Services.GetRequiredService<ISettingsService>();
-                DebugLog("StartupAsync - ISettingsService resolved, calling LoadAsync...");
-                await Task.Delay(100);
-                await settingsService.LoadAsync();
-                DebugLog("StartupAsync - settings loaded OK");
+
+                var settingsPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "VKVideoDesktop", "settings.json");
+
+                if (File.Exists(settingsPath))
+                {
+                    var json = File.ReadAllText(settingsPath);
+                    if (json.Contains("AccessToken"))
+                    {
+                        DebugLog("StartupAsync - settings has DPAPI token, deleting file to avoid native crash");
+                        try { File.Delete(settingsPath); } catch { }
+                        DebugLog("StartupAsync - settings.json deleted, fresh start");
+                    }
+                    else
+                    {
+                        await settingsService.LoadAsync();
+                        DebugLog("StartupAsync - settings loaded OK");
+                    }
+                }
+                else
+                {
+                    DebugLog("StartupAsync - no settings file");
+                }
             }
             catch (Exception ex)
             {
-                DebugLog($"StartupAsync - settings FAILED (non-fatal): {ex.GetType().Name}: {ex.Message}");
+                DebugLog($"StartupAsync - settings (non-fatal): {ex.GetType().Name}: {ex.Message}");
             }
 
             DebugLog("StartupAsync - creating window...");
