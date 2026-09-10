@@ -82,10 +82,22 @@
                                     Visibility="{x:Bind IsPaused}" />
                             <Button Content="✕" Click="OnCancelClick"
                                     Tag="{x:Bind DownloadId}" />
+                            <Button Content="⋯" Click="OnMoreClick"
+                                    Tag="{x:Bind}" />
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
     </Grid>
+
+    <Page.Resources>
+        <MenuFlyout x:Name="DownloadItemMenuFlyout">
+            <MenuFlyoutItem Content="Открыть файл" Click="OnOpenFileClick" />
+            <MenuFlyoutItem Content="Открыть папку" Click="OnOpenFolderClick" />
+            <MenuFlyoutItem Content="Копировать путь" Click="OnCopyPathClick" />
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Content="Удалить запись" Click="OnDeleteRecordClick" Foreground="Red" />
+        </MenuFlyout>
+    </Page.Resources>
 </Page>

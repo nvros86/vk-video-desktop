@@ -2,12 +2,14 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using VKVideoDesktop.App.ViewModels;
 using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Data.Database;
 using VKVideoDesktop.Infrastructure.Cache;
+using Serilog;
 using VKVideoDesktop.Infrastructure.Download;
 using VKVideoDesktop.Infrastructure.VkApi;
 
@@ -121,7 +123,17 @@ public partial class App : Microsoft.UI.Xaml.Application
             .ConfigureServices((context, services) =>
             {
                 services.AddHttpClient();
-                services.AddLogging();
+                var logPath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "VKVideoDesktop", "Logs", "log-.txt");
+
+                services.AddLogging(builder =>
+                {
+                    builder.AddSerilog(new LoggerConfiguration()
+                        .MinimumLevel.Information()
+                        .WriteTo.File(logPath, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
+                        .CreateLogger());
+                });
 
                 services.AddSingleton(new LocalizationService(resourcesPath));
 
@@ -131,6 +143,7 @@ public partial class App : Microsoft.UI.Xaml.Application
                 services.AddSingleton<IDownloadEngine, DownloadEngine>();
                 services.AddSingleton<IDownloadRepository, DownloadDatabase>();
                 services.AddSingleton<IDownloadSourceResolver, VkVideoSourceResolver>();
+                services.AddSingleton<IVideoDownloadProvider, VkVideoDownloadProvider>();
                 services.AddSingleton<IDownloadManager, DownloadManager>();
                 services.AddSingleton<IThumbnailCache, ThumbnailCache>();
                 services.AddSingleton<IHistoryService, HistoryDatabase>();

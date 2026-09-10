@@ -73,6 +73,15 @@ public sealed partial class SettingsPage
     internal ToggleSwitch AutoResumeToggle = null!;
     internal ToggleSwitch DeletePartToggle = null!;
     internal ComboBox QualityBehaviorCombo = null!;
+    internal Slider VolumeSlider = null!;
+    internal ComboBox SpeedComboBox = null!;
+    internal CheckBox UseProxyCheckBox = null!;
+    internal TextBox ProxyAddressTextBox = null!;
+    internal void InitializeComponent() { }
+}
+
+public sealed partial class ProfilePage
+{
     internal void InitializeComponent() { }
 }
 

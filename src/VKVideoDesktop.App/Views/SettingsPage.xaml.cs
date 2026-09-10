@@ -44,6 +44,18 @@ public sealed partial class SettingsPage : Page
             _ => 4
         };
         AutoplayToggle.IsOn = s.Autoplay;
+        VolumeSlider.Value = s.DefaultVolume * 100;
+        var speedIndex = s.DefaultPlaybackSpeed switch
+        {
+            0.5 => 0,
+            0.75 => 1,
+            1.0 => 2,
+            1.25 => 3,
+            1.5 => 4,
+            2.0 => 5,
+            _ => 2
+        };
+        SpeedComboBox.SelectedIndex = speedIndex;
         DownloadFolderText.Text = s.DownloadFolder;
         MaxDownloadsCombo.SelectedIndex = s.MaxConcurrentDownloads - 1;
         SpeedLimitCombo.SelectedIndex = s.SpeedLimit switch
@@ -60,6 +72,8 @@ public sealed partial class SettingsPage : Page
         AutoResumeToggle.IsOn = s.AutoResumeAfterStartup;
         DeletePartToggle.IsOn = s.DeletePartOnCancel;
         QualityBehaviorCombo.SelectedIndex = (int)s.DownloadQualityBehavior;
+        UseProxyCheckBox.IsChecked = s.UseProxy;
+        ProxyAddressTextBox.Text = s.ProxyAddress;
     }
 
     private async void OnSettingChanged(object sender, RoutedEventArgs e)
@@ -84,6 +98,40 @@ public sealed partial class SettingsPage : Page
     {
         if (_isLoading) return;
         await SaveSettings();
+    }
+
+    private async void OnVolumeChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+    {
+        if (_isLoading) return;
+        _settingsService.Settings.DefaultVolume = e.NewValue / 100.0;
+        await _settingsService.SaveAsync();
+    }
+
+    private async void OnSpeedChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isLoading) return;
+        if (SpeedComboBox.SelectedItem is ComboBoxItem item && item.Tag is string tag)
+        {
+            if (double.TryParse(tag, System.Globalization.CultureInfo.InvariantCulture, out var speed))
+            {
+                _settingsService.Settings.DefaultPlaybackSpeed = speed;
+                await _settingsService.SaveAsync();
+            }
+        }
+    }
+
+    private async void OnProxyChanged(object sender, RoutedEventArgs e)
+    {
+        if (_isLoading) return;
+        _settingsService.Settings.UseProxy = UseProxyCheckBox.IsChecked == true;
+        await _settingsService.SaveAsync();
+    }
+
+    private async void OnProxyAddressChanged(object sender, RoutedEventArgs e)
+    {
+        if (_isLoading) return;
+        _settingsService.Settings.ProxyAddress = ProxyAddressTextBox.Text;
+        await _settingsService.SaveAsync();
     }
 
     private async Task SaveSettings()

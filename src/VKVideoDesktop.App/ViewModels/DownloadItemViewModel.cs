@@ -8,6 +8,7 @@ public sealed class DownloadItemViewModel : ViewModelBase
     private string _downloadId = string.Empty;
     private string _title = string.Empty;
     private string _thumbnailUrl = string.Empty;
+    private string _destinationPath = string.Empty;
     private string _statusText = string.Empty;
     private string _progressText = string.Empty;
     private string _speedText = string.Empty;
@@ -18,6 +19,7 @@ public sealed class DownloadItemViewModel : ViewModelBase
     public string DownloadId { get => _downloadId; set => SetProperty(ref _downloadId, value); }
     public string Title { get => _title; set => SetProperty(ref _title, value); }
     public string ThumbnailUrl { get => _thumbnailUrl; set => SetProperty(ref _thumbnailUrl, value); }
+    public string DestinationPath { get => _destinationPath; set => SetProperty(ref _destinationPath, value); }
     public string StatusText { get => _statusText; set => SetProperty(ref _statusText, value); }
     public string ProgressText { get => _progressText; set => SetProperty(ref _progressText, value); }
     public string SpeedText { get => _speedText; set => SetProperty(ref _speedText, value); }
@@ -33,6 +35,7 @@ public sealed class DownloadItemViewModel : ViewModelBase
         DownloadId = task.Id;
         Title = task.Title;
         ThumbnailUrl = task.ThumbnailUrl;
+        DestinationPath = task.DestinationPath;
         Status = task.Status;
         StatusText = GetStatusText(task.Status);
         Progress = task.Progress;

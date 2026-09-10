@@ -7,15 +7,20 @@ using VKVideoDesktop.App.ViewModels;
 using VKVideoDesktop.App.Views;
 using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Interfaces;
+using Microsoft.UI.Windowing;
+using Windows.System;
 
 namespace VKVideoDesktop.App;
 
 public sealed partial class MainWindow : Window
 {
+    public static MainWindow? Instance { get; private set; }
+
     private bool _isDownloadsPanelOpen;
     private MiniPlayerWindow? _miniPlayerWindow;
     private readonly IAuthenticationService _authService;
     private readonly PlaybackService _playbackService;
+    private OverlappedPresenter? _savedPresenter;
 
     private readonly Dictionary<string, Type> _pageMap = new()
     {
@@ -24,11 +29,13 @@ public sealed partial class MainWindow : Window
         ["Favorites"] = typeof(FavoritesPage),
         ["Playlists"] = typeof(PlaylistsPage),
         ["History"] = typeof(HistoryPage),
-        ["Downloads"] = typeof(DownloadsPage)
+        ["Downloads"] = typeof(DownloadsPage),
+        ["Profile"] = typeof(ProfilePage)
     };
 
     public MainWindow()
     {
+        Instance = this;
         InitializeComponent();
         Title = "VK Video Desktop";
         _authService = App.GetService<IAuthenticationService>();
@@ -54,40 +61,74 @@ public sealed partial class MainWindow : Window
 
     private void OnGlobalKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        switch (e.Key)
+        var ctrl = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
+        var shift = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift);
+        bool isCtrlPressed = ctrl.HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
+        bool isShiftPressed = shift.HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
+
+        if (isCtrlPressed && e.Key == VirtualKey.K)
         {
-            case Windows.System.VirtualKey.Space:
-                if (ContentFrame.CurrentSourcePageType == typeof(VideoPage))
-                {
-                    _playbackService.TogglePlayPause();
+            SearchBox?.Focus(FocusState.Programmatic);
+            e.Handled = true;
+            return;
+        }
+
+        if (ContentFrame.Content is VideoPage videoPage)
+        {
+            switch (e.Key)
+            {
+                case VirtualKey.Space:
+                case VirtualKey.K:
+                    videoPage.TogglePlayPause();
                     e.Handled = true;
-                }
-                break;
-            case Windows.System.VirtualKey.K:
-                if (ContentFrame.CurrentSourcePageType == typeof(VideoPage))
-                {
-                    _playbackService.TogglePlayPause();
+                    break;
+
+                case VirtualKey.F:
+                    videoPage.ToggleFullscreen();
                     e.Handled = true;
-                }
-                break;
-            case Windows.System.VirtualKey.F:
-                if (ContentFrame.CurrentSourcePageType == typeof(VideoPage))
-                {
-                    NavigateToVideoPage();
+                    break;
+
+                case VirtualKey.M:
+                    videoPage.ToggleMute();
                     e.Handled = true;
-                }
-                break;
-            case Windows.System.VirtualKey.M:
-                if (ContentFrame.CurrentSourcePageType == typeof(VideoPage))
-                {
-                    var vol = _playbackService.State.IsMuted ? 1.0 : 0.0;
-                    _playbackService.SetVolume(vol);
+                    break;
+
+                case VirtualKey.Left:
+                    videoPage.SeekRelative(isShiftPressed ? -10000 : -5000);
                     e.Handled = true;
-                }
-                break;
-            case Windows.System.VirtualKey.Escape:
-                SearchBox.Text = string.Empty;
-                break;
+                    break;
+
+                case VirtualKey.Right:
+                    videoPage.SeekRelative(isShiftPressed ? 10000 : 5000);
+                    e.Handled = true;
+                    break;
+
+                case VirtualKey.Up:
+                    videoPage.AdjustVolume(5);
+                    e.Handled = true;
+                    break;
+
+                case VirtualKey.Down:
+                    videoPage.AdjustVolume(-5);
+                    e.Handled = true;
+                    break;
+
+                case VirtualKey.Escape:
+                    if (videoPage.IsFullscreen)
+                    {
+                        videoPage.ToggleFullscreen();
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            if (e.Key == VirtualKey.Escape)
+            {
+                SearchBox.Text = "";
+                e.Handled = true;
+            }
         }
     }
 
@@ -142,6 +183,8 @@ public sealed partial class MainWindow : Window
             NavView.SelectedItem = NavView.MenuItems[4];
         else if (e.SourcePageType == typeof(DownloadsPage))
             NavView.SelectedItem = NavView.MenuItems[5];
+        else if (e.SourcePageType == typeof(ProfilePage))
+            NavView.SelectedItem = NavView.MenuItems[6];
     }
 
     private void OnSearchBoxKeyDown(object sender, KeyRoutedEventArgs e)
@@ -221,6 +264,35 @@ public sealed partial class MainWindow : Window
         else
         {
             _miniPlayerWindow.Activate();
+        }
+    }
+
+    public void GoToFullscreen()
+    {
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+        var presenter = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId).Presenter
+            as Microsoft.UI.Windowing.OverlappedPresenter;
+
+        if (presenter != null)
+        {
+            presenter.IsAlwaysOnTop = false;
+            presenter.SetBorderAndTitleBar(false, false);
+            presenter.Maximize();
+        }
+    }
+
+    public void RestoreFromFullscreen()
+    {
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+        var presenter = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId).Presenter
+            as Microsoft.UI.Windowing.OverlappedPresenter;
+
+        if (presenter != null)
+        {
+            presenter.SetBorderAndTitleBar(true, true);
+            presenter.Restore();
         }
     }
 

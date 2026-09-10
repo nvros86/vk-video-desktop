@@ -13,7 +13,6 @@ public sealed partial class VideoPage : Page
     public VideoViewModel ViewModel { get; }
     private readonly PlaybackService _playbackService;
     private Windows.Media.Playback.MediaPlayer? _mediaPlayer;
-    private bool _isFullscreen;
     private bool _isPip;
     private Dictionary<string, string> _availableQualities = new();
     private string _currentQualityKey = "720";
@@ -27,6 +26,61 @@ public sealed partial class VideoPage : Page
         ViewModel = App.GetService<VideoViewModel>();
         _playbackService = App.GetService<PlaybackService>();
         _playbackService.PlaybackCompleted += OnPlaybackCompleted;
+    }
+
+    public bool IsFullscreen { get; private set; } = false;
+
+    public void TogglePlayPause()
+    {
+        if (MediaPlayerElement == null) return;
+
+        var player = MediaPlayerElement.MediaPlayer;
+        if (player == null) return;
+
+        if (player.PlaybackSession.PlaybackState == Windows.Media.Playback.MediaPlaybackState.Playing)
+            player.Pause();
+        else
+            player.Play();
+    }
+
+    public void ToggleFullscreen()
+    {
+        if (MainWindow.Instance == null) return;
+
+        if (IsFullscreen)
+        {
+            MainWindow.Instance.RestoreFromFullscreen();
+            IsFullscreen = false;
+        }
+        else
+        {
+            MainWindow.Instance.GoToFullscreen();
+            IsFullscreen = true;
+        }
+    }
+
+    public void ToggleMute()
+    {
+        if (MediaPlayerElement?.MediaPlayer == null) return;
+        MediaPlayerElement.MediaPlayer.IsMuted = !MediaPlayerElement.MediaPlayer.IsMuted;
+    }
+
+    public void SeekRelative(int milliseconds)
+    {
+        if (MediaPlayerElement?.MediaPlayer?.PlaybackSession == null) return;
+        var session = MediaPlayerElement.MediaPlayer.PlaybackSession;
+        var newPos = session.Position + TimeSpan.FromMilliseconds(milliseconds);
+        if (newPos < TimeSpan.Zero) newPos = TimeSpan.Zero;
+        if (newPos > session.NaturalDuration) newPos = session.NaturalDuration;
+        session.Position = newPos;
+    }
+
+    public void AdjustVolume(int delta)
+    {
+        if (MediaPlayerElement?.MediaPlayer == null) return;
+        var current = MediaPlayerElement.MediaPlayer.Volume;
+        var newVol = Math.Clamp(current + delta / 100.0, 0.0, 1.0);
+        MediaPlayerElement.MediaPlayer.Volume = newVol;
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -342,26 +396,7 @@ public sealed partial class VideoPage : Page
 
     private void OnFullscreenClick(object sender, RoutedEventArgs e)
     {
-        var window = App.GetService<MainWindow>();
-        _isFullscreen = !_isFullscreen;
-
-        if (_isFullscreen)
-        {
-            window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = false;
-            window.SystemBackdrop = null;
-            var presenter = Microsoft.UI.Windowing.OverlappedPresenter.Create();
-            presenter.IsAlwaysOnTop = false;
-            presenter.IsMaximizable = true;
-            presenter.IsMinimizable = true;
-            presenter.IsResizable = true;
-            window.AppWindow.SetPresenter(presenter);
-        }
-        else
-        {
-            window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = false;
-            window.SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
-            window.AppWindow.SetPresenter(Microsoft.UI.Windowing.OverlappedPresenter.Create());
-        }
+        ToggleFullscreen();
     }
 
     private async void OnFavoriteClick(object sender, RoutedEventArgs e)

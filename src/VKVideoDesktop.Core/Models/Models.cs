@@ -108,6 +108,8 @@ public sealed class UserSettings
     public bool DeletePartOnCancel { get; set; } = true;
     public bool AskFolderBeforeDownload { get; set; }
     public DownloadQualityBehavior DownloadQualityBehavior { get; set; } = DownloadQualityBehavior.Ask;
+    public bool UseProxy { get; set; }
+    public string ProxyAddress { get; set; } = string.Empty;
     public bool IsAuthorized { get; set; }
     public string? AccessToken { get; set; }
     public UserSettings()

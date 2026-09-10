@@ -69,6 +69,13 @@ public sealed class DownloadsViewModel : ViewModelBase
         if (item != null) Downloads.Remove(item);
     }
 
+    public async Task RemoveDownloadAsync(string downloadId)
+    {
+        var item = Downloads.FirstOrDefault(d => d.DownloadId == downloadId);
+        if (item != null) Downloads.Remove(item);
+        await Task.CompletedTask;
+    }
+
     public async Task ClearCompletedAsync()
     {
         var completed = Downloads.Where(d => d.Status == DownloadStatus.Completed).ToList();

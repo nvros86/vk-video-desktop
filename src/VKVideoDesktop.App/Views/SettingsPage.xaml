@@ -55,6 +55,26 @@
                     <ToggleSwitch x:Name="NotificationsToggle" IsOn="True"
                                   Toggled="OnSettingChanged_Toggle" />
                 </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Громкость по умолчанию" VerticalAlignment="Center" />
+                    <Slider x:Name="VolumeSlider" Minimum="0" Maximum="100" Width="200"
+                            ValueChanged="OnVolumeChanged" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
+                            JustifyContent="SpaceBetween">
+                    <TextBlock Text="Скорость воспроизведения" VerticalAlignment="Center" />
+                    <ComboBox x:Name="SpeedComboBox" Width="200" SelectionChanged="OnSpeedChanged">
+                        <ComboBoxItem Content="0.5x" Tag="0.5" />
+                        <ComboBoxItem Content="0.75x" Tag="0.75" />
+                        <ComboBoxItem Content="1x" Tag="1" />
+                        <ComboBoxItem Content="1.25x" Tag="1.25" />
+                        <ComboBoxItem Content="1.5x" Tag="1.5" />
+                        <ComboBoxItem Content="2x" Tag="2" />
+                    </ComboBox>
+                </StackPanel>
             </StackPanel>
 
             <Divider />
@@ -166,6 +186,12 @@
                         <ComboBoxItem Content="Использовать максимальное качество" />
                     </ComboBox>
                 </StackPanel>
+
+                <TextBlock Text="Сетевые настройки" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,8" />
+                <CheckBox x:Name="UseProxyCheckBox" Content="Использовать прокси"
+                          Checked="OnProxyChanged" Unchecked="OnProxyChanged" />
+                <TextBox x:Name="ProxyAddressTextBox" Header="Адрес прокси" Width="300" Margin="0,8,0,0"
+                         PlaceholderText="http://proxy:port" LostFocus="OnProxyAddressChanged" />
             </StackPanel>
 
             <Divider />

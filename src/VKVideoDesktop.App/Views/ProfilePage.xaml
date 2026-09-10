@@ -1,0 +1,36 @@
+<Page
+    x:Class="VKVideoDesktop.App.Views.ProfilePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="Transparent">
+
+    <Grid Padding="24" MaxWidth="800" HorizontalAlignment="Center">
+        <StackPanel Spacing="16">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <Ellipse Width="80" Height="80" Fill="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                    <Ellipse.BitmapImage>
+                        <BitmapImage UriSource="{x:Bind ViewModel.AvatarUrl, Mode=OneWay}" />
+                    </Ellipse.BitmapImage>
+                </Ellipse>
+                <StackPanel VerticalAlignment="Center" Spacing="4">
+                    <TextBlock Text="{x:Bind ViewModel.UserName, Mode=OneWay}" FontSize="24" FontWeight="Bold" />
+                    <TextBlock Text="{x:Bind ViewModel.UserDomain, Mode=OneWay}" FontSize="14" Opacity="0.6" />
+                </StackPanel>
+            </StackPanel>
+
+            <NavigationView x:Name="ProfileNav" SelectionChanged="OnProfileNavSelectionChanged">
+                <NavigationView.MenuItems>
+                    <NavigationViewItem Content="Мои видео" Tag="MyVideos" />
+                    <NavigationViewItem Content="Избранное" Tag="Favorites" />
+                    <NavigationViewItem Content="Плейлисты" Tag="Playlists" />
+                    <NavigationViewItem Content="История" Tag="History" />
+                    <NavigationViewItem Content="Настройки" Tag="Settings" />
+                </NavigationView.MenuItems>
+            </NavigationView>
+
+            <Button Content="Выйти" Click="OnLogoutClick" HorizontalAlignment="Left"
+                    Background="{ThemeResource SystemControlBackgroundAccentBrush}" Foreground="White"
+                    Padding="24,8" Margin="0,16,0,0" />
+        </StackPanel>
+    </Grid>
+</Page>
