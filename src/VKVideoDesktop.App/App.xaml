@@ -8,6 +8,87 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+
+                <!-- Colors -->
+                <ResourceDictionary>
+                    <SolidColorBrush x:Key="VkBackgroundBrush" Color="#FF0A1628"/>
+                    <SolidColorBrush x:Key="VkSurfaceBrush" Color="#FF0F1F35"/>
+                    <SolidColorBrush x:Key="VkCardBrush" Color="#FF142240"/>
+                    <SolidColorBrush x:Key="VkCardHoverBrush" Color="#FF1A2D52"/>
+                    <SolidColorBrush x:Key="VkCardBorderBrush" Color="#FF1E3A5F"/>
+                    <SolidColorBrush x:Key="VkSidebarBrush" Color="#FF080E1C"/>
+                    <SolidColorBrush x:Key="VkSidebarItemHoverBrush" Color="#FF142240"/>
+                    <SolidColorBrush x:Key="VkSidebarItemSelectedBrush" Color="#FF1A3366"/>
+                    <SolidColorBrush x:Key="VkTopBarBrush" Color="#FF0D1B30"/>
+                    <SolidColorBrush x:Key="VkTopBarBorderBrush" Color="#FF1A2D52"/>
+                    <SolidColorBrush x:Key="VkAccentBrush" Color="#FF2688EB"/>
+                    <SolidColorBrush x:Key="VkAccentHoverBrush" Color="#FF4DA3FF"/>
+                    <SolidColorBrush x:Key="VkAccentDarkBrush" Color="#FF1A6BC4"/>
+                    <SolidColorBrush x:Key="VkTextPrimaryBrush" Color="#FFFFFFFF"/>
+                    <SolidColorBrush x:Key="VkTextSecondaryBrush" Color="#FF8899B3"/>
+                    <SolidColorBrush x:Key="VkTextTertiaryBrush" Color="#FF556680"/>
+                    <SolidColorBrush x:Key="VkOverlayBrush" Color="#99000000"/>
+                    <SolidColorBrush x:Key="VkBadgeBackgroundBrush" Color="#FF2688EB"/>
+                    <SolidColorBrush x:Key="VkPlayerBackgroundBrush" Color="#FF050A12"/>
+                    <SolidColorBrush x:Key="VkPlayerControlsBrush" Color="#CC050A12"/>
+                    <SolidColorBrush x:Key="VkSuccessBrush" Color="#FF2ECC71"/>
+                    <SolidColorBrush x:Key="VkWarningBrush" Color="#FFFFC107"/>
+                    <SolidColorBrush x:Key="VkErrorBrush" Color="#FFE53935"/>
+                    <SolidColorBrush x:Key="VkSeparatorBrush" Color="#1A1E3A5F"/>
+                    <SolidColorBrush x:Key="VkProgressBrush" Color="#FF2688EB"/>
+                    <SolidColorBrush x:Key="VkProgressTrackBrush" Color="#FF142240"/>
+                </ResourceDictionary>
+
+                <!-- Styles -->
+                <ResourceDictionary>
+                    <Style x:Key="FilterPillStyle" TargetType="RadioButton">
+                        <Setter Property="Padding" Value="16,8" />
+                        <Setter Property="CornerRadius" Value="20" />
+                        <Setter Property="Background" Value="{StaticResource VkCardBrush}" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="BorderBrush" Value="{StaticResource VkCardBorderBrush}" />
+                        <Setter Property="Foreground" Value="{StaticResource VkTextSecondaryBrush}" />
+                        <Setter Property="FontFamily" Value="Segoe UI" />
+                        <Setter Property="FontSize" Value="13" />
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Setter Property="MinHeight" Value="32" />
+                    </Style>
+                    <Style x:Key="FilterRadioButtonStyle" TargetType="RadioButton" BasedOn="{StaticResource FilterPillStyle}" />
+                    <Style x:Key="VideoCardButtonStyle" TargetType="Button">
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0" />
+                    </Style>
+                    <Style x:Key="SidebarItemStyle" TargetType="NavigationViewItem">
+                        <Setter Property="CornerRadius" Value="8" />
+                        <Setter Property="Padding" Value="12,10" />
+                        <Setter Property="Margin" Value="4,2" />
+                    </Style>
+                    <Style x:Key="DownloadCardStyle" TargetType="Grid">
+                        <Setter Property="Background" Value="{StaticResource VkCardBrush}" />
+                        <Setter Property="CornerRadius" Value="8" />
+                        <Setter Property="Padding" Value="12" />
+                        <Setter Property="Margin" Value="0,0,0,8" />
+                    </Style>
+                    <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+                        <Setter Property="Style" Value="{StaticResource SubtitleTextBlockStyle}" />
+                        <Setter Property="Margin" Value="0,0,0,12" />
+                        <Setter Property="Foreground" Value="{StaticResource VkTextPrimaryBrush}" />
+                    </Style>
+                    <Style x:Key="AccentActionButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
+                        <Setter Property="CornerRadius" Value="8" />
+                        <Setter Property="Padding" Value="16,8" />
+                    </Style>
+                    <Style x:Key="TextLinkButtonStyle" TargetType="Button" BasedOn="{StaticResource TextButtonStyle}">
+                        <Setter Property="HorizontalAlignment" Value="Right" />
+                        <Setter Property="Foreground" Value="{StaticResource VkTextSecondaryBrush}" />
+                    </Style>
+                    <Style x:Key="VkPageStyle" TargetType="Page">
+                        <Setter Property="Background" Value="{StaticResource VkBackgroundBrush}" />
+                    </Style>
+                </ResourceDictionary>
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

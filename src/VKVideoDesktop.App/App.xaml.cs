@@ -204,35 +204,6 @@ public partial class App : Microsoft.UI.Xaml.Application
         DebugLog("StartupAsync - entry point reached");
         try
         {
-            DebugLog("OnLaunched - loading styles...");
-            try
-            {
-                var baseDir = AppContext.BaseDirectory;
-                var colorsPath = System.IO.Path.Combine(baseDir, "Styles", "Colors.xaml");
-                var stylesPath = System.IO.Path.Combine(baseDir, "Styles", "Styles.xaml");
-                DebugLog($"BaseDir: {baseDir}, Colors exists: {System.IO.File.Exists(colorsPath)}, Styles exists: {System.IO.File.Exists(stylesPath)}");
-
-                if (System.IO.File.Exists(colorsPath))
-                {
-                    var colorsXaml = System.IO.File.ReadAllText(colorsPath);
-                    var colorsDict = (ResourceDictionary)Microsoft.UI.Xaml.Markup.XamlReader.Load(colorsXaml);
-                    Resources.MergedDictionaries.Add(colorsDict);
-                    DebugLog("Colors.xaml loaded");
-                }
-
-                if (System.IO.File.Exists(stylesPath))
-                {
-                    var stylesXaml = System.IO.File.ReadAllText(stylesPath);
-                    var stylesDict = (ResourceDictionary)Microsoft.UI.Xaml.Markup.XamlReader.Load(stylesXaml);
-                    Resources.MergedDictionaries.Add(stylesDict);
-                    DebugLog("Styles.xaml loaded");
-                }
-            }
-            catch (Exception ex)
-            {
-                DebugLog($"Failed to load styles: {ex}");
-            }
-
             await _host.StartAsync();
 
             var settingsService = Services.GetRequiredService<ISettingsService>();
