@@ -31,7 +31,16 @@ static class Program
                 {
                     var app = new App();
                     WriteDebugLog("new App() completed, calling StartupAsync...");
-                    _ = app.StartupAsync();
+                    var startupTask = app.StartupAsync();
+                    startupTask.ContinueWith(t =>
+                    {
+                        if (t.IsFaulted)
+                            WriteDebugLog($"StartupAsync FAULTED: {t.Exception}");
+                        else if (t.IsCanceled)
+                            WriteDebugLog("StartupAsync CANCELED");
+                        else
+                            WriteDebugLog("StartupAsync COMPLETED successfully");
+                    }, TaskContinuationOptions.None);
                     WriteDebugLog("StartupAsync called");
                 }
                 catch (Exception appEx)
