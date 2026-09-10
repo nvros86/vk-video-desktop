@@ -196,17 +196,18 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        await StartupAsync(args.Arguments);
+        DebugLog("OnLaunched called");
     }
 
-    public async Task StartupAsync(string? arguments = null)
+    public async Task StartupAsync(MainWindow? window = null, string? arguments = null)
     {
-        DebugLog("StartupAsync - entry point reached");
+        _mainWindow = window;
+        DebugLog("StartupAsync - entry");
         try
         {
             DebugLog("StartupAsync - starting host...");
             await _host.StartAsync();
-            DebugLog("StartupAsync - host started");
+            DebugLog("StartupAsync - host started OK");
 
             DebugLog("StartupAsync - loading settings (sync)...");
             try
@@ -222,13 +223,13 @@ public partial class App : Microsoft.UI.Xaml.Application
                     {
                         DebugLog("StartupAsync - settings has DPAPI token, deleting file");
                         try { File.Delete(settingsPath); } catch { }
-                        DebugLog("StartupAsync - settings.json deleted, fresh start");
+                        DebugLog("StartupAsync - deleted OK");
                     }
                     else
                     {
                         var settingsService = Services.GetRequiredService<ISettingsService>();
                         await settingsService.LoadAsync();
-                        DebugLog("StartupAsync - settings loaded OK");
+                        DebugLog("StartupAsync - settings loaded");
                     }
                 }
                 else
@@ -238,40 +239,32 @@ public partial class App : Microsoft.UI.Xaml.Application
             }
             catch (Exception ex)
             {
-                DebugLog($"StartupAsync - settings (non-fatal): {ex.GetType().Name}: {ex.Message}");
+                DebugLog($"StartupAsync - settings err: {ex.GetType().Name}: {ex.Message}");
             }
 
-            DebugLog("StartupAsync - creating window...");
-            try
+            DebugLog("StartupAsync - subscribing to window events...");
+            if (_mainWindow != null)
             {
-                _mainWindow = Services.GetRequiredService<MainWindow>();
-                DebugLog("StartupAsync - MainWindow resolved, activating...");
-                _mainWindow.Activate();
-                DebugLog("StartupAsync - MainWindow activated");
                 _mainWindow.Closed += OnMainWindowClosed;
-            }
-            catch (Exception ex)
-            {
-                DebugLog($"StartupAsync - MainWindow FAILED: {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
-                throw;
+                _mainWindow.InitServices();
+                DebugLog("StartupAsync - services injected into MainWindow");
+                _mainWindow.DispatcherQueue.TryEnqueue(() =>
+                {
+                    _mainWindow.NavigateToHome();
+                });
             }
 
-            DebugLog("StartupAsync - initializing tray icon...");
-            try
-            {
-                InitializeTrayIcon();
-            }
-            catch (Exception ex)
-            {
-                DebugLog($"StartupAsync - tray icon (non-fatal): {ex.GetType().Name}: {ex.Message}");
-            }
-            DebugLog("StartupAsync - done!");
+            DebugLog("StartupAsync - init tray...");
+            try { InitializeTrayIcon(); DebugLog("StartupAsync - tray OK"); }
+            catch (Exception ex) { DebugLog($"StartupAsync - tray err: {ex.Message}"); }
+
+            DebugLog("StartupAsync - ALL DONE!");
 
             if (arguments?.StartsWith("vkvideo://") == true || arguments?.StartsWith("vkvideo:") == true)
             {
                 var deepLinkService = Services.GetRequiredService<DeepLinkService>();
                 var result = deepLinkService.ProcessString(arguments);
-                if (result != null)
+                if (result != null && _mainWindow != null)
                 {
                     _mainWindow.DispatcherQueue.TryEnqueue(async () =>
                     {
@@ -282,7 +275,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         }
         catch (Exception ex)
         {
-            DebugLog($"StartupAsync FAILED: {ex}");
+            DebugLog($"StartupAsync FAILED: {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
         }
     }
 

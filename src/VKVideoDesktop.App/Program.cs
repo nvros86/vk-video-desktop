@@ -27,26 +27,18 @@ static class Program
                 var context = new DispatcherQueueSynchronizationContext(
                     DispatcherQueue.GetForCurrentThread());
                 SynchronizationContext.SetSynchronizationContext(context);
-                try
-                {
-                    var app = new App();
-                    WriteDebugLog("new App() completed, calling StartupAsync...");
-                    var startupTask = app.StartupAsync();
-                    startupTask.ContinueWith(t =>
-                    {
-                        if (t.IsFaulted)
-                            WriteDebugLog($"StartupAsync FAULTED: {t.Exception}");
-                        else if (t.IsCanceled)
-                            WriteDebugLog("StartupAsync CANCELED");
-                        else
-                            WriteDebugLog("StartupAsync COMPLETED successfully");
-                    }, TaskContinuationOptions.None);
-                    WriteDebugLog("StartupAsync called");
-                }
-                catch (Exception appEx)
-                {
-                    WriteDebugLog($"App constructor EXCEPTION: {appEx}");
-                }
+
+                WriteDebugLog("Creating App and building DI...");
+                var app = new App();
+                WriteDebugLog("DI ready, creating MainWindow synchronously...");
+
+                var window = new MainWindow();
+                window.Activate();
+                WriteDebugLog("MainWindow activated!");
+
+                WriteDebugLog("Starting async host + settings...");
+                _ = app.StartupAsync(window);
+                WriteDebugLog("Application.Start callback done");
             });
         }
         catch (Exception ex)

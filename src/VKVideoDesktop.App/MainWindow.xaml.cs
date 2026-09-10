@@ -18,8 +18,15 @@ public sealed partial class MainWindow : Window
 
     private bool _isDownloadsPanelOpen;
     private MiniPlayerWindow? _miniPlayerWindow;
-    private readonly IAuthenticationService _authService;
-    private readonly PlaybackService _playbackService;
+    private IAuthenticationService? _authService;
+    private PlaybackService? _playbackService;
+
+    internal void InitServices()
+    {
+        _authService = App.GetService<IAuthenticationService>();
+        _playbackService = App.GetService<PlaybackService>();
+        _playbackService.StateChanged += OnPlaybackStateChanged;
+    }
 
     private readonly Dictionary<string, Type> _pageMap = new()
     {
@@ -50,34 +57,11 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
-        MwLog("Constructor - entry");
         Instance = this;
-        MwLog("Constructor - Instance set");
-        MwLog("Constructor - calling InitializeComponent...");
         InitializeComponent();
-        MwLog("Constructor - InitializeComponent done, setting Title...");
         Title = "VK Video Desktop";
-        MwLog("Constructor - resolving services...");
-        _authService = App.GetService<IAuthenticationService>();
-        _playbackService = App.GetService<PlaybackService>();
-        MwLog("Constructor - services resolved");
-
-        _playbackService.StateChanged += OnPlaybackStateChanged;
-
-        MwLog("Constructor - navigating to initial page...");
-        ContentFrame.Navigated += OnFrameNavigated;
-
-        if (_authService.IsAuthenticated)
-        {
-            ContentFrame.Navigate(typeof(HomePage));
-        }
-        else
-        {
-            ContentFrame.Navigate(typeof(LoginPage));
-        }
-
         ExtendsContentIntoTitleBar = false;
-
+        ContentFrame.Navigated += OnFrameNavigated;
         ContentFrame.KeyDown += OnGlobalKeyDown;
     }
 
@@ -156,7 +140,7 @@ public sealed partial class MainWindow : Window
 
     private void NavigateToVideoPage()
     {
-        if (_playbackService.State.CurrentVideoId != null)
+        if (_playbackService?.State.CurrentVideoId != null)
         {
             ContentFrame.Navigate(typeof(VideoPage), _playbackService.State.CurrentVideoId);
         }
