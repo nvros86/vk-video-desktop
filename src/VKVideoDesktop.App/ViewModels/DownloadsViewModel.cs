@@ -24,6 +24,19 @@ public sealed class DownloadsViewModel : ViewModelBase
 
     public ObservableCollection<DownloadItemViewModel> Downloads { get; } = new();
 
+    public async Task LoadDownloadsAsync()
+    {
+        var repository = App.GetService<IDownloadRepository>();
+        var tasks = await repository.GetAllAsync();
+        Downloads.Clear();
+        foreach (var task in tasks.Where(t => t.Status != DownloadStatus.Completed))
+        {
+            var item = new DownloadItemViewModel();
+            item.UpdateFrom(task);
+            Downloads.Add(item);
+        }
+    }
+
     public string ActiveDownloadsText =>
         $"{_downloadService.ActiveDownloadsCount} активных";
 

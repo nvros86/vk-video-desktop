@@ -4,20 +4,21 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
 using VKVideoDesktop.App.ViewModels;
 using VKVideoDesktop.App.Views;
+using VKVideoDesktop.Application.Services;
+using VKVideoDesktop.Core.Interfaces;
 
 namespace VKVideoDesktop.App;
 
 public sealed partial class MainWindow : Window
 {
     private bool _isDownloadsPanelOpen;
-    public string MiniPlayerThumbnail { get; set; } = string.Empty;
+    private readonly IAuthenticationService _authService;
+    private readonly PlaybackService _playbackService;
 
     private readonly Dictionary<string, Type> _pageMap = new()
     {
         ["Home"] = typeof(HomePage),
         ["Search"] = typeof(SearchPage),
-        ["MyVideos"] = typeof(HomePage),
-        ["Subscriptions"] = typeof(HomePage),
         ["Favorites"] = typeof(FavoritesPage),
         ["Playlists"] = typeof(PlaylistsPage),
         ["History"] = typeof(HistoryPage),
@@ -28,23 +29,36 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
         Title = "VK Video Desktop";
+        _authService = App.GetService<IAuthenticationService>();
+        _playbackService = App.GetService<PlaybackService>();
+
+        _playbackService.StateChanged += OnPlaybackStateChanged;
 
         ContentFrame.Navigated += OnFrameNavigated;
-        ContentFrame.Navigate(typeof(HomePage));
 
-        // Global keyboard shortcuts
-        var accelerator1 = new KeyboardAccelerator { Key = Windows.System.VirtualKey.K, Modifiers = Windows.System.VirtualKeyModifiers.Control };
-        var accelerator2 = new KeyboardAccelerator { Key = Windows.System.VirtualKey.J, Modifiers = Windows.System.VirtualKeyModifiers.Control };
-        var accelerator3 = new KeyboardAccelerator { Key = Windows.System.VirtualKey.F };
-        var accelerator4 = new KeyboardAccelerator { Key = Windows.System.VirtualKey.Escape };
+        if (_authService.IsAuthenticated)
+        {
+            ContentFrame.Navigate(typeof(HomePage));
+        }
+        else
+        {
+            ContentFrame.Navigate(typeof(LoginPage));
+        }
 
-        // Set title bar
         ExtendsContentIntoTitleBar = false;
+    }
+
+    private void OnPlaybackStateChanged(object? sender, Core.Models.PlaybackState state)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            MiniPlayerBar.Visibility = state.CurrentVideoId != null ? Visibility.Visible : Visibility.Collapsed;
+            MiniPlayerTitle.Text = state.CurrentVideoId ?? string.Empty;
+        });
     }
 
     private void OnNavViewLoaded(object sender, RoutedEventArgs e)
     {
-        // Select Home by default
         NavView.SelectedItem = NavView.MenuItems[0];
     }
 
@@ -64,7 +78,18 @@ public sealed partial class MainWindow : Window
 
     private void OnFrameNavigated(object sender, NavigationEventArgs e)
     {
-        // Update nav view selection based on current page
+        if (e.SourcePageType == typeof(HomePage))
+            NavView.SelectedItem = NavView.MenuItems[0];
+        else if (e.SourcePageType == typeof(SearchPage))
+            NavView.SelectedItem = NavView.MenuItems[1];
+        else if (e.SourcePageType == typeof(FavoritesPage))
+            NavView.SelectedItem = NavView.MenuItems[2];
+        else if (e.SourcePageType == typeof(PlaylistsPage))
+            NavView.SelectedItem = NavView.MenuItems[3];
+        else if (e.SourcePageType == typeof(HistoryPage))
+            NavView.SelectedItem = NavView.MenuItems[4];
+        else if (e.SourcePageType == typeof(DownloadsPage))
+            NavView.SelectedItem = NavView.MenuItems[5];
     }
 
     private void OnSearchBoxKeyDown(object sender, KeyRoutedEventArgs e)
@@ -72,7 +97,7 @@ public sealed partial class MainWindow : Window
         if (e.Key == Windows.System.VirtualKey.Enter && SearchBox.Text is { Length: > 0 } query)
         {
             ContentFrame.Navigate(typeof(SearchPage), query);
-            NavView.SelectedItem = NavView.MenuItems[1]; // Search
+            NavView.SelectedItem = NavView.MenuItems[1];
         }
         else if (e.Key == Windows.System.VirtualKey.Escape)
         {
@@ -99,22 +124,27 @@ public sealed partial class MainWindow : Window
 
     private void OnMiniPlayerPlayClick(object sender, RoutedEventArgs e)
     {
-        // TODO: Toggle play/pause
+        _playbackService.TogglePlayPause();
     }
 
     private void OnMiniPlayerPrevClick(object sender, RoutedEventArgs e)
     {
-        // TODO: Previous video
     }
 
     private void OnMiniPlayerNextClick(object sender, RoutedEventArgs e)
     {
-        // TODO: Next video
     }
 
     private void OnMiniPlayerFullscreenClick(object sender, RoutedEventArgs e)
     {
-        // TODO: Fullscreen
+        if (ContentFrame.CurrentSourcePageType == typeof(VideoPage))
+        {
+            ContentFrame.GoBack();
+        }
+        else
+        {
+            ContentFrame.Navigate(typeof(VideoPage), _playbackService.State.CurrentVideoId);
+        }
     }
 
     private void OnMiniPlayerCloseClick(object sender, RoutedEventArgs e)

@@ -26,15 +26,17 @@ public partial class App : Microsoft.UI.Xaml.Application
                 services.AddLogging();
 
                 services.AddSingleton<ISettingsService, SettingsService>();
+                services.AddSingleton<IAuthenticationService, VkAuthenticationService>();
                 services.AddSingleton<IVideoProvider, VkVideoProvider>();
                 services.AddSingleton<IDownloadEngine, DownloadEngine>();
                 services.AddSingleton<IDownloadRepository, DownloadDatabase>();
                 services.AddSingleton<IDownloadSourceResolver, VkVideoSourceResolver>();
                 services.AddSingleton<IDownloadManager, DownloadManager>();
                 services.AddSingleton<IThumbnailCache, ThumbnailCache>();
-                services.AddSingleton<IHistoryService, HistoryService>();
-                services.AddSingleton<IFavoritesService, FavoritesService>();
-                services.AddSingleton<IPlaylistService, PlaylistService>();
+                services.AddSingleton<IHistoryService, HistoryDatabase>();
+                services.AddSingleton<IFavoritesService, FavoritesDatabase>();
+                services.AddSingleton<IPlaylistService, PlaylistDatabase>();
+                services.AddSingleton<PlaybackService>();
 
                 services.AddTransient<SearchService>();
                 services.AddTransient<VideoService>();

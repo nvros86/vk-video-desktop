@@ -9,13 +9,23 @@ namespace VKVideoDesktop.Infrastructure.VkApi;
 public sealed class VkVideoProvider : IVideoProvider
 {
     private readonly HttpClient _httpClient;
+    private readonly ISettingsService _settingsService;
     private readonly ILogger<VkVideoProvider> _logger;
     private const string BaseUrl = "https://api.vk.com/method";
 
-    public VkVideoProvider(HttpClient httpClient, ILogger<VkVideoProvider> logger)
+    public VkVideoProvider(HttpClient httpClient, ISettingsService settingsService, ILogger<VkVideoProvider> logger)
     {
         _httpClient = httpClient;
+        _settingsService = settingsService;
         _logger = logger;
+    }
+
+    private string BuildUrl(string method, Dictionary<string, string> parameters)
+    {
+        parameters["access_token"] = _settingsService.Settings.AccessToken ?? string.Empty;
+        parameters["v"] = "5.199";
+        var queryString = string.Join("&", parameters.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
+        return $"{BaseUrl}/method/{method}?{queryString}";
     }
 
     public async Task<IReadOnlyList<Video>> SearchAsync(
@@ -28,7 +38,7 @@ public sealed class VkVideoProvider : IVideoProvider
         {
             _logger.LogDebug("Searching VK for '{Query}'", query);
 
-            var parameters = new Dictionary<string, string>
+            var url = BuildUrl("video.search", new Dictionary<string, string>
             {
                 ["q"] = query,
                 ["count"] = "20",
@@ -38,11 +48,8 @@ public sealed class VkVideoProvider : IVideoProvider
                     SearchSortOrder.Popularity => "0",
                     _ => "1"
                 }
-            };
-
-            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(
-                $"{BaseUrl}/video.search?{string.Join("&", parameters.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"))}",
-                cancellationToken);
+            });
+            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
 
             if (response?.Response?.Items == null)
                 return Array.Empty<Video>();
@@ -60,9 +67,11 @@ public sealed class VkVideoProvider : IVideoProvider
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoListResult>>(
-                $"{BaseUrl}/video.get?videos={videoId}",
-                cancellationToken);
+            var url = BuildUrl("video.get", new Dictionary<string, string>
+            {
+                ["videos"] = videoId
+            });
+            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoListResult>>(url, cancellationToken);
 
             return response?.Response?.Items?.FirstOrDefault()?.MapToVideo();
         }
@@ -77,9 +86,12 @@ public sealed class VkVideoProvider : IVideoProvider
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkUserListResult>>(
-                $"{BaseUrl}/users.get?user_id={channelId}&fields=photo_200,photo_400_orig,description,subscriptions_count",
-                cancellationToken);
+            var url = BuildUrl("users.get", new Dictionary<string, string>
+            {
+                ["user_id"] = channelId,
+                ["fields"] = "photo_200,photo_400_orig,description,subscriptions_count"
+            });
+            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkUserListResult>>(url, cancellationToken);
 
             var user = response?.Response?.Items?.FirstOrDefault();
             if (user == null) return null;
@@ -111,9 +123,11 @@ public sealed class VkVideoProvider : IVideoProvider
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(
-                $"{BaseUrl}/video.get?count=20",
-                cancellationToken);
+            var url = BuildUrl("video.get", new Dictionary<string, string>
+            {
+                ["count"] = "20"
+            });
+            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
 
             IReadOnlyList<Video> result = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
             return result;
@@ -130,10 +144,13 @@ public sealed class VkVideoProvider : IVideoProvider
         CancellationToken cancellationToken)
     {
         try
+        {
+            var url = BuildUrl("video.get", new Dictionary<string, string>
             {
-            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(
-                $"{BaseUrl}/video.get?owner_id={channelId}&count=20",
-                cancellationToken);
+                ["owner_id"] = channelId,
+                ["count"] = "20"
+            });
+            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
 
             IReadOnlyList<Video> result2 = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
             return result2;
@@ -143,6 +160,24 @@ public sealed class VkVideoProvider : IVideoProvider
             _logger.LogError(ex, "Failed to get videos for channel {ChannelId}", channelId);
             return Array.Empty<Video>();
         }
+    }
+
+    private static string? GetBestPlaybackUrl(VkVideoItem item)
+    {
+        if (item.Files != null && item.Files.Count > 0)
+        {
+            var best = item.Files
+                .Where(f => f.Key.StartsWith("mp4"))
+                .OrderByDescending(f =>
+                {
+                    if (int.TryParse(f.Key.Replace("mp4_", ""), out var h)) return h;
+                    return 0;
+                })
+                .FirstOrDefault();
+            if (!string.IsNullOrEmpty(best.Value))
+                return best.Value;
+        }
+        return item.Player;
     }
 
     private static Video MapVideo(VkVideoItem item)
@@ -157,7 +192,8 @@ public sealed class VkVideoProvider : IVideoProvider
             Duration = TimeSpan.FromSeconds(item.Duration),
             ViewCount = item.Views,
             PublishedAt = DateTimeOffset.FromUnixTimeSeconds(item.Date).DateTime,
-            IsLive = item.Platform == 7
+            IsLive = item.Platform == 7,
+            PlaybackUrl = GetBestPlaybackUrl(item)
         };
     }
 
@@ -196,6 +232,8 @@ public sealed class VkVideoProvider : IVideoProvider
         public long Date { get; set; }
         public int? Platform { get; set; }
         public List<VkImage>? Image { get; set; }
+        public string? Player { get; set; }
+        public Dictionary<string, string>? Files { get; set; }
 
         public Video MapToVideo()
         {
@@ -209,7 +247,8 @@ public sealed class VkVideoProvider : IVideoProvider
                 Duration = TimeSpan.FromSeconds(Duration),
                 ViewCount = Views,
                 PublishedAt = DateTimeOffset.FromUnixTimeSeconds(Date).DateTime,
-                IsLive = Platform == 7
+                IsLive = Platform == 7,
+                PlaybackUrl = GetBestPlaybackUrl(this)
             };
         }
     }

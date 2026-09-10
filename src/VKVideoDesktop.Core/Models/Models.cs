@@ -16,6 +16,7 @@ public sealed class Video
     public DateTime PublishedAt { get; init; }
     public string? Url { get; init; }
     public bool IsLive { get; init; }
+    public string? PlaybackUrl { get; init; }
 }
 
 public sealed class Channel

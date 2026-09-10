@@ -13,6 +13,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Top Bar -->
@@ -96,6 +97,63 @@
                     <Frame x:Name="ContentFrame" />
                 </Grid>
             </NavigationView>
+        </Grid>
+
+        <!-- Mini Player Bar -->
+        <Grid x:Name="MiniPlayerBar" Grid.Row="2" Height="48" Padding="12,0"
+              Background="{ThemeResource LayerFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+              BorderThickness="0,1,0,0"
+              Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="MiniPlayerTitle" Grid.Column="0"
+                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center" FontSize="13" />
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                        VerticalAlignment="Center">
+                <Button Click="OnMiniPlayerPlayClick" ToolTipService.ToolTip="Воспроизвести/Пауза">
+                    <FontIcon Glyph="&#xE768;" FontSize="14" />
+                </Button>
+                <Button Click="OnMiniPlayerPrevClick" ToolTipService.ToolTip="Предыдущее">
+                    <FontIcon Glyph="&#xE892;" FontSize="14" />
+                </Button>
+                <Button Click="OnMiniPlayerNextClick" ToolTipService.ToolTip="Следующее">
+                    <FontIcon Glyph="&#xE893;" FontSize="14" />
+                </Button>
+                <Button Click="OnMiniPlayerFullscreenClick" ToolTipService.ToolTip="Полный экран">
+                    <FontIcon Glyph="&#xE740;" FontSize="14" />
+                </Button>
+                <Button Click="OnMiniPlayerCloseClick" ToolTipService.ToolTip="Закрыть">
+                    <FontIcon Glyph="&#xE8BB;" FontSize="14" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Downloads Panel -->
+        <Grid x:Name="DownloadsPanel" Grid.Row="1" Grid.ColumnSpan="2"
+              HorizontalAlignment="Right" VerticalAlignment="Top"
+              Width="360" Height="400" Margin="0,0,12,12"
+              Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+              BorderThickness="1" CornerRadius="8"
+              Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Padding="12,8">
+                <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}"
+                           VerticalAlignment="Center" />
+                <Button Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets"
+                        HorizontalAlignment="Right" Click="OnCloseDownloadsPanel"
+                        Style="{StaticResource TextButtonStyle}" />
+            </Grid>
         </Grid>
     </Grid>
 </Window>

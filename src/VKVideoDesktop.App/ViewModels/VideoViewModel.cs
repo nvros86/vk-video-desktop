@@ -37,6 +37,7 @@ public sealed class VideoViewModel : ViewModelBase
     public string Author { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
     public string DurationText { get; set; } = string.Empty;
+    public string PlaybackUrl { get; set; } = string.Empty;
 
     public VideoDisplayViewModel CurrentVideo { get; } = new();
     public ObservableCollection<VideoDisplayViewModel> RelatedVideos { get; } = new();
@@ -60,6 +61,7 @@ public sealed class VideoViewModel : ViewModelBase
         Author = video.ChannelName ?? string.Empty;
         ThumbnailUrl = video.ThumbnailUrl;
         DurationText = FormatDuration(video.Duration);
+        PlaybackUrl = video.PlaybackUrl ?? string.Empty;
     }
 
     public async Task LoadVideoAsync(string videoId)
@@ -154,6 +156,8 @@ public sealed class VideoDisplayViewModel : ViewModelBase
     private string _channelAvatarUrl = string.Empty;
     private string _durationText = string.Empty;
     private string _viewCountText = string.Empty;
+    private string _playbackUrl = string.Empty;
+    private TimeSpan _duration;
 
     public string Id { get => _id; set => SetProperty(ref _id, value); }
     public string Title { get => _title; set => SetProperty(ref _title, value); }
@@ -163,6 +167,8 @@ public sealed class VideoDisplayViewModel : ViewModelBase
     public string ChannelAvatarUrl { get => _channelAvatarUrl; set => SetProperty(ref _channelAvatarUrl, value); }
     public string DurationText { get => _durationText; set => SetProperty(ref _durationText, value); }
     public string ViewCountText { get => _viewCountText; set => SetProperty(ref _viewCountText, value); }
+    public string PlaybackUrl { get => _playbackUrl; set => SetProperty(ref _playbackUrl, value); }
+    public TimeSpan Duration { get => _duration; set => SetProperty(ref _duration, value); }
 
     public void UpdateFrom(Core.Models.Video video)
     {
@@ -173,6 +179,8 @@ public sealed class VideoDisplayViewModel : ViewModelBase
         Author = video.ChannelName ?? string.Empty;
         DurationText = FormatDuration(video.Duration);
         ViewCountText = FormatViewCount(video.ViewCount);
+        PlaybackUrl = video.PlaybackUrl ?? string.Empty;
+        Duration = video.Duration;
     }
 
     private static string FormatDuration(TimeSpan duration)

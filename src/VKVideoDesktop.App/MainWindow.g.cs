@@ -5,11 +5,11 @@ namespace VKVideoDesktop.App;
 
 public sealed partial class MainWindow
 {
-    internal void InitializeComponent() { }
-
-    internal Frame ContentFrame = null!;
     internal NavigationView NavView = null!;
-    internal AutoSuggestBox SearchBox = null!;
-    internal Grid DownloadsPanel = null!;
+    internal Frame ContentFrame = null!;
     internal Grid MiniPlayerBar = null!;
+    internal TextBlock MiniPlayerTitle = null!;
+    internal Grid DownloadsPanel = null!;
+    internal AutoSuggestBox SearchBox = null!;
+    internal void InitializeComponent() { }
 }

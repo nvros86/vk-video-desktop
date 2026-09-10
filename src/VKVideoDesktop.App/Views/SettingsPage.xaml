@@ -17,7 +17,8 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Язык" VerticalAlignment="Center" />
-                    <ComboBox SelectedIndex="0" Width="150">
+                    <ComboBox x:Name="LanguageCombo" SelectedIndex="0" Width="150"
+                              SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="Русский" />
                         <ComboBoxItem Content="English" />
                     </ComboBox>
@@ -26,7 +27,8 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Тема" VerticalAlignment="Center" />
-                    <ComboBox SelectedIndex="0" Width="150">
+                    <ComboBox x:Name="ThemeCombo" SelectedIndex="0" Width="150"
+                              SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="Тёмная" />
                         <ComboBoxItem Content="Светлая" />
                         <ComboBoxItem Content="Системная" />
@@ -36,19 +38,22 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Запуск с Windows" VerticalAlignment="Center" />
-                    <ToggleSwitch IsOn="False" />
+                    <ToggleSwitch x:Name="StartWithWindowsToggle" IsOn="False"
+                                  Toggled="OnSettingChanged_Toggle" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Сворачивать в трей" VerticalAlignment="Center" />
-                    <ToggleSwitch IsOn="True" />
+                    <ToggleSwitch x:Name="MinimizeToTrayToggle" IsOn="True"
+                                  Toggled="OnSettingChanged_Toggle" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Уведомления" VerticalAlignment="Center" />
-                    <ToggleSwitch IsOn="True" />
+                    <ToggleSwitch x:Name="NotificationsToggle" IsOn="True"
+                                  Toggled="OnSettingChanged_Toggle" />
                 </StackPanel>
             </StackPanel>
 
@@ -61,7 +66,8 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Качество по умолчанию" VerticalAlignment="Center" />
-                    <ComboBox SelectedIndex="2" Width="150">
+                    <ComboBox x:Name="QualityCombo" SelectedIndex="2" Width="150"
+                              SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="240p" />
                         <ComboBoxItem Content="360p" />
                         <ComboBoxItem Content="480p" />
@@ -75,7 +81,8 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Автовоспроизведение" VerticalAlignment="Center" />
-                    <ToggleSwitch IsOn="True" />
+                    <ToggleSwitch x:Name="AutoplayToggle" IsOn="True"
+                                  Toggled="OnSettingChanged_Toggle" />
                 </StackPanel>
             </StackPanel>
 
@@ -89,16 +96,17 @@
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Папка загрузок" VerticalAlignment="Center" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="C:\Users\Videos\VK Video" Opacity="0.6"
+                        <TextBlock x:Name="DownloadFolderText" Text="C:\Users\Videos\VK Video" Opacity="0.6"
                                    VerticalAlignment="Center" />
-                        <Button Content="Изменить" />
+                        <Button Content="Изменить" Click="OnChangeFolderClick" />
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Макс. одновременных загрузок" VerticalAlignment="Center" />
-                    <ComboBox SelectedIndex="1" Width="80">
+                    <ComboBox x:Name="MaxDownloadsCombo" SelectedIndex="1" Width="80"
+                              SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="1" />
                         <ComboBoxItem Content="2" />
                         <ComboBoxItem Content="3" />
@@ -110,7 +118,8 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Ограничение скорости" VerticalAlignment="Center" />
-                    <ComboBox SelectedIndex="0" Width="150">
+                    <ComboBox x:Name="SpeedLimitCombo" SelectedIndex="0" Width="150"
+                              SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="Без ограничений" />
                         <ComboBoxItem Content="512 КБ/с" />
                         <ComboBoxItem Content="1 МБ/с" />
@@ -123,13 +132,15 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Количество повторных попыток" VerticalAlignment="Center" />
-                    <NumberBox Value="3" Minimum="0" Maximum="10" Width="80" />
+                    <NumberBox x:Name="RetryCountBox" Value="3" Minimum="0" Maximum="10" Width="80"
+                               ValueChanged="OnRetryCountChanged" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Автовозобновление при запуске" VerticalAlignment="Center" />
-                    <ToggleSwitch IsOn="True" />
+                    <ToggleSwitch x:Name="AutoResumeToggle" IsOn="True"
+                                  Toggled="OnSettingChanged_Toggle" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
@@ -141,13 +152,15 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Удалять .part при отмене" VerticalAlignment="Center" />
-                    <ToggleSwitch IsOn="True" />
+                    <ToggleSwitch x:Name="DeletePartToggle" IsOn="True"
+                                  Toggled="OnSettingChanged_Toggle" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
                             JustifyContent="SpaceBetween">
                     <TextBlock Text="Способ загрузки" VerticalAlignment="Center" />
-                    <ComboBox SelectedIndex="0" Width="250">
+                    <ComboBox x:Name="QualityBehaviorCombo" SelectedIndex="0" Width="250"
+                              SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="Показывать выбор качества" />
                         <ComboBoxItem Content="Использовать последнее качество" />
                         <ComboBoxItem Content="Использовать максимальное качество" />

@@ -15,21 +15,29 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Margin="24,16">
-                <!-- Video Player Placeholder -->
+                <!-- Video Player -->
                 <Grid x:Name="PlayerContainer" Height="480" Background="#1E1E1E" CornerRadius="8,8,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
+                    <!-- Thumbnail / Player overlay -->
                     <Grid Grid.Row="0">
-                        <Image Source="{x:Bind ViewModel.CurrentVideo.ThumbnailUrl, Mode=OneWay}"
+                        <Image x:Name="ThumbnailImage"
+                               Source="{Binding CurrentVideo.ThumbnailUrl}"
                                Stretch="UniformToFill" Opacity="0.5" />
-                        <Button HorizontalAlignment="Center" VerticalAlignment="Center"
+                        <MediaPlayerElement x:Name="MediaPlayerElement"
+                                           AutoPlay="True"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           Visibility="Collapsed" />
+                        <Button x:Name="PlayButton"
+                                HorizontalAlignment="Center" VerticalAlignment="Center"
                                 Background="#CC000000" Foreground="White"
                                 Width="72" Height="72" CornerRadius="36"
                                 Click="OnPlayClick">
-                            <FontIcon Glyph="&#xE768;" FontSize="32" />
+                            <FontIcon x:Name="PlayIcon" Glyph="&#xE768;" FontSize="32" />
                         </Button>
                     </Grid>
 
@@ -43,21 +51,21 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0" Content="&#xE768;" Background="Transparent"
+                        <Button Grid.Column="0" x:Name="ControlPlayButton" Content="&#xE768;" Background="Transparent"
                                 Foreground="White" Click="OnPlayClick" />
-                        <ProgressBar Grid.Column="1" Value="0" Maximum="100"
+                        <ProgressBar Grid.Column="1" x:Name="PositionBar" Value="0" Maximum="100"
                                      Margin="12,0" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" Text="0:00 / 0:00" Foreground="White"
+                        <TextBlock Grid.Column="2" x:Name="TimeText" Text="0:00 / 0:00" Foreground="White"
                                    VerticalAlignment="Center" FontSize="12" Margin="0,0,12,0" />
-                        <Button Grid.Column="3" Content="&#xE767;" Background="Transparent"
-                                Foreground="White" />
+                        <Button Grid.Column="3" x:Name="VolumeButton" Content="&#xE767;" Background="Transparent"
+                                Foreground="White" Click="OnVolumeClick" />
                         <Button Grid.Column="4" Content="&#xE740;" Background="Transparent"
                                 Foreground="White" Click="OnFullscreenClick" />
                     </Grid>
                 </Grid>
 
                 <!-- Video Info -->
-                <TextBlock Text="{x:Bind ViewModel.CurrentVideo.Title, Mode=OneWay}"
+                <TextBlock Text="{Binding CurrentVideo.Title}"
                            Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap"
                            Margin="0,16,0,8" />
 
@@ -70,15 +78,15 @@
 
                     <Ellipse Grid.Column="0" Width="40" Height="40" Margin="0,0,12,0">
                         <Ellipse.Fill>
-                            <ImageBrush ImageSource="{x:Bind ViewModel.CurrentVideo.ChannelAvatarUrl, Mode=OneWay}"
+                            <ImageBrush ImageSource="{Binding CurrentVideo.ChannelAvatarUrl}"
                                         Stretch="UniformToFill" />
                         </Ellipse.Fill>
                     </Ellipse>
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="{x:Bind ViewModel.CurrentVideo.Author, Mode=OneWay}"
+                        <TextBlock Text="{Binding CurrentVideo.Author}"
                                    FontWeight="SemiBold" />
-                        <TextBlock Text="{x:Bind ViewModel.CurrentVideo.ViewCountText, Mode=OneWay}"
+                        <TextBlock Text="{Binding CurrentVideo.ViewCountText}"
                                    Opacity="0.6" FontSize="12" />
                     </StackPanel>
 
@@ -96,7 +104,7 @@
 
                 <!-- Description -->
                 <Expander Header="Описание">
-                    <TextBlock Text="{x:Bind ViewModel.CurrentVideo.Description, Mode=OneWay}"
+                    <TextBlock Text="{Binding CurrentVideo.Description}"
                                TextWrapping="Wrap" Opacity="0.8" />
                 </Expander>
             </StackPanel>
@@ -107,7 +115,7 @@
                            Margin="0,0,0,12" />
                 <ItemsControl ItemsSource="{x:Bind ViewModel.RelatedVideos}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:VideoViewModel">
+                        <DataTemplate x:DataType="vm:VideoDisplayViewModel">
                             <Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                                     Click="OnRelatedVideoClick" Tag="{x:Bind Id}" Margin="0,0,0,8">
                                 <Grid>

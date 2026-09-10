@@ -1,20 +1,28 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using VKVideoDesktop.App.ViewModels;
+using VKVideoDesktop.Core.Interfaces;
+using VKVideoDesktop.Core.Models;
 
 namespace VKVideoDesktop.App.Views;
 
 public sealed partial class HistoryPage : Page
 {
+    private readonly IHistoryService _historyService;
+
     public HistoryPage()
     {
         InitializeComponent();
+        _historyService = App.GetService<IHistoryService>();
         Loaded += OnLoaded;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        // TODO: Load history
+        var entries = await _historyService.GetAllAsync();
+        HistoryList.ItemsSource = entries;
+        EmptyState.Visibility = entries.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        HistoryList.Visibility = entries.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void OnPlayClick(object sender, RoutedEventArgs e)
@@ -25,9 +33,13 @@ public sealed partial class HistoryPage : Page
         }
     }
 
-    private void OnRemoveClick(object sender, RoutedEventArgs e)
+    private async void OnRemoveClick(object sender, RoutedEventArgs e)
     {
-        // TODO: Remove from history
+        if (sender is Button button && button.Tag is string entryId)
+        {
+            await _historyService.DeleteAsync(entryId);
+            OnLoaded(this, new RoutedEventArgs());
+        }
     }
 
     private async void OnClearClick(object sender, RoutedEventArgs e)
@@ -45,7 +57,8 @@ public sealed partial class HistoryPage : Page
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
-            // TODO: Clear history
+            await _historyService.ClearAsync();
+            OnLoaded(this, new RoutedEventArgs());
         }
     }
 }
