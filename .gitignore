@@ -49,3 +49,7 @@ desktop.ini
 *.appxbundle
 *.msixbundle
 *.appinstaller
+*.pfx
+publish/
+msix/
+msix_staging/
