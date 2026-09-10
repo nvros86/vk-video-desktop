@@ -536,6 +536,23 @@ SOFTWARE."
         File.Delete(zipPath);
         SetupLogger.Info("Архив распакован");
 
+        SetProgress("Копирование установщика...", 50);
+        SetupLogger.Info("Копирование установщика для удаления...");
+        var currentExe = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+        if (!string.IsNullOrEmpty(currentExe))
+        {
+            var destExe = Path.Combine(_installPath, "VKVideoDesktopSetup.exe");
+            try
+            {
+                File.Copy(currentExe, destExe, overwrite: true);
+                SetupLogger.Info($"Установщик скопирован: {destExe}");
+            }
+            catch (Exception ex)
+            {
+                SetupLogger.Warn($"Не удалось скопировать установщик: {ex.Message}");
+            }
+        }
+
         SetProgress("Создание ярлыков...", 60);
         if (_desktopCheck.Checked)
         {
@@ -546,6 +563,8 @@ SOFTWARE."
         {
             SetupLogger.Info("Создание ярлыка в меню Пуск...");
             CreateStartMenuShortcut();
+            SetupLogger.Info("Создание ярлыка удаления в меню Пуск...");
+            CreateUninstallShortcut();
         }
 
         SetProgress("Регистрация протокола...", 75);
@@ -836,6 +855,66 @@ SOFTWARE."
         Directory.CreateDirectory(programsDir);
         var shortcutPath = Path.Combine(programsDir, "VK Video Desktop.lnk");
         CreateShortcut(shortcutPath, exePath, "VK Video Desktop");
+    }
+
+    private void CreateUninstallShortcut()
+    {
+        var uninstallExe = Path.Combine(_installPath, "VKVideoDesktopSetup.exe");
+        if (!File.Exists(uninstallExe))
+        {
+            SetupLogger.Warn($"Установщик не найден, ярлык удаления не создан: {uninstallExe}");
+            return;
+        }
+
+        var startMenu = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
+        var programsDir = Path.Combine(startMenu, "Programs", "VK Video Desktop");
+        Directory.CreateDirectory(programsDir);
+        var shortcutPath = Path.Combine(programsDir, "Удалить VK Video Desktop.lnk");
+        CreateShortcutWithArgs(shortcutPath, uninstallExe, "--uninstall", "Удалить VK Video Desktop");
+    }
+
+    private static void CreateShortcutWithArgs(string shortcutPath, string targetPath, string arguments, string description)
+    {
+        var workingDir = Path.GetDirectoryName(targetPath) ?? targetPath;
+        var escapedShortcut = shortcutPath.Replace("'", "''");
+        var escapedTarget = targetPath.Replace("'", "''");
+        var escapedWorkDir = workingDir.Replace("'", "''");
+        var escapedArgs = arguments.Replace("'", "''");
+        var escapedDesc = description.Replace("'", "''");
+
+        var scriptContent = $@"$wsh = New-Object -ComObject WScript.Shell
+$link = $wsh.CreateShortcut('{escapedShortcut}')
+$link.TargetPath = '{escapedTarget}'
+$link.Arguments = '{escapedArgs}'
+$link.WorkingDirectory = '{escapedWorkDir}'
+$link.Description = '{escapedDesc}'
+$link.IconLocation = '{escapedTarget},0'
+$link.Save()";
+
+        var tempScript = Path.Combine(Path.GetTempPath(), $"VKSetup_Shortcut_{Guid.NewGuid():N}.ps1");
+        try
+        {
+            File.WriteAllText(tempScript, scriptContent);
+            var psi = new System.Diagnostics.ProcessStartInfo("powershell",
+                $"-NoProfile -ExecutionPolicy Bypass -File \"{tempScript}\"")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            using var proc = System.Diagnostics.Process.Start(psi);
+            proc?.WaitForExit(15000);
+            SetupLogger.Info($"Ярлык удаления создан: {shortcutPath}");
+        }
+        catch (Exception ex)
+        {
+            SetupLogger.Error($"Ошибка создания ярлыка удаления: {shortcutPath}", ex);
+        }
+        finally
+        {
+            try { File.Delete(tempScript); } catch { }
+        }
     }
 
     private static void CreateShortcut(string shortcutPath, string targetPath, string description)
