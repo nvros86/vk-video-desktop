@@ -12,6 +12,7 @@ namespace VKVideoDesktop.App;
 public sealed partial class MainWindow : Window
 {
     private bool _isDownloadsPanelOpen;
+    private MiniPlayerWindow? _miniPlayerWindow;
     private readonly IAuthenticationService _authService;
     private readonly PlaybackService _playbackService;
 
@@ -46,6 +47,55 @@ public sealed partial class MainWindow : Window
         }
 
         ExtendsContentIntoTitleBar = false;
+
+        ContentFrame.KeyDown += OnGlobalKeyDown;
+    }
+
+    private void OnGlobalKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Windows.System.VirtualKey.Space:
+                if (ContentFrame.CurrentSourcePageType == typeof(VideoPage))
+                {
+                    _playbackService.TogglePlayPause();
+                    e.Handled = true;
+                }
+                break;
+            case Windows.System.VirtualKey.K:
+                if (ContentFrame.CurrentSourcePageType == typeof(VideoPage))
+                {
+                    _playbackService.TogglePlayPause();
+                    e.Handled = true;
+                }
+                break;
+            case Windows.System.VirtualKey.F:
+                if (ContentFrame.CurrentSourcePageType == typeof(VideoPage))
+                {
+                    NavigateToVideoPage();
+                    e.Handled = true;
+                }
+                break;
+            case Windows.System.VirtualKey.M:
+                if (ContentFrame.CurrentSourcePageType == typeof(VideoPage))
+                {
+                    var vol = _playbackService.State.IsMuted ? 1.0 : 0.0;
+                    _playbackService.SetVolume(vol);
+                    e.Handled = true;
+                }
+                break;
+            case Windows.System.VirtualKey.Escape:
+                SearchBox.Text = string.Empty;
+                break;
+        }
+    }
+
+    private void NavigateToVideoPage()
+    {
+        if (_playbackService.State.CurrentVideoId != null)
+        {
+            ContentFrame.Navigate(typeof(VideoPage), _playbackService.State.CurrentVideoId);
+        }
     }
 
     private void OnPlaybackStateChanged(object? sender, Core.Models.PlaybackState state)
@@ -54,6 +104,7 @@ public sealed partial class MainWindow : Window
         {
             MiniPlayerBar.Visibility = state.CurrentVideoId != null ? Visibility.Visible : Visibility.Collapsed;
             MiniPlayerTitle.Text = state.CurrentVideoId ?? string.Empty;
+            _miniPlayerWindow?.UpdateTitle(state.CurrentVideoId ?? "VK Video");
         });
     }
 
@@ -159,7 +210,17 @@ public sealed partial class MainWindow : Window
 
     private void OnMiniPlayerCloseClick(object sender, RoutedEventArgs e)
     {
-        MiniPlayerBar.Visibility = Visibility.Collapsed;
+        if (_miniPlayerWindow == null)
+        {
+            _miniPlayerWindow = new MiniPlayerWindow();
+            _miniPlayerWindow.Closed += (_, _) => _miniPlayerWindow = null;
+            _miniPlayerWindow.UpdateTitle(_playbackService.State.CurrentVideoId ?? "VK Video");
+            _miniPlayerWindow.Activate();
+        }
+        else
+        {
+            _miniPlayerWindow.Activate();
+        }
     }
 
     public void NavigateToHome()

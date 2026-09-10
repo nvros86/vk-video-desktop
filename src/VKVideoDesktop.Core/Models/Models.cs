@@ -17,6 +17,7 @@ public sealed class Video
     public string? Url { get; init; }
     public bool IsLive { get; init; }
     public string? PlaybackUrl { get; init; }
+    public Dictionary<string, string>? QualityUrls { get; init; }
 }
 
 public sealed class Channel

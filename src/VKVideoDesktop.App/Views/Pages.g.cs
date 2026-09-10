@@ -23,7 +23,8 @@ public sealed partial class VideoPage
     internal Image ThumbnailImage = null!;
     internal Button ControlPlayButton = null!;
     internal Button VolumeButton = null!;
-    internal Button FullscreenButton = null!;
+    internal Button SpeedButton = null!;
+    internal Button QualityButton = null!;
     internal Grid PlayerContainer = null!;
     internal void InitializeComponent() { }
 }

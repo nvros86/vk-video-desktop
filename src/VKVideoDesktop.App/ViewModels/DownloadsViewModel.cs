@@ -11,6 +11,7 @@ public sealed class DownloadsViewModel : ViewModelBase
 {
     private readonly DownloadService _downloadService;
     private readonly ILogger<DownloadsViewModel> _logger;
+    private bool _hasActiveDownloads;
 
     public DownloadsViewModel(DownloadService downloadService, ILogger<DownloadsViewModel> logger)
     {
@@ -24,6 +25,18 @@ public sealed class DownloadsViewModel : ViewModelBase
 
     public ObservableCollection<DownloadItemViewModel> Downloads { get; } = new();
 
+    public bool HasActiveDownloads
+    {
+        get => _hasActiveDownloads;
+        set => SetProperty(ref _hasActiveDownloads, value);
+    }
+
+    public int ActiveDownloadsCount => Downloads.Count(d =>
+        d.Status == DownloadStatus.Downloading ||
+        d.Status == DownloadStatus.Queued ||
+        d.Status == DownloadStatus.Resolving ||
+        d.Status == DownloadStatus.Retrying);
+
     public async Task LoadDownloadsAsync()
     {
         var repository = App.GetService<IDownloadRepository>();
@@ -35,10 +48,9 @@ public sealed class DownloadsViewModel : ViewModelBase
             item.UpdateFrom(task);
             Downloads.Add(item);
         }
+        OnPropertyChanged(nameof(ActiveDownloadsCount));
+        HasActiveDownloads = ActiveDownloadsCount > 0;
     }
-
-    public string ActiveDownloadsText =>
-        $"{_downloadService.ActiveDownloadsCount} активных";
 
     public async Task PauseAsync(string downloadId)
     {
@@ -53,6 +65,8 @@ public sealed class DownloadsViewModel : ViewModelBase
     public async Task CancelAsync(string downloadId)
     {
         await _downloadService.CancelAsync(downloadId);
+        var item = Downloads.FirstOrDefault(d => d.DownloadId == downloadId);
+        if (item != null) Downloads.Remove(item);
     }
 
     public async Task ClearCompletedAsync()
@@ -80,6 +94,8 @@ public sealed class DownloadsViewModel : ViewModelBase
         {
             item.UpdateFrom(task);
         }
+        OnPropertyChanged(nameof(ActiveDownloadsCount));
+        HasActiveDownloads = ActiveDownloadsCount > 0;
     }
 
     private void OnDownloadFailed(object? sender, DownloadTask task)
@@ -89,5 +105,7 @@ public sealed class DownloadsViewModel : ViewModelBase
         {
             item.UpdateFrom(task);
         }
+        OnPropertyChanged(nameof(ActiveDownloadsCount));
+        HasActiveDownloads = ActiveDownloadsCount > 0;
     }
 }

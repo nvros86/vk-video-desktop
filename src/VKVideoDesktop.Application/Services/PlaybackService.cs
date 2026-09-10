@@ -10,6 +10,7 @@ public sealed class PlaybackService
 
     public event EventHandler<PlaybackState>? StateChanged;
     public event EventHandler<string>? VideoChanged;
+    public event EventHandler? PlaybackCompleted;
 
     public void UpdateState(Video video, string playbackUrl)
     {
@@ -81,4 +82,12 @@ public sealed class PlaybackService
 
     public bool HasNext => _state.Queue.Count > 0 && _state.CurrentQueueIndex < _state.Queue.Count - 1;
     public bool HasPrevious => _state.Queue.Count > 0 && _state.CurrentQueueIndex > 0;
+
+    public void SetPlaybackSpeed(double speed)
+    {
+        _state.PlaybackSpeed = speed;
+        StateChanged?.Invoke(this, _state);
+    }
+
+    public void NotifyPlaybackCompleted() => PlaybackCompleted?.Invoke(this, EventArgs.Empty);
 }

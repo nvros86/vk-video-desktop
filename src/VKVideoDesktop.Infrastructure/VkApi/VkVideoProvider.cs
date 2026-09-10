@@ -193,7 +193,9 @@ public sealed class VkVideoProvider : IVideoProvider
             ViewCount = item.Views,
             PublishedAt = DateTimeOffset.FromUnixTimeSeconds(item.Date).DateTime,
             IsLive = item.Platform == 7,
-            PlaybackUrl = GetBestPlaybackUrl(item)
+            PlaybackUrl = GetBestPlaybackUrl(item),
+            QualityUrls = item.Files?.Where(f => f.Key.StartsWith("mp4") && !string.IsNullOrEmpty(f.Value))
+                .ToDictionary(f => f.Key.Replace("mp4_", ""), f => f.Value)
         };
     }
 
@@ -248,7 +250,9 @@ public sealed class VkVideoProvider : IVideoProvider
                 ViewCount = Views,
                 PublishedAt = DateTimeOffset.FromUnixTimeSeconds(Date).DateTime,
                 IsLive = Platform == 7,
-                PlaybackUrl = GetBestPlaybackUrl(this)
+                PlaybackUrl = GetBestPlaybackUrl(this),
+                QualityUrls = Files?.Where(f => f.Key.StartsWith("mp4") && !string.IsNullOrEmpty(f.Value))
+                    .ToDictionary(f => f.Key.Replace("mp4_", ""), f => f.Value)
             };
         }
     }

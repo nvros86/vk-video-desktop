@@ -9,14 +9,20 @@
     <Grid Margin="24,16,24,80">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <Button Content="Очистить завершённые" HorizontalAlignment="Right"
+                    Style="{StaticResource TextButtonStyle}" Click="OnClearCompletedClick" />
         </Grid>
 
-        <StackPanel x:Name="EmptyState" Grid.Row="1" HorizontalAlignment="Center"
+        <TextBlock Grid.Row="1" Text="Активные" Style="{StaticResource SubtitleTextBlockStyle}"
+                   Margin="0,0,0,8" Visibility="{x:Bind ViewModel.HasActiveDownloads}" />
+
+        <StackPanel x:Name="EmptyState" Grid.Row="2" HorizontalAlignment="Center"
                     VerticalAlignment="Center" Spacing="12">
             <FontIcon Glyph="&#xE896;" FontSize="48" Opacity="0.3" />
             <TextBlock Text="Нет загрузок" Opacity="0.5" TextAlignment="Center" />
@@ -24,7 +30,7 @@
                        Opacity="0.4" TextAlignment="Center" FontSize="12" />
         </StackPanel>
 
-        <ListView x:Name="DownloadsList" Grid.Row="1"
+        <ListView x:Name="DownloadsList" Grid.Row="2"
                   ItemsSource="{x:Bind ViewModel.Downloads}">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="vm:DownloadItemViewModel">
@@ -48,15 +54,28 @@
                             <TextBlock Text="{x:Bind StatusText}" Opacity="0.6" FontSize="12" />
                             <ProgressBar Value="{x:Bind Progress}" Maximum="100"
                                          Margin="0,4,0,4" />
-                            <TextBlock Text="{x:Bind ProgressText}" Opacity="0.5" FontSize="11" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{x:Bind ProgressText}" Opacity="0.5" FontSize="11" />
+                                <TextBlock Grid.Column="1" Text="{x:Bind SpeedText}" Opacity="0.5" FontSize="11"
+                                           Margin="12,0,0,0" />
+                                <TextBlock Grid.Column="2" Text="{x:Bind EtaText}" Opacity="0.5" FontSize="11"
+                                           Margin="12,0,0,0" />
+                            </Grid>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="4"
                                     Margin="12,0,0,0">
                             <Button Content="⏸" Click="OnPauseClick"
-                                    Tag="{x:Bind DownloadId}" />
+                                    Tag="{x:Bind DownloadId}"
+                                    Visibility="{x:Bind IsDownloading}" />
                             <Button Content="▶" Click="OnResumeClick"
-                                    Tag="{x:Bind DownloadId}" />
+                                    Tag="{x:Bind DownloadId}"
+                                    Visibility="{x:Bind IsPaused}" />
                             <Button Content="✕" Click="OnCancelClick"
                                     Tag="{x:Bind DownloadId}" />
                         </StackPanel>

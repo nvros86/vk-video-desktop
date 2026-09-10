@@ -158,6 +158,7 @@ public sealed class VideoDisplayViewModel : ViewModelBase
     private string _viewCountText = string.Empty;
     private string _playbackUrl = string.Empty;
     private TimeSpan _duration;
+    private Dictionary<string, string>? _qualityUrls;
 
     public string Id { get => _id; set => SetProperty(ref _id, value); }
     public string Title { get => _title; set => SetProperty(ref _title, value); }
@@ -169,6 +170,7 @@ public sealed class VideoDisplayViewModel : ViewModelBase
     public string ViewCountText { get => _viewCountText; set => SetProperty(ref _viewCountText, value); }
     public string PlaybackUrl { get => _playbackUrl; set => SetProperty(ref _playbackUrl, value); }
     public TimeSpan Duration { get => _duration; set => SetProperty(ref _duration, value); }
+    public Dictionary<string, string>? QualityUrls { get => _qualityUrls; set => SetProperty(ref _qualityUrls, value); }
 
     public void UpdateFrom(Core.Models.Video video)
     {
@@ -181,6 +183,7 @@ public sealed class VideoDisplayViewModel : ViewModelBase
         ViewCountText = FormatViewCount(video.ViewCount);
         PlaybackUrl = video.PlaybackUrl ?? string.Empty;
         Duration = video.Duration;
+        QualityUrls = video.QualityUrls;
     }
 
     private static string FormatDuration(TimeSpan duration)

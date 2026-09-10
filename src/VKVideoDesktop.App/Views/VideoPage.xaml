@@ -49,6 +49,9 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Button Grid.Column="0" x:Name="ControlPlayButton" Content="&#xE768;" Background="Transparent"
@@ -57,9 +60,25 @@
                                      Margin="12,0" VerticalAlignment="Center" />
                         <TextBlock Grid.Column="2" x:Name="TimeText" Text="0:00 / 0:00" Foreground="White"
                                    VerticalAlignment="Center" FontSize="12" Margin="0,0,12,0" />
-                        <Button Grid.Column="3" x:Name="VolumeButton" Content="&#xE767;" Background="Transparent"
+
+                        <!-- Speed selector -->
+                        <Button Grid.Column="3" x:Name="SpeedButton" Content="1x" Background="Transparent"
+                                Foreground="White" Click="OnSpeedClick" FontSize="11" Padding="6,2"
+                                ToolTipService.ToolTip="Скорость воспроизведения" />
+
+                        <!-- Quality selector -->
+                        <Button Grid.Column="4" x:Name="QualityButton" Content="HQ" Background="Transparent"
+                                Foreground="White" Click="OnQualityClick" FontSize="11" Padding="6,2"
+                                ToolTipService.ToolTip="Качество видео" />
+
+                        <!-- PiP -->
+                        <Button Grid.Column="5" Content="&#xE740;" Background="Transparent"
+                                Foreground="White" Click="OnPipClick"
+                                ToolTipService.ToolTip="Картинка в картинке" />
+
+                        <Button Grid.Column="6" x:Name="VolumeButton" Content="&#xE767;" Background="Transparent"
                                 Foreground="White" Click="OnVolumeClick" />
-                        <Button Grid.Column="4" Content="&#xE740;" Background="Transparent"
+                        <Button Grid.Column="7" Content="&#xE740;" Background="Transparent"
                                 Foreground="White" Click="OnFullscreenClick" />
                     </Grid>
                 </Grid>

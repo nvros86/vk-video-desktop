@@ -14,12 +14,19 @@ public sealed partial class VideoPage : Page
     private readonly PlaybackService _playbackService;
     private Windows.Media.Playback.MediaPlayer? _mediaPlayer;
     private bool _isFullscreen;
+    private bool _isPip;
+    private Dictionary<string, string> _availableQualities = new();
+    private string _currentQualityKey = "720";
+    private double _currentSpeed = 1.0;
+    private static readonly double[] SpeedOptions = { 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0 };
+    private int _speedIndex = 3;
 
     public VideoPage()
     {
         InitializeComponent();
         ViewModel = App.GetService<VideoViewModel>();
         _playbackService = App.GetService<PlaybackService>();
+        _playbackService.PlaybackCompleted += OnPlaybackCompleted;
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -29,6 +36,12 @@ public sealed partial class VideoPage : Page
         if (e.Parameter is string videoId)
         {
             await ViewModel.LoadVideoAsync(videoId);
+
+            if (ViewModel.CurrentVideo.QualityUrls != null)
+            {
+                _availableQualities = ViewModel.CurrentVideo.QualityUrls;
+                UpdateQualityButton();
+            }
 
             if (!string.IsNullOrEmpty(ViewModel.CurrentVideo.PlaybackUrl))
             {
@@ -40,6 +53,7 @@ public sealed partial class VideoPage : Page
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
         base.OnNavigatedFrom(e);
+        _playbackService.PlaybackCompleted -= OnPlaybackCompleted;
         CleanupMediaPlayer();
     }
 
@@ -51,11 +65,13 @@ public sealed partial class VideoPage : Page
 
             _mediaPlayer = new Windows.Media.Playback.MediaPlayer();
             _mediaPlayer.Source = Windows.Media.Core.MediaSource.CreateFromUri(new Uri(url));
+            _mediaPlayer.PlaybackRate = _currentSpeed;
             _mediaPlayer.Play();
 
             _mediaPlayer.MediaOpened += OnMediaPlayerOpened;
             _mediaPlayer.MediaFailed += OnMediaPlayerFailed;
             _mediaPlayer.CurrentStateChanged += OnCurrentStateChanged;
+            _mediaPlayer.MediaEnded += OnMediaEnded;
 
             MediaPlayerElement.SetMediaPlayer(_mediaPlayer);
             MediaPlayerElement.Visibility = Visibility.Visible;
@@ -88,6 +104,7 @@ public sealed partial class VideoPage : Page
             _mediaPlayer.MediaOpened -= OnMediaPlayerOpened;
             _mediaPlayer.MediaFailed -= OnMediaPlayerFailed;
             _mediaPlayer.CurrentStateChanged -= OnCurrentStateChanged;
+            _mediaPlayer.MediaEnded -= OnMediaEnded;
             _mediaPlayer.Dispose();
             _mediaPlayer = null;
         }
@@ -148,6 +165,26 @@ public sealed partial class VideoPage : Page
         });
     }
 
+    private void OnMediaEnded(object? sender, object e)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            _playbackService.NotifyPlaybackCompleted();
+        });
+    }
+
+    private void OnPlaybackCompleted(object? sender, EventArgs e)
+    {
+        DispatcherQueue.TryEnqueue(async () =>
+        {
+            var nextId = _playbackService.GetNextVideoId();
+            if (nextId != null)
+            {
+                Frame.Navigate(typeof(VideoPage), nextId);
+            }
+        });
+    }
+
     private void UpdateTimeDisplay(TimeSpan position, TimeSpan duration)
     {
         TimeText.Text = $"{FormatTime(position)} / {FormatTime(duration)}";
@@ -181,6 +218,106 @@ public sealed partial class VideoPage : Page
         {
             _mediaPlayer.IsMuted = !_mediaPlayer.IsMuted;
             _playbackService.SetVolume(_mediaPlayer.IsMuted ? 0 : _mediaPlayer.Volume);
+        }
+    }
+
+    private void OnSpeedClick(object sender, RoutedEventArgs e)
+    {
+        _speedIndex = (_speedIndex + 1) % SpeedOptions.Length;
+        _currentSpeed = SpeedOptions[_speedIndex];
+        SpeedButton.Content = _currentSpeed == 1.0 ? "1x" : $"{_currentSpeed}x";
+
+        if (_mediaPlayer != null)
+        {
+            _mediaPlayer.PlaybackRate = _currentSpeed;
+        }
+        _playbackService.SetPlaybackSpeed(_currentSpeed);
+    }
+
+    private async void OnQualityClick(object sender, RoutedEventArgs e)
+    {
+        if (_availableQualities.Count == 0) return;
+
+        var dialog = new ContentDialog
+        {
+            Title = "Качество видео",
+            CloseButtonText = "Закрыть",
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = XamlRoot
+        };
+
+        var panel = new StackPanel { Spacing = 8 };
+        foreach (var quality in _availableQualities.Keys.OrderByDescending(k => int.TryParse(k, out var h) ? h : 0))
+        {
+            var btn = new Button
+            {
+                Content = $"{quality}p",
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Left,
+                Padding = new Thickness(12, 8, 12, 8),
+                Tag = quality
+            };
+            btn.Click += OnQualitySelected;
+            panel.Children.Add(btn);
+        }
+        dialog.Content = panel;
+        await dialog.ShowAsync();
+    }
+
+    private void OnQualitySelected(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string qualityKey)
+        {
+            _currentQualityKey = qualityKey;
+            if (_availableQualities.TryGetValue(qualityKey, out var url))
+            {
+                var currentPosition = _mediaPlayer?.PlaybackSession?.Position ?? TimeSpan.Zero;
+                var wasPlaying = _mediaPlayer?.PlaybackSession?.PlaybackState == Windows.Media.Playback.MediaPlaybackState.Playing;
+                StartPlayback(url);
+                if (_mediaPlayer?.PlaybackSession != null)
+                {
+                    _mediaPlayer.PlaybackSession.Position = currentPosition;
+                    if (!wasPlaying) _mediaPlayer.Pause();
+                }
+            }
+            UpdateQualityButton();
+        }
+    }
+
+    private void UpdateQualityButton()
+    {
+        QualityButton.Content = _availableQualities.ContainsKey(_currentQualityKey) ? $"{_currentQualityKey}p" : "HQ";
+    }
+
+    private void OnPipClick(object sender, RoutedEventArgs e)
+    {
+        TogglePip();
+    }
+
+    private void TogglePip()
+    {
+        var window = App.GetService<MainWindow>();
+        _isPip = !_isPip;
+
+        if (_isPip)
+        {
+            window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = false;
+            window.SystemBackdrop = null;
+            var presenter = Microsoft.UI.Windowing.OverlappedPresenter.Create();
+            presenter.IsAlwaysOnTop = true;
+            presenter.IsMaximizable = false;
+            presenter.IsMinimizable = true;
+            presenter.IsResizable = true;
+            presenter.SetBorderAndTitleBar(true, true);
+            window.AppWindow.SetPresenter(presenter);
+            window.AppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 480, Height = 320 });
+        }
+        else
+        {
+            window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = false;
+            window.SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
+            window.AppWindow.SetPresenter(Microsoft.UI.Windowing.OverlappedPresenter.Create());
+            window.AppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 1400, Height = 900 });
         }
     }
 

@@ -10,6 +10,8 @@ public sealed class DownloadItemViewModel : ViewModelBase
     private string _thumbnailUrl = string.Empty;
     private string _statusText = string.Empty;
     private string _progressText = string.Empty;
+    private string _speedText = string.Empty;
+    private string _etaText = string.Empty;
     private double _progress;
     private DownloadStatus _status;
 
@@ -18,19 +20,49 @@ public sealed class DownloadItemViewModel : ViewModelBase
     public string ThumbnailUrl { get => _thumbnailUrl; set => SetProperty(ref _thumbnailUrl, value); }
     public string StatusText { get => _statusText; set => SetProperty(ref _statusText, value); }
     public string ProgressText { get => _progressText; set => SetProperty(ref _progressText, value); }
+    public string SpeedText { get => _speedText; set => SetProperty(ref _speedText, value); }
+    public string EtaText { get => _etaText; set => SetProperty(ref _etaText, value); }
     public double Progress { get => _progress; set => SetProperty(ref _progress, value); }
     public DownloadStatus Status { get => _status; set => SetProperty(ref _status, value); }
+
+    public bool IsDownloading => Status == DownloadStatus.Downloading || Status == DownloadStatus.Queued || Status == DownloadStatus.Resolving || Status == DownloadStatus.Retrying;
+    public bool IsPaused => Status == DownloadStatus.Paused;
 
     public void UpdateFrom(DownloadTask task)
     {
         DownloadId = task.Id;
         Title = task.Title;
+        ThumbnailUrl = task.ThumbnailUrl;
         Status = task.Status;
         StatusText = GetStatusText(task.Status);
         Progress = task.Progress;
-        ProgressText = task.Status == DownloadStatus.Downloading
-            ? $"{task.DownloadedBytes / 1024.0 / 1024.0:F1} MB / {task.TotalBytes / 1024.0 / 1024.0:F1} MB"
-            : StatusText;
+
+        if (task.Status == DownloadStatus.Downloading)
+        {
+            var downloaded = task.DownloadedBytes / 1024.0 / 1024.0;
+            var total = task.TotalBytes / 1024.0 / 1024.0;
+            ProgressText = $"{downloaded:F1} MB / {total:F1} MB";
+
+            if (task.SpeedBytesPerSecond > 0)
+            {
+                var speed = task.SpeedBytesPerSecond / 1024.0 / 1024.0;
+                SpeedText = $"{speed:F1} MB/s";
+            }
+
+            if (task.RemainingTime.HasValue && task.RemainingTime.Value.TotalSeconds > 0)
+            {
+                var remaining = task.RemainingTime.Value;
+                EtaText = remaining.TotalHours >= 1
+                    ? $"~{(int)remaining.TotalHours}ч {remaining.Minutes}м"
+                    : $"~{(int)remaining.TotalMinutes}м {remaining.Seconds}с";
+            }
+        }
+        else
+        {
+            ProgressText = StatusText;
+            SpeedText = string.Empty;
+            EtaText = string.Empty;
+        }
     }
 
     private static string GetStatusText(DownloadStatus status) => status switch
