@@ -114,6 +114,23 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         _wndProcDelegate = WndProc;
 
+        var logDir = System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "VKVideoDesktop", "Logs");
+        System.IO.Directory.CreateDirectory(logDir);
+
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            if (e.ExceptionObject is Exception ex)
+                WriteCrashLog(logDir, "UnhandledException", ex);
+        };
+
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            WriteCrashLog(logDir, "UnobservedTaskException", e.Exception);
+            e.SetObserved();
+        };
+
         var resourcesPath = AppContext.BaseDirectory;
 
         _host = Host.CreateDefaultBuilder()
@@ -128,7 +145,12 @@ public partial class App : Microsoft.UI.Xaml.Application
                 {
                     builder.AddSerilog(new LoggerConfiguration()
                         .MinimumLevel.Information()
-                        .WriteTo.File(logPath, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
+                        .WriteTo.File(logPath,
+                            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                            rollingInterval: RollingInterval.Day,
+                            retainedFileCountLimit: 7,
+                            fileSizeLimitBytes: 10 * 1024 * 1024,
+                            rollOnFileSizeLimit: true)
                         .CreateLogger());
                 });
 
@@ -269,6 +291,44 @@ public partial class App : Microsoft.UI.Xaml.Application
 
             if (_gchThis.IsAllocated)
                 _gchThis.Free();
+        }
+    }
+
+    private static void WriteCrashLog(string logDir, string type, Exception ex)
+    {
+        try
+        {
+            var crashPath = System.IO.Path.Combine(logDir, $"crash-{DateTime.Now:yyyy-MM-dd_HHmmss}.log");
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"=== VK Video Desktop Crash Report ===");
+            sb.AppendLine($"Дата: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+            sb.AppendLine($"Тип: {type}");
+            sb.AppendLine($"Версия ОС: {Environment.OSVersion}");
+            sb.AppendLine($"64-bit: {Environment.Is64BitOperatingSystem}");
+            sb.AppendLine($"CLR: {Environment.Version}");
+            sb.AppendLine();
+            sb.AppendLine($"Исключение: {ex.GetType().FullName}");
+            sb.AppendLine($"Сообщение: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"Внутреннее исключение: {ex.InnerException.GetType().FullName}");
+                sb.AppendLine($"Сообщение: {ex.InnerException.Message}");
+            }
+            sb.AppendLine();
+            sb.AppendLine($"Стек вызовов:");
+            sb.AppendLine(ex.StackTrace);
+            if (ex.Data.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"Дополнительные данные:");
+                foreach (System.Collections.DictionaryEntry entry in ex.Data)
+                    sb.AppendLine($"  {entry.Key}: {entry.Value}");
+            }
+            System.IO.File.WriteAllText(crashPath, sb.ToString());
+        }
+        catch
+        {
         }
     }
 

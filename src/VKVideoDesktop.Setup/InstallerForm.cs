@@ -36,6 +36,10 @@ public class InstallerForm : Form
 
     public InstallerForm()
     {
+        SetupLogger.Info("=== Установщик VK Video Desktop запущен ===");
+        SetupLogger.Info($"Версия ОС: {Environment.OSVersion}");
+        SetupLogger.Info($"64-bit: {Environment.Is64BitOperatingSystem}");
+        SetupLogger.Info($"Пользователь: {Environment.UserName}");
         InitializeUI();
         TrySetFormIcon();
     }
@@ -56,6 +60,7 @@ public class InstallerForm : Form
                 if (File.Exists(full))
                 {
                     Icon = new Icon(full);
+                    SetupLogger.Info($"Иконка загружена: {full}");
                     return;
                 }
             }
@@ -66,9 +71,17 @@ public class InstallerForm : Form
             {
                 Icon = new Icon(iconStream);
                 iconStream.Dispose();
+                SetupLogger.Info("Иконка загружена из ресурсов сборки");
+            }
+            else
+            {
+                SetupLogger.Warn("Иконка не найдена");
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            SetupLogger.Error("Ошибка загрузки иконки", ex);
+        }
     }
 
     private void InitializeUI()
@@ -450,6 +463,12 @@ SOFTWARE."
 
     private async void StartInstallation()
     {
+        SetupLogger.Info("Начало установки");
+        SetupLogger.Info($"Путь установки: {_installPath}");
+        SetupLogger.Info($"Ярлык на рабочем столе: {_desktopCheck.Checked}");
+        SetupLogger.Info($"Ярлык в Пуск: {_startMenuCheck.Checked}");
+        SetupLogger.Info($"Протокол vkvideo://: {_protocolCheck.Checked}");
+
         _titleLabel.Text = "Установка";
         _subtitleLabel.Text = "Подождите, пока VK Video Desktop устанавливается...";
 
@@ -465,10 +484,12 @@ SOFTWARE."
         try
         {
             await Task.Run(() => DoInstall(_installCts.Token));
+            SetupLogger.Info("Установка завершена успешно");
             ShowPage(4);
         }
         catch (OperationCanceledException)
         {
+            SetupLogger.Warn("Установка отменена пользователем");
             _statusLabel.Text = "Установка отменена.";
             _nextButton.Text = "Закрыть";
             _nextButton.Visible = true;
@@ -476,6 +497,7 @@ SOFTWARE."
         }
         catch (Exception ex)
         {
+            SetupLogger.Fatal("Ошибка установки", ex);
             _statusLabel.Text = $"Ошибка: {ex.Message}";
             _nextButton.Text = "Закрыть";
             _nextButton.Visible = true;
@@ -486,40 +508,63 @@ SOFTWARE."
     private void DoInstall(CancellationToken ct)
     {
         SetProgress("Проверка Windows App Runtime...", 3);
+        SetupLogger.Info("Проверка Windows App Runtime...");
         var winrtOk = EnsureWindowsAppRuntimeInstalled(ct);
         if (!winrtOk)
         {
+            SetupLogger.Warn("Windows App Runtime не установлен");
             SetProgress("Windows App Runtime не установлен (приложение может потребовать его позже)...", 8);
             Thread.Sleep(1500);
         }
+        else
+        {
+            SetupLogger.Info("Windows App Runtime установлен");
+        }
 
         SetProgress("Извлечение файлов...", 10);
+        SetupLogger.Info("Создание папки установки...");
         Directory.CreateDirectory(_installPath);
 
         var zipData = GetEmbeddedZip();
+        SetupLogger.Info($"Размер встроенного архива: {zipData.Length / 1024} КБ");
         var zipPath = Path.Combine(_installPath, "_app.zip");
         File.WriteAllBytes(zipPath, zipData);
 
         SetProgress("Распаковка архива...", 30);
+        SetupLogger.Info("Распаковка архива...");
         ZipFile.ExtractToDirectory(zipPath, _installPath, overwriteFiles: true);
         File.Delete(zipPath);
+        SetupLogger.Info("Архив распакован");
 
         SetProgress("Создание ярлыков...", 60);
         if (_desktopCheck.Checked)
+        {
+            SetupLogger.Info("Создание ярлыка на рабочем столе...");
             CreateDesktopShortcut();
+        }
         if (_startMenuCheck.Checked)
+        {
+            SetupLogger.Info("Создание ярлыка в меню Пуск...");
             CreateStartMenuShortcut();
+        }
 
         SetProgress("Регистрация протокола...", 75);
         if (_protocolCheck.Checked)
+        {
+            SetupLogger.Info("Регистрация протокола vkvideo://...");
             RegisterProtocol();
+        }
 
         SetProgress("Регистрация в реестре...", 85);
+        SetupLogger.Info("Создание записи в реестре для удаления...");
         RegisterUninstallEntry();
 
         SetProgress("Завершение...", 95);
         Thread.Sleep(300);
 
+        SetupLogger.Info("=== Установка завершена ===");
+        SetupLogger.Info($"Путь установки: {_installPath}");
+        SetupLogger.Info($"Лог установки: {SetupLogger.LogPath}");
         SetProgress("Готово!", 100);
     }
 
@@ -592,8 +637,14 @@ SOFTWARE."
 
     private bool EnsureWindowsAppRuntimeInstalled(CancellationToken ct)
     {
-        if (IsWindowsAppRuntimeInstalled()) return true;
+        SetupLogger.Info("Проверка наличия Windows App Runtime...");
+        if (IsWindowsAppRuntimeInstalled())
+        {
+            SetupLogger.Info("Windows App Runtime уже установлен");
+            return true;
+        }
 
+        SetupLogger.Warn("Windows App Runtime не найден, начинаем скачивание...");
         var tempFile = Path.Combine(Path.GetTempPath(), $"VKSetup_WinRT_{Guid.NewGuid():N}.msixinstaller");
         try
         {
@@ -602,12 +653,15 @@ SOFTWARE."
             {
                 client.Timeout = TimeSpan.FromMinutes(5);
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("VKVideoDesktop/1.0");
+                SetupLogger.Info("Скачивание с https://aka.ms/windowsappruntimeinstall-x64 ...");
                 var data = client.GetByteArrayAsync(
                     "https://aka.ms/windowsappruntimeinstall-x64", ct).GetAwaiter().GetResult();
                 File.WriteAllBytes(tempFile, data);
+                SetupLogger.Info($"Скачано: {data.Length / 1024} КБ");
             }
 
             SetProgress("Установка Windows App Runtime... (может потребовать подтверждение)", 8);
+            SetupLogger.Info("Запуск установщика Windows App Runtime...");
             var psi = new ProcessStartInfo(tempFile, "--quiet --accept-license --force")
             {
                 UseShellExecute = true,
@@ -616,20 +670,24 @@ SOFTWARE."
             using var proc = Process.Start(psi)!;
             proc.WaitForExit(300_000);
             var exitCode = proc.ExitCode;
+            SetupLogger.Info($"Установщик WinRT завершён с кодом: {exitCode}");
 
             if (exitCode == 0 || exitCode == 0x80070005)
             {
                 if (IsWindowsAppRuntimeInstalled()) return true;
             }
 
-            return IsWindowsAppRuntimeInstalled();
+            var result = IsWindowsAppRuntimeInstalled();
+            SetupLogger.Info($"Проверка после установки: {(result ? "установлен" : "не установлен")}");
+            return result;
         }
         catch (OperationCanceledException)
         {
             throw;
         }
-        catch
+        catch (Exception ex)
         {
+            SetupLogger.Error("Ошибка установки Windows App Runtime", ex);
             return false;
         }
         finally
@@ -641,7 +699,11 @@ SOFTWARE."
     private void CreateDesktopShortcut()
     {
         var exePath = Path.Combine(_installPath, "VKVideoDesktop.exe");
-        if (!File.Exists(exePath)) return;
+        if (!File.Exists(exePath))
+        {
+            SetupLogger.Warn($"Файл не найден, ярлык не создан: {exePath}");
+            return;
+        }
 
         var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         var shortcutPath = Path.Combine(desktopPath, "VK Video Desktop.lnk");
@@ -651,7 +713,11 @@ SOFTWARE."
     private void CreateStartMenuShortcut()
     {
         var exePath = Path.Combine(_installPath, "VKVideoDesktop.exe");
-        if (!File.Exists(exePath)) return;
+        if (!File.Exists(exePath))
+        {
+            SetupLogger.Warn($"Файл не найден, ярлык не создан: {exePath}");
+            return;
+        }
 
         var startMenu = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
         var programsDir = Path.Combine(startMenu, "Programs", "VK Video Desktop");
@@ -690,6 +756,11 @@ $link.Save()";
             };
             using var proc = Process.Start(psi);
             proc?.WaitForExit(15000);
+            SetupLogger.Info($"Ярлык создан: {shortcutPath}");
+        }
+        catch (Exception ex)
+        {
+            SetupLogger.Error($"Ошибка создания ярлыка: {shortcutPath}", ex);
         }
         finally
         {
@@ -700,17 +771,29 @@ $link.Save()";
     private void RegisterProtocol()
     {
         var exePath = Path.Combine(_installPath, "VKVideoDesktop.exe");
-        if (!File.Exists(exePath)) return;
+        if (!File.Exists(exePath))
+        {
+            SetupLogger.Warn($"Файл не найден, протокол не зарегистрирован: {exePath}");
+            return;
+        }
 
-        using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Classes\vkvideo");
-        key?.SetValue("", "URL: VK Video Desktop");
-        key?.SetValue("URL Protocol", "");
+        try
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Classes\vkvideo");
+            key?.SetValue("", "URL: VK Video Desktop");
+            key?.SetValue("URL Protocol", "");
 
-        using var icon = key?.CreateSubKey("DefaultIcon");
-        icon?.SetValue("", $"\"{exePath}\",0");
+            using var icon = key?.CreateSubKey("DefaultIcon");
+            icon?.SetValue("", $"\"{exePath}\",0");
 
-        using var command = key?.CreateSubKey(@"shell\open\command");
-        command?.SetValue("", $"\"{exePath}\" \"%1\"");
+            using var command = key?.CreateSubKey(@"shell\open\command");
+            command?.SetValue("", $"\"{exePath}\" \"%1\"");
+            SetupLogger.Info("Протокол vkvideo:// зарегистрирован");
+        }
+        catch (Exception ex)
+        {
+            SetupLogger.Error("Ошибка регистрации протокола", ex);
+        }
     }
 
     private void RegisterUninstallEntry()
@@ -718,17 +801,25 @@ $link.Save()";
         var exePath = Path.Combine(_installPath, "VKVideoDesktop.exe");
         var uninstallExe = Path.Combine(_installPath, "VKVideoDesktopSetup.exe");
 
-        using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(
-            @"Software\Microsoft\Windows\CurrentVersion\Uninstall\VKVideoDesktop");
-        key?.SetValue("DisplayName", "VK Video Desktop");
-        key?.SetValue("DisplayVersion", "1.0.0");
-        key?.SetValue("Publisher", "VK Video Desktop Contributors");
-        key?.SetValue("InstallLocation", _installPath);
-        key?.SetValue("UninstallString", $"\"{uninstallExe}\" --uninstall");
-        key?.SetValue("QuietUninstallString", $"\"{uninstallExe}\" --uninstall --silent");
-        key?.SetValue("NoModify", 1);
-        key?.SetValue("NoRepair", 1);
-        key?.SetValue("EstimatedSize", 119000);
+        try
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Uninstall\VKVideoDesktop");
+            key?.SetValue("DisplayName", "VK Video Desktop");
+            key?.SetValue("DisplayVersion", "1.0.0");
+            key?.SetValue("Publisher", "VK Video Desktop Contributors");
+            key?.SetValue("InstallLocation", _installPath);
+            key?.SetValue("UninstallString", $"\"{uninstallExe}\" --uninstall");
+            key?.SetValue("QuietUninstallString", $"\"{uninstallExe}\" --uninstall --silent");
+            key?.SetValue("NoModify", 1);
+            key?.SetValue("NoRepair", 1);
+            key?.SetValue("EstimatedSize", 119000);
+            SetupLogger.Info("Запись в реестре для удаления создана");
+        }
+        catch (Exception ex)
+        {
+            SetupLogger.Error("Ошибка создания записи в реестре", ex);
+        }
     }
 
     private void ShowCompletePage()
