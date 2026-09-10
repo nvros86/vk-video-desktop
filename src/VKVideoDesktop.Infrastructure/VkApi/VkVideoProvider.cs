@@ -32,16 +32,18 @@ public sealed class VkVideoProvider : IVideoProvider
         string query,
         SearchFilter filter,
         SearchSortOrder sortOrder,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        int offset = 0)
     {
         try
         {
-            _logger.LogDebug("Searching VK for '{Query}'", query);
+            _logger.LogDebug("Searching VK for '{Query}' offset {Offset}", query, offset);
 
             var url = BuildUrl("video.search", new Dictionary<string, string>
             {
                 ["q"] = query,
                 ["count"] = "20",
+                ["offset"] = offset.ToString(),
                 ["sort"] = sortOrder switch
                 {
                     SearchSortOrder.Date => "2",

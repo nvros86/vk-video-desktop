@@ -20,16 +20,17 @@ public sealed class SearchService
         string query,
         SearchFilter filter = SearchFilter.All,
         SearchSortOrder sortOrder = SearchSortOrder.Relevance,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        int offset = 0)
     {
         if (string.IsNullOrWhiteSpace(query))
             return new SearchResult();
 
         try
         {
-            _logger.LogInformation("Searching for '{Query}' with filter {Filter}", query, filter);
+            _logger.LogInformation("Searching for '{Query}' with filter {Filter} offset {Offset}", query, filter, offset);
 
-            var videos = await _videoProvider.SearchAsync(query, filter, sortOrder, cancellationToken);
+            var videos = await _videoProvider.SearchAsync(query, filter, sortOrder, cancellationToken, offset);
 
             return new SearchResult
             {

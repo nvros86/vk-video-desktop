@@ -17,6 +17,7 @@ public sealed class MainViewModel : ViewModelBase
     private string _searchQuery = string.Empty;
     private bool _isLoading;
     private string _currentSection = "Главная";
+    private int _searchOffset;
 
     public MainViewModel(
         SearchService searchService,
@@ -120,6 +121,7 @@ public sealed class MainViewModel : ViewModelBase
         try
         {
             IsLoading = true;
+            _searchOffset = 0;
             var result = await _searchService.SearchAsync(query);
             SearchResults.Clear();
             foreach (var video in result.Videos)
@@ -136,6 +138,21 @@ public sealed class MainViewModel : ViewModelBase
         finally
         {
             IsLoading = false;
+        }
+    }
+
+    public async Task<IReadOnlyList<Video>> SearchMoreAsync(string query)
+    {
+        try
+        {
+            _searchOffset += 20;
+            var result = await _searchService.SearchAsync(query, offset: _searchOffset);
+            return result.Videos;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Search more failed for '{Query}'", query);
+            return Array.Empty<Video>();
         }
     }
 

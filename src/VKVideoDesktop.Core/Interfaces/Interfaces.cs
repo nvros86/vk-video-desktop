@@ -9,7 +9,8 @@ public interface IVideoProvider
         string query,
         SearchFilter filter,
         SearchSortOrder sortOrder,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken,
+        int offset = 0);
 
     Task<Video?> GetVideoAsync(
         string videoId,
@@ -87,4 +88,12 @@ public interface ISettingsService
     Task LoadAsync();
     Task SaveAsync();
     Task ResetAsync();
+}
+
+public interface IVKWebViewService
+{
+    string GetVideoUrl(Video video);
+    string GetChannelUrl(string channelId);
+    string GetPlaylistUrl(string ownerId, string playlistId);
+    bool CanHandleInWebView(Video video);
 }

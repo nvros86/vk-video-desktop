@@ -9,6 +9,7 @@ using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Data.Database;
 using VKVideoDesktop.Infrastructure.Cache;
+using VKVideoDesktop.Infrastructure;
 using Serilog;
 using VKVideoDesktop.Infrastructure.Download;
 using VKVideoDesktop.Infrastructure.VkApi;
@@ -149,6 +150,7 @@ public partial class App : Microsoft.UI.Xaml.Application
                 services.AddSingleton<IHistoryService, HistoryDatabase>();
                 services.AddSingleton<IFavoritesService, FavoritesDatabase>();
                 services.AddSingleton<IPlaylistService, PlaylistDatabase>();
+                services.AddSingleton<IVKWebViewService, VKWebViewService>();
                 services.AddSingleton<PlaybackService>();
                 services.AddSingleton<ErrorHandlerService>();
                 services.AddSingleton<DeepLinkService>();

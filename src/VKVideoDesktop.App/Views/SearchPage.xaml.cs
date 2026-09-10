@@ -9,6 +9,7 @@ public sealed partial class SearchPage : Page
 {
     private MainViewModel ViewModel { get; }
     private readonly DispatcherTimer _debounceTimer;
+    private string? _lastQuery;
 
     public SearchPage()
     {
@@ -47,11 +48,14 @@ public sealed partial class SearchPage : Page
         {
             ResultsList.Visibility = Visibility.Collapsed;
             EmptyState.Visibility = Visibility.Visible;
+            LoadMoreButton.Visibility = Visibility.Collapsed;
             return;
         }
 
+        _lastQuery = query;
         LoadingRing.IsActive = true;
         EmptyState.Visibility = Visibility.Collapsed;
+        LoadMoreButton.Visibility = Visibility.Collapsed;
 
         try
         {
@@ -63,6 +67,10 @@ public sealed partial class SearchPage : Page
             if (ViewModel.SearchResults.Count == 0)
             {
                 EmptyState.Visibility = Visibility.Visible;
+            }
+            else if (ViewModel.SearchResults.Count >= 20)
+            {
+                LoadMoreButton.Visibility = Visibility.Visible;
             }
         }
         finally
@@ -77,6 +85,7 @@ public sealed partial class SearchPage : Page
         var query = SearchBox.Text?.Trim();
         if (!string.IsNullOrEmpty(query))
         {
+            _lastQuery = query;
             _ = ViewModel.SearchAsync(query);
         }
     }
@@ -104,6 +113,34 @@ public sealed partial class SearchPage : Page
         if (sender is Button button && button.Tag is string videoId)
         {
             Frame.Navigate(typeof(VideoPage), videoId);
+        }
+    }
+
+    private async void OnLoadMoreClick(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel == null || string.IsNullOrEmpty(_lastQuery)) return;
+        LoadMoreButton.IsEnabled = false;
+        try
+        {
+            var moreResults = await ViewModel.SearchMoreAsync(_lastQuery);
+            if (moreResults != null && moreResults.Count > 0)
+            {
+                foreach (var video in moreResults)
+                {
+                    var vm = new VideoViewModel();
+                    vm.UpdateFrom(video);
+                    ViewModel.SearchResults.Add(vm);
+                }
+                LoadMoreButton.Visibility = moreResults.Count >= 20 ? Visibility.Visible : Visibility.Collapsed;
+            }
+            else
+            {
+                LoadMoreButton.Visibility = Visibility.Collapsed;
+            }
+        }
+        finally
+        {
+            LoadMoreButton.IsEnabled = true;
         }
     }
 }

@@ -1,7 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using VKVideoDesktop.App.ViewModels;
+using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Core.Models;
 
@@ -26,6 +28,8 @@ public sealed partial class HomePage : Page
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await ViewModel.LoadRecommendationsAsync();
+        EmptyState.Visibility = (ViewModel.HistoryEntries.Count == 0 && ViewModel.Recommendations.Count == 0)
+            ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void OnVideoItemClick(object sender, RoutedEventArgs e)
@@ -131,6 +135,61 @@ public sealed partial class HomePage : Page
         if (sender is MenuFlyoutItem item && item.Tag is string videoId)
         {
             await Windows.System.Launcher.LaunchUriAsync(new Uri($"https://vk.com/video{videoId}"));
+        }
+    }
+
+    private void OnAddToQueueClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem item && item.Tag is VideoViewModel video)
+        {
+            var playbackService = App.Services.GetRequiredService<PlaybackService>();
+            playbackService.Enqueue(video.Id);
+        }
+    }
+
+    private async void OnAddToPlaylistClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem item && item.Tag is VideoViewModel video)
+        {
+            var playlistService = App.Services.GetRequiredService<IPlaylistService>();
+            var playlists = await playlistService.GetAllAsync();
+            if (playlists.Count > 0)
+            {
+                var dialog = new ContentDialog();
+                dialog.Title = "Добавить в плейлист";
+                var listView = new ListView();
+                foreach (var pl in playlists)
+                    listView.Items.Add(new ListViewItem { Content = pl.Title, Tag = pl });
+                listView.SelectionChanged += async (s, args) =>
+                {
+                    if (listView.SelectedItem is ListViewItem selected && selected.Tag is Playlist playlist)
+                    {
+                        var videoObj = new Video
+                        {
+                            Id = video.Id,
+                            Title = video.Title,
+                            ChannelName = video.Author,
+                            ThumbnailUrl = video.ThumbnailUrl,
+                            Duration = TimeSpan.Zero
+                        };
+                        await playlistService.AddVideoAsync(playlist.Id, videoObj);
+                        dialog.Hide();
+                    }
+                };
+                dialog.Content = listView;
+                dialog.PrimaryButtonText = "Отмена";
+                await dialog.ShowAsync();
+            }
+        }
+    }
+
+    private async void OnShareClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuFlyoutItem item && item.Tag is VideoViewModel video)
+        {
+            var dataPackage = new Windows.ApplicationModel.DataTransfer.DataPackage();
+            dataPackage.SetText($"https://vk.com/video{video.Id}");
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
         }
     }
 }

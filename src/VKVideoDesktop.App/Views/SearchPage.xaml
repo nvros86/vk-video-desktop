@@ -92,6 +92,9 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+
+                <Button x:Name="LoadMoreButton" Content="Загрузить ещё" Click="OnLoadMoreClick"
+                        HorizontalAlignment="Center" Margin="0,16" Visibility="Collapsed" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

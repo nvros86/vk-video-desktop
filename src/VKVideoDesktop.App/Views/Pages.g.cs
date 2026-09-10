@@ -6,12 +6,14 @@ namespace VKVideoDesktop.App.Views;
 
 public sealed partial class HomePage
 {
+    internal StackPanel EmptyState = null!;
     internal void InitializeComponent() { }
 }
 
 public sealed partial class SearchPage
 {
     internal ComboBox SortComboBox = null!;
+    internal Button LoadMoreButton = null!;
     internal void InitializeComponent() { }
 }
 

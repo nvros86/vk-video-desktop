@@ -7,6 +7,14 @@
     xmlns:vm="using:VKVideoDesktop.App.ViewModels"
     Background="Transparent">
 
+    <Grid>
+        <StackPanel x:Name="EmptyState" Visibility="Collapsed" HorizontalAlignment="Center"
+                    VerticalAlignment="Center" Spacing="12" Margin="40">
+            <FontIcon Glyph="&#xE786;" FontSize="64" Opacity="0.3" />
+            <TextBlock Text="Нет контента" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center" />
+            <TextBlock Text="Поищите видео или откройте каналы" Opacity="0.6" HorizontalAlignment="Center" />
+        </StackPanel>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,0,80">
         <StackPanel Spacing="24" Margin="24,16">
 
@@ -116,6 +124,10 @@
                                         <MenuFlyoutItem Text="Добавить в избранное" Click="OnContextFavorite" Tag="{x:Bind Id}" />
                                         <MenuFlyoutItem Text="Скачать" Click="OnContextDownload" Tag="{x:Bind Id}" />
                                         <MenuFlyoutSeparator />
+                                        <MenuFlyoutItem Text="Добавить в очередь" Click="OnAddToQueueClick" Tag="{x:Bind}" />
+                                        <MenuFlyoutItem Text="Добавить в плейлист" Click="OnAddToPlaylistClick" Tag="{x:Bind}" />
+                                        <MenuFlyoutSeparator />
+                                        <MenuFlyoutItem Text="Поделиться" Click="OnShareClick" Tag="{x:Bind}" />
                                         <MenuFlyoutItem Text="Открыть в VK" Click="OnContextOpenInVk" Tag="{x:Bind Id}" />
                                     </MenuFlyout>
                                 </Button.ContextFlyout>
@@ -147,4 +159,5 @@
 
         </StackPanel>
     </ScrollViewer>
+    </Grid>
 </Page>

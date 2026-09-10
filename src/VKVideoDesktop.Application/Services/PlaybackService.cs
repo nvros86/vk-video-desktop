@@ -80,6 +80,12 @@ public sealed class PlaybackService
         return null;
     }
 
+    public void Enqueue(string videoId)
+    {
+        _state.Queue.Add(videoId);
+        StateChanged?.Invoke(this, _state);
+    }
+
     public bool HasNext => _state.Queue.Count > 0 && _state.CurrentQueueIndex < _state.Queue.Count - 1;
     public bool HasPrevious => _state.Queue.Count > 0 && _state.CurrentQueueIndex > 0;
 
