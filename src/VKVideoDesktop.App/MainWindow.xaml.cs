@@ -34,16 +34,37 @@ public sealed partial class MainWindow : Window
         ["Settings"] = typeof(SettingsPage)
     };
 
+    private static void MwLog(string msg)
+    {
+        try
+        {
+            var dir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "VKVideoDesktop", "log");
+            Directory.CreateDirectory(dir);
+            File.AppendAllText(Path.Combine(dir, "debug.log"),
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [MainWindow] {msg}\n");
+        }
+        catch { }
+    }
+
     public MainWindow()
     {
+        MwLog("Constructor - entry");
         Instance = this;
+        MwLog("Constructor - Instance set");
+        MwLog("Constructor - calling InitializeComponent...");
         InitializeComponent();
+        MwLog("Constructor - InitializeComponent done, setting Title...");
         Title = "VK Video Desktop";
+        MwLog("Constructor - resolving services...");
         _authService = App.GetService<IAuthenticationService>();
         _playbackService = App.GetService<PlaybackService>();
+        MwLog("Constructor - services resolved");
 
         _playbackService.StateChanged += OnPlaybackStateChanged;
 
+        MwLog("Constructor - navigating to initial page...");
         ContentFrame.Navigated += OnFrameNavigated;
 
         if (_authService.IsAuthenticated)

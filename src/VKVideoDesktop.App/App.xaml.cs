@@ -208,11 +208,9 @@ public partial class App : Microsoft.UI.Xaml.Application
             await _host.StartAsync();
             DebugLog("StartupAsync - host started");
 
-            DebugLog("StartupAsync - loading settings...");
+            DebugLog("StartupAsync - loading settings (sync)...");
             try
             {
-                var settingsService = Services.GetRequiredService<ISettingsService>();
-
                 var settingsPath = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "VKVideoDesktop", "settings.json");
@@ -222,12 +220,13 @@ public partial class App : Microsoft.UI.Xaml.Application
                     var json = File.ReadAllText(settingsPath);
                     if (json.Contains("AccessToken"))
                     {
-                        DebugLog("StartupAsync - settings has DPAPI token, deleting file to avoid native crash");
+                        DebugLog("StartupAsync - settings has DPAPI token, deleting file");
                         try { File.Delete(settingsPath); } catch { }
                         DebugLog("StartupAsync - settings.json deleted, fresh start");
                     }
                     else
                     {
+                        var settingsService = Services.GetRequiredService<ISettingsService>();
                         await settingsService.LoadAsync();
                         DebugLog("StartupAsync - settings loaded OK");
                     }
@@ -243,25 +242,29 @@ public partial class App : Microsoft.UI.Xaml.Application
             }
 
             DebugLog("StartupAsync - creating window...");
-            _mainWindow = Services.GetRequiredService<MainWindow>();
-            DebugLog("StartupAsync - MainWindow resolved, activating...");
-            _mainWindow.Activate();
-            DebugLog("StartupAsync - MainWindow activated");
-            _mainWindow.Closed += OnMainWindowClosed;
+            try
+            {
+                _mainWindow = Services.GetRequiredService<MainWindow>();
+                DebugLog("StartupAsync - MainWindow resolved, activating...");
+                _mainWindow.Activate();
+                DebugLog("StartupAsync - MainWindow activated");
+                _mainWindow.Closed += OnMainWindowClosed;
+            }
+            catch (Exception ex)
+            {
+                DebugLog($"StartupAsync - MainWindow FAILED: {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                throw;
+            }
 
             DebugLog("StartupAsync - initializing tray icon...");
-            InitializeTrayIcon();
-            DebugLog("StartupAsync - done!");
-
-            DebugLog("StartupAsync - creating window...");
-            _mainWindow = Services.GetRequiredService<MainWindow>();
-            DebugLog("StartupAsync - MainWindow resolved, activating...");
-            _mainWindow.Activate();
-            DebugLog("StartupAsync - MainWindow activated");
-            _mainWindow.Closed += OnMainWindowClosed;
-
-            DebugLog("StartupAsync - initializing tray icon...");
-            InitializeTrayIcon();
+            try
+            {
+                InitializeTrayIcon();
+            }
+            catch (Exception ex)
+            {
+                DebugLog($"StartupAsync - tray icon (non-fatal): {ex.GetType().Name}: {ex.Message}");
+            }
             DebugLog("StartupAsync - done!");
 
             if (arguments?.StartsWith("vkvideo://") == true || arguments?.StartsWith("vkvideo:") == true)
