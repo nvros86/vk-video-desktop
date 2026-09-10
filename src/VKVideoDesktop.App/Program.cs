@@ -15,11 +15,15 @@ static class Program
     [STAThread]
     static void Main(string[] args)
     {
+        WriteDebugLog("Main() entered");
         try
         {
+            WriteDebugLog("Calling InitializeComWrappers...");
             WinRT.ComWrappersSupport.InitializeComWrappers();
+            WriteDebugLog("InitializeComWrappers done, starting Application...");
             Microsoft.UI.Xaml.Application.Start((p) =>
             {
+                WriteDebugLog("Application.Start callback");
                 var context = new DispatcherQueueSynchronizationContext(
                     DispatcherQueue.GetForCurrentThread());
                 SynchronizationContext.SetSynchronizationContext(context);
@@ -28,6 +32,7 @@ static class Program
         }
         catch (Exception ex)
         {
+            WriteDebugLog($"Exception: {ex.GetType().Name}: {ex.Message}");
             WriteStartupCrashLog(ex);
 
             var isRuntimeMissing = ex is DllNotFoundException
@@ -58,6 +63,19 @@ static class Program
                 throw;
             }
         }
+    }
+
+    private static void WriteDebugLog(string message)
+    {
+        try
+        {
+            var path = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "VKVideoDesktop", "log", "debug.log");
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.AppendAllText(path, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}{Environment.NewLine}");
+        }
+        catch { }
     }
 
     private static void WriteStartupCrashLog(Exception ex)
