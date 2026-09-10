@@ -204,16 +204,23 @@ public partial class App : Microsoft.UI.Xaml.Application
         DebugLog("StartupAsync - entry point reached");
         try
         {
+            DebugLog("StartupAsync - starting host...");
             await _host.StartAsync();
+            DebugLog("StartupAsync - host started, loading settings...");
 
             var settingsService = Services.GetRequiredService<ISettingsService>();
             await settingsService.LoadAsync();
+            DebugLog("StartupAsync - settings loaded, creating window...");
 
             _mainWindow = Services.GetRequiredService<MainWindow>();
+            DebugLog("StartupAsync - MainWindow resolved, activating...");
             _mainWindow.Activate();
+            DebugLog("StartupAsync - MainWindow activated");
             _mainWindow.Closed += OnMainWindowClosed;
 
+            DebugLog("StartupAsync - initializing tray icon...");
             InitializeTrayIcon();
+            DebugLog("StartupAsync - tray icon initialized, done!");
 
             if (arguments?.StartsWith("vkvideo://") == true || arguments?.StartsWith("vkvideo:") == true)
             {
