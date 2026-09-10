@@ -268,7 +268,7 @@ public sealed class DownloadManager : IDownloadManager
         }
         catch (OperationCanceledException)
         {
-            // Download was cancelled - status already updated
+            // Загрузка была отменена - статус уже обновлен
         }
         catch (Exception ex)
         {
