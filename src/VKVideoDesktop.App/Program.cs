@@ -32,9 +32,15 @@ static class Program
                 var app = new App();
                 WriteDebugLog("DI ready, creating MainWindow synchronously...");
 
+                WriteDebugLog("Step 1: new MainWindow()...");
                 var window = new MainWindow();
+                WriteDebugLog("Step 2: MainWindow created, calling SetupUI...");
+                window.SetupUI();
+                WriteDebugLog("Step 3: SetupUI done, setting Title...");
+                window.Title = "VK Video Desktop";
+                WriteDebugLog("Step 4: Title set, activating...");
                 window.Activate();
-                WriteDebugLog("MainWindow activated!");
+                WriteDebugLog("Step 5: MainWindow activated!");
 
                 WriteDebugLog("Starting async host + settings...");
                 _ = app.StartupAsync(window);

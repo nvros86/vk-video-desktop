@@ -24,10 +24,10 @@ public sealed partial class MainWindow
     internal Border DownloadBadge = null!;
     internal TextBlock DownloadBadgeCount = null!;
 
-    private static readonly Brush TextPrimary = new SolidColorBrush(Colors.White);
-    private static readonly Brush TextSecondary = new SolidColorBrush(Colors.Gray);
-    private static readonly Brush Accent = new SolidColorBrush(ColorHelper.FromArgb(255, 88, 166, 255));
-    private static readonly Brush Transparent = new SolidColorBrush(Colors.Transparent);
+    private static Brush Mp => new SolidColorBrush(Colors.White);
+    private static Brush Ms => new SolidColorBrush(Colors.Gray);
+    private static Brush Ma => new SolidColorBrush(ColorHelper.FromArgb(255, 88, 166, 255));
+    private static Brush Mt => new SolidColorBrush(Colors.Transparent);
 
     internal void InitializeComponent()
     {
@@ -68,13 +68,13 @@ public sealed partial class MainWindow
         bar.Padding = new Thickness(16, 10, 16, 10);
 
         var titleStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, VerticalAlignment = VerticalAlignment.Center };
-        titleStack.Children.Add(new FontIcon { Glyph = "\uE72B", FontSize = 20, Foreground = Accent });
+        titleStack.Children.Add(new FontIcon { Glyph = "\uE72B", FontSize = 20, Foreground = Ma });
         titleStack.Children.Add(new TextBlock
         {
             Text = "VK Video Desktop",
             FontSize = 16,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-            Foreground = TextPrimary,
+            Foreground = Mp,
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(0, 0, 24, 0)
         });
@@ -96,16 +96,16 @@ public sealed partial class MainWindow
 
         var rightPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
 
-        var dlButton = new Button { Background = Transparent, BorderThickness = new Thickness(0) };
+        var dlButton = new Button { Background = Mt, BorderThickness = new Thickness(0) };
         ToolTipService.SetToolTip(dlButton, "\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0438");
         dlButton.Click += OnDownloadsClick;
-        dlButton.Content = new FontIcon { Glyph = "\uE896", Foreground = TextSecondary };
+        dlButton.Content = new FontIcon { Glyph = "\uE896", Foreground = Ms };
         rightPanel.Children.Add(dlButton);
 
-        var settingsButton = new Button { Background = Transparent, BorderThickness = new Thickness(0) };
+        var settingsButton = new Button { Background = Mt, BorderThickness = new Thickness(0) };
         ToolTipService.SetToolTip(settingsButton, "\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438");
         settingsButton.Click += OnSettingsClick;
-        settingsButton.Content = new FontIcon { Glyph = "\uE713", Foreground = TextSecondary };
+        settingsButton.Content = new FontIcon { Glyph = "\uE713", Foreground = Ms };
         rightPanel.Children.Add(settingsButton);
 
         Grid.SetColumn(rightPanel, 2);
@@ -174,40 +174,40 @@ public sealed partial class MainWindow
         Grid.SetColumn(MiniPlayerThumb, 0);
         bar.Children.Add(MiniPlayerThumb);
 
-        MiniPlayerTitle = new TextBlock { TextWrapping = TextWrapping.NoWrap, TextTrimming = TextTrimming.CharacterEllipsis, VerticalAlignment = VerticalAlignment.Center, FontSize = 13, Foreground = TextPrimary };
+        MiniPlayerTitle = new TextBlock { TextWrapping = TextWrapping.NoWrap, TextTrimming = TextTrimming.CharacterEllipsis, VerticalAlignment = VerticalAlignment.Center, FontSize = 13, Foreground = Mp };
         Grid.SetColumn(MiniPlayerTitle, 1);
         bar.Children.Add(MiniPlayerTitle);
 
         var miniButtons = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
 
-        var playBtn = new Button { Background = Transparent, BorderThickness = new Thickness(0) };
+        var playBtn = new Button { Background = Mt, BorderThickness = new Thickness(0) };
         ToolTipService.SetToolTip(playBtn, "\u0412\u043e\u0441\u043f\u0440\u043e\u0438\u0437\u0432\u0435\u0441\u0442\u0438/\u041f\u0430\u0437\u0443\u0437\u0430");
         playBtn.Click += OnMiniPlayerPlayClick;
-        playBtn.Content = new FontIcon { Glyph = "\uE768", FontSize = 14, Foreground = TextPrimary };
+        playBtn.Content = new FontIcon { Glyph = "\uE768", FontSize = 14, Foreground = Mp };
         miniButtons.Children.Add(playBtn);
 
-        var prevBtn = new Button { Background = Transparent, BorderThickness = new Thickness(0) };
+        var prevBtn = new Button { Background = Mt, BorderThickness = new Thickness(0) };
         ToolTipService.SetToolTip(prevBtn, "\u041f\u0440\u0435\u0434\u044b\u0434\u0443\u0449\u0435\u0435");
         prevBtn.Click += OnMiniPlayerPrevClick;
-        prevBtn.Content = new FontIcon { Glyph = "\uE892", FontSize = 14, Foreground = TextSecondary };
+        prevBtn.Content = new FontIcon { Glyph = "\uE892", FontSize = 14, Foreground = Ms };
         miniButtons.Children.Add(prevBtn);
 
-        var nextBtn = new Button { Background = Transparent, BorderThickness = new Thickness(0) };
+        var nextBtn = new Button { Background = Mt, BorderThickness = new Thickness(0) };
         ToolTipService.SetToolTip(nextBtn, "\u0421\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u0435");
         nextBtn.Click += OnMiniPlayerNextClick;
-        nextBtn.Content = new FontIcon { Glyph = "\uE893", FontSize = 14, Foreground = TextSecondary };
+        nextBtn.Content = new FontIcon { Glyph = "\uE893", FontSize = 14, Foreground = Ms };
         miniButtons.Children.Add(nextBtn);
 
-        var fsBtn = new Button { Background = Transparent, BorderThickness = new Thickness(0) };
+        var fsBtn = new Button { Background = Mt, BorderThickness = new Thickness(0) };
         ToolTipService.SetToolTip(fsBtn, "\u041f\u043e\u043b\u043d\u044b\u0439 \u044d\u043a\u0440\u0430\u043d");
         fsBtn.Click += OnMiniPlayerFullscreenClick;
-        fsBtn.Content = new FontIcon { Glyph = "\uE740", FontSize = 14, Foreground = TextSecondary };
+        fsBtn.Content = new FontIcon { Glyph = "\uE740", FontSize = 14, Foreground = Ms };
         miniButtons.Children.Add(fsBtn);
 
-        var closeBtn = new Button { Background = Transparent, BorderThickness = new Thickness(0) };
+        var closeBtn = new Button { Background = Mt, BorderThickness = new Thickness(0) };
         ToolTipService.SetToolTip(closeBtn, "\u0417\u0430\u043a\u0440\u044b\u0442\u044c");
         closeBtn.Click += OnMiniPlayerCloseClick;
-        closeBtn.Content = new FontIcon { Glyph = "\uE8BB", FontSize = 14, Foreground = TextSecondary };
+        closeBtn.Content = new FontIcon { Glyph = "\uE8BB", FontSize = 14, Foreground = Ms };
         miniButtons.Children.Add(closeBtn);
 
         Grid.SetColumn(miniButtons, 2);
@@ -227,7 +227,7 @@ public sealed partial class MainWindow
         Grid.SetColumn(ErrorBannerText, 0);
         banner.Children.Add(ErrorBannerText);
 
-        var closeBtn = new Button { Background = Transparent, Foreground = new SolidColorBrush(Colors.White) };
+        var closeBtn = new Button { Background = Mt, Foreground = new SolidColorBrush(Colors.White) };
         closeBtn.Content = "\uE8BB";
         closeBtn.FontFamily = new FontFamily("Segoe MDL2 Assets");
         closeBtn.Click += OnCloseErrorBanner;
@@ -252,8 +252,8 @@ public sealed partial class MainWindow
         panel.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         var header = new Grid { Padding = new Thickness(12, 8, 12, 8) };
-        header.Children.Add(new TextBlock { Text = "\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0438", VerticalAlignment = VerticalAlignment.Center, Foreground = TextPrimary });
-        var closeBtn = new Button { HorizontalAlignment = HorizontalAlignment.Right, Background = Transparent };
+        header.Children.Add(new TextBlock { Text = "\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0438", VerticalAlignment = VerticalAlignment.Center, Foreground = Mp });
+        var closeBtn = new Button { HorizontalAlignment = HorizontalAlignment.Right, Background = Mt };
         closeBtn.Content = "\uE8BB";
         closeBtn.FontFamily = new FontFamily("Segoe MDL2 Assets");
         closeBtn.Click += OnCloseDownloadsPanel;

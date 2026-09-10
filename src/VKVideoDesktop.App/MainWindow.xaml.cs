@@ -58,8 +58,11 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         Instance = this;
+    }
+
+    internal void SetupUI()
+    {
         InitializeComponent();
-        Title = "VK Video Desktop";
         ExtendsContentIntoTitleBar = false;
         ContentFrame.Navigated += OnFrameNavigated;
         ContentFrame.KeyDown += OnGlobalKeyDown;
