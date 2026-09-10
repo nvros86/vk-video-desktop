@@ -23,6 +23,18 @@
             <StackPanel x:Name="WelcomePage" Visibility="Visible" VerticalAlignment="Center">
                 <TextBlock Text="Добро пожаловать!" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,15"/>
                 <TextBlock Text="Этот мастер поможет установить VK Video Desktop на ваш компьютер." TextWrapping="Wrap" Foreground="#CCCCCC" FontSize="14"/>
+
+                <Border x:Name="UpdateInfoBorder" Visibility="Collapsed" Background="#1B3A20" CornerRadius="4" Padding="12" Margin="0,15,0,0" BorderBrush="#4CAF50" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock x:Name="UpdateVersionText" FontSize="13" Foreground="#4CAF50"/>
+                        <Button x:Name="DownloadUpdateButton" Content="Скачать обновление" Click="OnDownloadUpdateClick"
+                                Margin="0,8,0,0" Padding="15,6" Background="#6C63FF" Foreground="White" BorderThickness="0"/>
+                    </StackPanel>
+                </Border>
+
+                <Button x:Name="UninstallButton" Content="Удалить VK Video Desktop" Click="OnUninstallClick"
+                        Visibility="Collapsed" Margin="0,20,0,0" Padding="15,8" Background="#FF5252" Foreground="White" BorderThickness="0"/>
+
                 <TextBlock Text="Нажмите «Далее» для продолжения." Margin="0,20,0,0" Foreground="#999999"/>
             </StackPanel>
 
@@ -67,6 +79,12 @@
                 <TextBlock Text="VK Video Desktop успешно установлен." Foreground="#CCCCCC" FontSize="14"/>
                 <TextBlock x:Name="InstallPathInfo" Margin="0,10,0,0" Foreground="#888888" FontSize="12"/>
                 <CheckBox x:Name="LaunchAfterInstall" Content="Запустить VK Video Desktop" IsChecked="True" Margin="0,15,0,0" Foreground="#CCCCCC"/>
+            </StackPanel>
+
+            <StackPanel x:Name="UninstallPage" Visibility="Collapsed" VerticalAlignment="Center">
+                <TextBlock x:Name="UninstallTitle" Text="Удаление..." FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15"/>
+                <ProgressBar x:Name="UninstallProgress" Height="20" Minimum="0" Maximum="100"/>
+                <TextBlock x:Name="UninstallStatus" Margin="0,10,0,0" Foreground="#CCCCCC"/>
             </StackPanel>
         </Grid>
 

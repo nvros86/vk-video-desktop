@@ -8,4 +8,7 @@
     <RootNamespace>VKVideoDesktop.Installer</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="version.txt" />
+  </ItemGroup>
 </Project>

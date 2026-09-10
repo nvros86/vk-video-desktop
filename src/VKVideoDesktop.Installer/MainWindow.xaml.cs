@@ -3,7 +3,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Net.Http;
 using System.Reflection;
+using System.Text.Json;
 using Microsoft.Win32;
 
 namespace VKVideoDesktop.Installer;
@@ -11,16 +13,104 @@ namespace VKVideoDesktop.Installer;
 public partial class MainWindow : System.Windows.Window
 {
     private int _currentPage;
-    private readonly string[] _pages = { "WelcomePage", "LicensePage", "LocationPage", "InstallingPage", "CompletePage" };
+    private readonly string[] _pages = { "WelcomePage", "LicensePage", "LocationPage", "InstallingPage", "CompletePage", "UninstallPage" };
     private string _installPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "VKVideoDesktop");
+    private string _installedPath = "";
+    private static readonly HttpClient _http = new();
 
     public MainWindow()
     {
         InitializeComponent();
         InstallPathBox.Text = _installPath;
         SpaceInfo.Text = "Свободно: " + GetFreeSpace();
+        DetectInstallation();
+        CheckForUpdates();
+    }
+
+    private void DetectInstallation()
+    {
+        try
+        {
+            var key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\vkvideo\shell\open\command");
+            if (key != null)
+            {
+                var cmd = key.GetValue("")?.ToString();
+                key.Close();
+                if (!string.IsNullOrEmpty(cmd))
+                {
+                    var parts = cmd.Split('"');
+                    var exePath = parts.Length > 1 ? parts[1] : "";
+                    if (!string.IsNullOrEmpty(exePath) && File.Exists(exePath))
+                    {
+                        _installedPath = Path.GetDirectoryName(exePath) ?? "";
+                        UninstallButton.Visibility = System.Windows.Visibility.Visible;
+                    }
+                }
+            }
+        }
+        catch { }
+    }
+
+    private async void CheckForUpdates()
+    {
+        try
+        {
+            _http.DefaultRequestHeaders.UserAgent.Clear();
+            _http.DefaultRequestHeaders.UserAgent.ParseAdd("VKVideoDesktop-Installer");
+            var response = await _http.GetStringAsync("https://api.github.com/repos/nvros86/vk-video-desktop/releases/latest");
+            using var doc = JsonDocument.Parse(response);
+            var root = doc.RootElement;
+            var tagName = root.GetProperty("tag_name").GetString() ?? "";
+            var htmlUrl = root.GetProperty("html_url").GetString() ?? "";
+
+            var currentVersion = GetCurrentVersion();
+            var latestVersion = tagName.TrimStart('v', 'V');
+
+            if (Version.TryParse(latestVersion, out var latest) && Version.TryParse(currentVersion, out var current) && latest > current)
+            {
+                UpdateVersionText.Text = "Доступна новая версия: v" + latestVersion;
+                UpdateInfoBorder.Visibility = System.Windows.Visibility.Visible;
+                UpdateInfoBorder.Tag = htmlUrl;
+            }
+        }
+        catch { }
+    }
+
+    private static string GetCurrentVersion()
+    {
+        try
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            using var stream = assembly.GetManifestResourceStream("VKVideoDesktop.Installer.version.txt");
+            if (stream != null)
+            {
+                using var reader = new StreamReader(stream);
+                return reader.ReadToEnd().Trim();
+            }
+        }
+        catch { }
+        return "1.0.0";
+    }
+
+    private void OnDownloadUpdateClick(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (UpdateInfoBorder.Tag is string url && !string.IsNullOrEmpty(url))
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    }
+
+    private void OnUninstallClick(object sender, System.Windows.RoutedEventArgs e)
+    {
+        var result = System.Windows.MessageBox.Show(
+            "Вы уверены, что хотите удалить VK Video Desktop?",
+            "Подтверждение",
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
+        if (result != System.Windows.MessageBoxResult.Yes) return;
+
+        ShowPage(5);
+        StartUninstall();
     }
 
     private void OnNextClick(object sender, System.Windows.RoutedEventArgs e)
@@ -60,6 +150,9 @@ public partial class MainWindow : System.Windows.Window
                 }
                 System.Windows.Application.Current.Shutdown();
                 break;
+            case 5:
+                System.Windows.Application.Current.Shutdown();
+                break;
         }
     }
 
@@ -80,8 +173,97 @@ public partial class MainWindow : System.Windows.Window
         if (target != null) target.Visibility = System.Windows.Visibility.Visible;
         _currentPage = index;
         BackButton.Visibility = index > 0 && index < 3 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
-        NextButton.Content = index == 4 ? "Готово" : "Далее";
-        NextButton.Visibility = index == 3 ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+        NextButton.Content = index == 4 || index == 5 ? "Готово" : "Далее";
+        NextButton.Visibility = index == 3 || index == 5 ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+    }
+
+    private void StartUninstall()
+    {
+        var worker = new BackgroundWorker { WorkerReportsProgress = true };
+
+        worker.DoWork += (s, e) =>
+        {
+            try
+            {
+                worker.ReportProgress(5, "Остановка процессов...");
+                foreach (var proc in Process.GetProcessesByName("VKVideoDesktop.App"))
+                {
+                    try { proc.Kill(); proc.WaitForExit(3000); } catch { }
+                }
+                foreach (var proc in Process.GetProcessesByName("VKVideoDesktop Installer"))
+                {
+                    try { proc.Kill(); proc.WaitForExit(3000); } catch { }
+                }
+
+                worker.ReportProgress(25, "Удаление сертификата...");
+                try
+                {
+                    var cerPath = Path.Combine(_installedPath, "VKVideoDesktop.cer");
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "certutil",
+                        Arguments = "-delstore -f Root VKVideoDesktop.cer",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    var p = Process.Start(psi);
+                    if (p != null) p.WaitForExit(10000);
+                }
+                catch { }
+
+                worker.ReportProgress(40, "Удаление реестра...");
+                try
+                {
+                    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\vkvideo", false);
+                }
+                catch { }
+
+                worker.ReportProgress(55, "Удаление ярлыков...");
+                try
+                {
+                    var desktopPath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                        "VK Video Desktop.lnk");
+                    if (File.Exists(desktopPath)) File.Delete(desktopPath);
+                }
+                catch { }
+                try
+                {
+                    var startMenuDir = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.Programs),
+                        "VK Video Desktop");
+                    if (Directory.Exists(startMenuDir))
+                        Directory.Delete(startMenuDir, true);
+                }
+                catch { }
+
+                worker.ReportProgress(70, "Удаление файлов...");
+                if (!string.IsNullOrEmpty(_installedPath) && Directory.Exists(_installedPath))
+                {
+                    try { Directory.Delete(_installedPath, true); } catch { }
+                }
+
+                worker.ReportProgress(100, "Готово!");
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("Ошибка удаления: " + ex.Message, "Ошибка", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+        };
+
+        worker.ProgressChanged += (s, e) =>
+        {
+            UninstallProgress.Value = e.ProgressPercentage;
+            UninstallStatus.Text = e.UserState != null ? e.UserState.ToString() : "";
+            if (e.ProgressPercentage >= 100)
+            {
+                UninstallTitle.Text = "Удаление завершено!";
+                UninstallTitle.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x4C, 0xAF, 0x50));
+                NextButton.Visibility = System.Windows.Visibility.Visible;
+            }
+        };
+
+        worker.RunWorkerAsync();
     }
 
     private void StartInstallation()
