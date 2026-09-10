@@ -27,7 +27,15 @@ static class Program
                 var context = new DispatcherQueueSynchronizationContext(
                     DispatcherQueue.GetForCurrentThread());
                 SynchronizationContext.SetSynchronizationContext(context);
-                _ = new App();
+                try
+                {
+                    _ = new App();
+                    WriteDebugLog("new App() completed");
+                }
+                catch (Exception appEx)
+                {
+                    WriteDebugLog($"App constructor EXCEPTION: {appEx}");
+                }
             });
         }
         catch (Exception ex)

@@ -112,7 +112,7 @@ public partial class App : Microsoft.UI.Xaml.Application
     {
         DebugLog("App constructor - InitializeComponent...");
         InitializeComponent();
-        DebugLog("App constructor - done");
+        DebugLog("App constructor - done, starting DI...");
 
         _wndProcDelegate = WndProc;
 
@@ -135,6 +135,7 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         var resourcesPath = AppContext.BaseDirectory;
 
+        DebugLog("Building host...");
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
@@ -190,61 +191,70 @@ public partial class App : Microsoft.UI.Xaml.Application
             .Build();
 
         Services = _host.Services;
+        DebugLog("App constructor - host built, Services assigned");
     }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        DebugLog("OnLaunched - loading styles...");
+        DebugLog("OnLaunched - entry point reached");
         try
         {
-            var baseDir = AppContext.BaseDirectory;
-            var colorsPath = System.IO.Path.Combine(baseDir, "Styles", "Colors.xaml");
-            var stylesPath = System.IO.Path.Combine(baseDir, "Styles", "Styles.xaml");
-            DebugLog($"BaseDir: {baseDir}, Colors exists: {System.IO.File.Exists(colorsPath)}, Styles exists: {System.IO.File.Exists(stylesPath)}");
-
-            if (System.IO.File.Exists(colorsPath))
+            DebugLog("OnLaunched - loading styles...");
+            try
             {
-                var colorsXaml = System.IO.File.ReadAllText(colorsPath);
-                var colorsDict = (ResourceDictionary)Microsoft.UI.Xaml.Markup.XamlReader.Load(colorsXaml);
-                Resources.MergedDictionaries.Add(colorsDict);
-                DebugLog("Colors.xaml loaded");
+                var baseDir = AppContext.BaseDirectory;
+                var colorsPath = System.IO.Path.Combine(baseDir, "Styles", "Colors.xaml");
+                var stylesPath = System.IO.Path.Combine(baseDir, "Styles", "Styles.xaml");
+                DebugLog($"BaseDir: {baseDir}, Colors exists: {System.IO.File.Exists(colorsPath)}, Styles exists: {System.IO.File.Exists(stylesPath)}");
+
+                if (System.IO.File.Exists(colorsPath))
+                {
+                    var colorsXaml = System.IO.File.ReadAllText(colorsPath);
+                    var colorsDict = (ResourceDictionary)Microsoft.UI.Xaml.Markup.XamlReader.Load(colorsXaml);
+                    Resources.MergedDictionaries.Add(colorsDict);
+                    DebugLog("Colors.xaml loaded");
+                }
+
+                if (System.IO.File.Exists(stylesPath))
+                {
+                    var stylesXaml = System.IO.File.ReadAllText(stylesPath);
+                    var stylesDict = (ResourceDictionary)Microsoft.UI.Xaml.Markup.XamlReader.Load(stylesXaml);
+                    Resources.MergedDictionaries.Add(stylesDict);
+                    DebugLog("Styles.xaml loaded");
+                }
+            }
+            catch (Exception ex)
+            {
+                DebugLog($"Failed to load styles: {ex}");
             }
 
-            if (System.IO.File.Exists(stylesPath))
+            await _host.StartAsync();
+
+            var settingsService = Services.GetRequiredService<ISettingsService>();
+            await settingsService.LoadAsync();
+
+            _mainWindow = Services.GetRequiredService<MainWindow>();
+            _mainWindow.Activate();
+            _mainWindow.Closed += OnMainWindowClosed;
+
+            InitializeTrayIcon();
+
+            if (args.Arguments?.StartsWith("vkvideo://") == true || args.Arguments?.StartsWith("vkvideo:") == true)
             {
-                var stylesXaml = System.IO.File.ReadAllText(stylesPath);
-                var stylesDict = (ResourceDictionary)Microsoft.UI.Xaml.Markup.XamlReader.Load(stylesXaml);
-                Resources.MergedDictionaries.Add(stylesDict);
-                DebugLog("Styles.xaml loaded");
+                var deepLinkService = Services.GetRequiredService<DeepLinkService>();
+                var result = deepLinkService.ProcessString(args.Arguments);
+                if (result != null)
+                {
+                    _mainWindow.DispatcherQueue.TryEnqueue(async () =>
+                    {
+                        await _mainWindow.HandleDeepLinkAsync(result);
+                    });
+                }
             }
         }
         catch (Exception ex)
         {
-            DebugLog($"Failed to load styles: {ex}");
-        }
-
-        await _host.StartAsync();
-
-        var settingsService = Services.GetRequiredService<ISettingsService>();
-        await settingsService.LoadAsync();
-
-        _mainWindow = Services.GetRequiredService<MainWindow>();
-        _mainWindow.Activate();
-        _mainWindow.Closed += OnMainWindowClosed;
-
-        InitializeTrayIcon();
-
-        if (args.Arguments?.StartsWith("vkvideo://") == true || args.Arguments?.StartsWith("vkvideo:") == true)
-        {
-            var deepLinkService = Services.GetRequiredService<DeepLinkService>();
-            var result = deepLinkService.ProcessString(args.Arguments);
-            if (result != null)
-            {
-                _mainWindow.DispatcherQueue.TryEnqueue(async () =>
-                {
-                    await _mainWindow.HandleDeepLinkAsync(result);
-                });
-            }
+            DebugLog($"OnLaunched FAILED: {ex}");
         }
     }
 
