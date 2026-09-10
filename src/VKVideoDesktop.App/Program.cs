@@ -29,8 +29,10 @@ static class Program
                 SynchronizationContext.SetSynchronizationContext(context);
                 try
                 {
-                    _ = new App();
-                    WriteDebugLog("new App() completed");
+                    var app = new App();
+                    WriteDebugLog("new App() completed, calling StartupAsync...");
+                    _ = app.StartupAsync();
+                    WriteDebugLog("StartupAsync called");
                 }
                 catch (Exception appEx)
                 {

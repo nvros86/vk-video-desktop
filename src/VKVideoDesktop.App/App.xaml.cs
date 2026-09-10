@@ -196,7 +196,12 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        DebugLog("OnLaunched - entry point reached");
+        await StartupAsync(args.Arguments);
+    }
+
+    public async Task StartupAsync(string? arguments = null)
+    {
+        DebugLog("StartupAsync - entry point reached");
         try
         {
             DebugLog("OnLaunched - loading styles...");
@@ -239,10 +244,10 @@ public partial class App : Microsoft.UI.Xaml.Application
 
             InitializeTrayIcon();
 
-            if (args.Arguments?.StartsWith("vkvideo://") == true || args.Arguments?.StartsWith("vkvideo:") == true)
+            if (arguments?.StartsWith("vkvideo://") == true || arguments?.StartsWith("vkvideo:") == true)
             {
                 var deepLinkService = Services.GetRequiredService<DeepLinkService>();
-                var result = deepLinkService.ProcessString(args.Arguments);
+                var result = deepLinkService.ProcessString(arguments);
                 if (result != null)
                 {
                     _mainWindow.DispatcherQueue.TryEnqueue(async () =>
@@ -254,7 +259,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         }
         catch (Exception ex)
         {
-            DebugLog($"OnLaunched FAILED: {ex}");
+            DebugLog($"StartupAsync FAILED: {ex}");
         }
     }
 
