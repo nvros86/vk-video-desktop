@@ -1,5 +1,7 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Interfaces;
@@ -10,7 +12,8 @@ namespace VKVideoDesktop.Infrastructure.Download;
 public sealed class DownloadEngine : IDownloadEngine
 {
     private readonly ILogger<DownloadEngine> _logger;
-    private const int BufferSize = 65536; // 64 KB
+    private readonly ConcurrentQueue<(DateTime time, long bytes)> _speedSamples = new();
+    private const int BufferSize = 65536;
     private const int MaxRedirects = 10;
 
     public DownloadEngine(ILogger<DownloadEngine> logger)
@@ -29,7 +32,6 @@ public sealed class DownloadEngine : IDownloadEngine
     {
         var downloadedBytes = 0L;
         var stopwatch = Stopwatch.StartNew();
-        var speedSamples = new List<(long bytes, double elapsedMs)>();
 
         try
         {
@@ -124,17 +126,7 @@ public sealed class DownloadEngine : IDownloadEngine
                     }
                 }
 
-                var elapsedMs = stopwatch.ElapsedMilliseconds;
-                if (elapsedMs > 0)
-                {
-                    speedSamples.Add((bytesRead, 1));
-                    if (speedSamples.Count > 20)
-                        speedSamples.RemoveAt(0);
-                }
-
-                var speed = speedSamples.Count > 0
-                    ? speedSamples.Sum(s => s.bytes) / (stopwatch.Elapsed.TotalSeconds)
-                    : 0;
+                var speed = CalculateSpeed(bytesRead);
 
                 if (speedLimitBytesPerSecond > 0 && speed > speedLimitBytesPerSecond)
                 {
@@ -166,6 +158,11 @@ public sealed class DownloadEngine : IDownloadEngine
 
             await fileStream.FlushAsync(cancellationToken);
 
+            if (File.Exists(temporaryPath) && !File.Exists(destinationPath))
+            {
+                File.Move(temporaryPath, destinationPath);
+            }
+
             _logger.LogInformation(
                 "Download complete: {Path} ({Bytes} bytes)",
                 temporaryPath, downloadedBytes);
@@ -173,7 +170,7 @@ public sealed class DownloadEngine : IDownloadEngine
             return new DownloadResult
             {
                 IsSuccess = true,
-                FilePath = temporaryPath,
+                FilePath = File.Exists(destinationPath) ? destinationPath : temporaryPath,
                 BytesWritten = downloadedBytes
             };
         }
@@ -221,6 +218,25 @@ public sealed class DownloadEngine : IDownloadEngine
         }
     }
 
+    private double CalculateSpeed(long bytesRead)
+    {
+        var now = DateTime.UtcNow;
+        _speedSamples.Enqueue((now, bytesRead));
+
+        while (_speedSamples.TryPeek(out var oldest) &&
+               (now - oldest.time).TotalSeconds > 3)
+        {
+            _speedSamples.TryDequeue(out _);
+        }
+
+        if (_speedSamples.IsEmpty) return 0;
+
+        var totalBytes = _speedSamples.Sum(s => s.bytes);
+        var timeSpan = (now - _speedSamples.First().time).TotalSeconds;
+
+        return timeSpan > 0 ? totalBytes / timeSpan : 0;
+    }
+
     private static bool HasEnoughDiskSpace(string path, long? requiredBytes)
     {
         if (!requiredBytes.HasValue) return true;
@@ -239,13 +255,13 @@ public sealed class DownloadEngine : IDownloadEngine
 
     private static void ValidateUrl(string url)
     {
+        if (string.IsNullOrWhiteSpace(url))
+            throw new ArgumentException("URL cannot be empty");
+
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            throw new ArgumentException($"Invalid URL: {url}");
+            throw new ArgumentException("Invalid URL format");
 
-        if (uri.Scheme != "https" && uri.Scheme != "http")
-            throw new ArgumentException($"Unsupported URL scheme: {uri.Scheme}");
-
-        if (uri.IsFile || uri.IsLoopback)
-            throw new ArgumentException("File and loopback URLs are not allowed");
+        if (uri.Scheme != Uri.UriSchemeHttps)
+            throw new ArgumentException("Only HTTPS URLs are supported");
     }
 }

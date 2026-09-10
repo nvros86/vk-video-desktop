@@ -20,7 +20,6 @@ public sealed partial class MainWindow : Window
     private MiniPlayerWindow? _miniPlayerWindow;
     private readonly IAuthenticationService _authService;
     private readonly PlaybackService _playbackService;
-    private OverlappedPresenter? _savedPresenter;
 
     private readonly Dictionary<string, Type> _pageMap = new()
     {

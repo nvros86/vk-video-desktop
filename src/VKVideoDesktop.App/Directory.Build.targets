@@ -10,4 +10,10 @@
       <Content Remove="@(Content)" Condition="$([System.String]::new('%(FullPath)').EndsWith('.xbf'))" />
     </ItemGroup>
   </Target>
+  <Target Name="RemoveXbfCopyInputs" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <Content Remove="@(Content)" Condition="$([System.String]::new('%(FullPath)').EndsWith('.xbf'))" />
+      <ContentWithTargetPath Remove="@(ContentWithTargetPath)" Condition="$([System.String]::new('%(FullPath)').EndsWith('.xbf'))" />
+    </ItemGroup>
+  </Target>
 </Project>

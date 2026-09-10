@@ -183,7 +183,7 @@ public sealed partial class HomePage : Page
         }
     }
 
-    private async void OnShareClick(object sender, RoutedEventArgs e)
+    private void OnShareClick(object sender, RoutedEventArgs e)
     {
         if (sender is MenuFlyoutItem item && item.Tag is VideoViewModel video)
         {

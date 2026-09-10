@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>VKVideoDesktop Installer</AssemblyName>
+    <RootNamespace>VKVideoDesktop.Installer</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+</Project>

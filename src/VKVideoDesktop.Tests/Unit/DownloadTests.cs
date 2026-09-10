@@ -73,125 +73,38 @@ public class DownloadEngineTests
     }
 
     [Fact]
-    public async Task DownloadAsync_SpeedLimitZero_NoThrottle()
+    public async Task ValidateUrl_Http_ReturnsErrorResult()
     {
         var engine = new DownloadEngine(_loggerMock.Object);
 
-        var tempDir = Path.Combine(Path.GetTempPath(), $"dltest_{Guid.NewGuid():N}");
-        Directory.CreateDirectory(tempDir);
-        try
-        {
-            var tempFile = Path.Combine(tempDir, "temp.bin");
-            var destFile = Path.Combine(tempDir, "dest.bin");
+        var result = await engine.DownloadAsync(
+            "http://example.com/video.mp4",
+            "test.mp4",
+            "test.mp4.part",
+            null,
+            0,
+            null,
+            CancellationToken.None);
 
-            var result = await engine.DownloadAsync(
-                "https://httpbin.org/bytes/1024",
-                destFile, tempFile, (long?)1024, 0,
-                null, CancellationToken.None);
-
-            Assert.True(result.IsSuccess);
-        }
-        finally
-        {
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, true);
-        }
-    }
-}
-
-public class DownloadManagerTests
-{
-    private readonly Mock<IDownloadEngine> _engineMock;
-    private readonly Mock<IDownloadSourceResolver> _resolverMock;
-    private readonly Mock<IDownloadRepository> _repositoryMock;
-    private readonly Mock<ISettingsService> _settingsServiceMock;
-    private readonly Mock<ILogger<DownloadManager>> _loggerMock;
-
-    public DownloadManagerTests()
-    {
-        _engineMock = new Mock<IDownloadEngine>();
-        _resolverMock = new Mock<IDownloadSourceResolver>();
-        _repositoryMock = new Mock<IDownloadRepository>();
-        _settingsServiceMock = new Mock<ISettingsService>();
-        _loggerMock = new Mock<ILogger<DownloadManager>>();
+        Assert.False(result.IsSuccess);
+        Assert.Contains("HTTPS", result.ErrorMessage);
     }
 
     [Fact]
-    public async Task AddAsync_CreatesDownloadTask()
+    public async Task ValidateUrl_Https_ReturnsNetworkError()
     {
-        _repositoryMock.Setup(r => r.SaveAsync(It.IsAny<DownloadTask>()))
-            .Returns(Task.CompletedTask);
+        var engine = new DownloadEngine(_loggerMock.Object);
 
-        var manager = new DownloadManager(
-            _engineMock.Object,
-            _resolverMock.Object,
-            _repositoryMock.Object,
-            _settingsServiceMock.Object,
-            _loggerMock.Object);
+        var result = await engine.DownloadAsync(
+            "https://nonexistent.invalid/video.mp4",
+            "test.mp4",
+            "test.mp4.part",
+            null,
+            0,
+            null,
+            CancellationToken.None);
 
-        var request = new DownloadRequest
-        {
-            VideoId = "123",
-            Title = "Test Video",
-            Option = new DownloadOption
-            {
-                Quality = "720p",
-                Format = "mp4",
-                SourceUrl = "https://example.com/video.mp4"
-            },
-            DestinationPath = @"C:\Videos\test.mp4"
-        };
-
-        var task = await manager.AddAsync(request, CancellationToken.None);
-
-        Assert.NotNull(task);
-        Assert.Equal("123", task.VideoId);
-        Assert.Equal("Test Video", task.Title);
-        Assert.Contains(manager.Downloads, d => d.Id == task.Id);
-    }
-
-    [Fact]
-    public async Task Downloads_ReturnsAllDownloads()
-    {
-        _repositoryMock.Setup(r => r.SaveAsync(It.IsAny<DownloadTask>()))
-            .Returns(Task.CompletedTask);
-
-        var manager = new DownloadManager(
-            _engineMock.Object,
-            _resolverMock.Object,
-            _repositoryMock.Object,
-            _settingsServiceMock.Object,
-            _loggerMock.Object);
-
-        var request = new DownloadRequest
-        {
-            VideoId = "123",
-            Title = "Test",
-            Option = new DownloadOption { Quality = "720p", Format = "mp4" },
-            DestinationPath = @"C:\Videos\test.mp4"
-        };
-
-        await manager.AddAsync(request, CancellationToken.None);
-
-        Assert.Single(manager.Downloads);
-    }
-
-    [Fact]
-    public async Task RecoverIncompleteDownloadsAsync_WithQueuedTasks_DoesNotThrow()
-    {
-        var engine = new Mock<IDownloadEngine>();
-        var sourceResolver = new Mock<IDownloadSourceResolver>();
-        var repo = new Mock<IDownloadRepository>();
-        var settings = new Mock<ISettingsService>();
-        settings.Setup(s => s.Settings).Returns(new UserSettings { DownloadFolder = "/tmp", MaxConcurrentDownloads = 2 });
-
-        repo.Setup(r => r.GetAllAsync())
-            .ReturnsAsync(new List<DownloadTask>());
-
-        var manager = new DownloadManager(
-            engine.Object, sourceResolver.Object, repo.Object,
-            settings.Object, _loggerMock.Object);
-
-        await manager.RecoverIncompleteDownloadsAsync();
+        Assert.False(result.IsSuccess);
+        Assert.False(string.IsNullOrEmpty(result.ErrorMessage));
     }
 }

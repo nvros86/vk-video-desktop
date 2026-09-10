@@ -36,6 +36,7 @@ public sealed class SettingsService : ISettingsService
                 }
                 catch
                 {
+                    _settings.AccessToken = "";
                 }
             }
         }

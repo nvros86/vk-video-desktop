@@ -36,7 +36,6 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     private IntPtr _trayIconHandle;
     private IntPtr _windowHandle;
-    private IntPtr _oldWndProc;
     private GCHandle _gchThis;
     private bool _isClosing;
 
@@ -69,9 +68,6 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     [DllImport("user32.dll")]
     private static extern bool DestroyMenu(IntPtr hMenu);
-
-    [DllImport("user32.dll")]
-    private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
     [DllImport("user32.dll")]
     private static extern IntPtr LoadIcon(IntPtr hInstance, IntPtr lpIconName);
@@ -217,7 +213,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         var wc = new WNDCLASS
         {
             lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate),
-            hInstance = GetModuleHandle(null),
+            hInstance = GetModuleHandle("VKVideoDesktop.App"),
             lpszClassName = className
         };
 
@@ -229,7 +225,7 @@ public partial class App : Microsoft.UI.Xaml.Application
             IntPtr.Zero, IntPtr.Zero, wc.hInstance, IntPtr.Zero);
 
         var iconHandle = LoadImage(
-            GetModuleHandle(null),
+            GetModuleHandle("VKVideoDesktop.App"),
             "IDR_MAINFRAME",
             1,
             16, 16,
@@ -267,11 +263,6 @@ public partial class App : Microsoft.UI.Xaml.Application
             };
 
             Shell_NotifyIcon(NIM_DELETE, ref nid);
-
-            if (_oldWndProc != IntPtr.Zero)
-            {
-                SetWindowLongPtr(_windowHandle, -4, _oldWndProc);
-            }
 
             DestroyWindow(_windowHandle);
             _windowHandle = IntPtr.Zero;
@@ -373,8 +364,8 @@ public partial class App : Microsoft.UI.Xaml.Application
         public IntPtr hIcon;
         public IntPtr hCursor;
         public IntPtr hbrBackground;
-        public string lpszMenuName;
-        public string lpszClassName;
+        public string? lpszMenuName;
+        public string? lpszClassName;
     }
 
     [DllImport("user32.dll")]
