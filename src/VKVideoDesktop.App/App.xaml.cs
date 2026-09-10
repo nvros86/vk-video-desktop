@@ -208,14 +208,33 @@ public partial class App : Microsoft.UI.Xaml.Application
             await _host.StartAsync();
             DebugLog("StartupAsync - host started, loading settings...");
 
-            var settingsService = Services.GetRequiredService<ISettingsService>();
-            await settingsService.LoadAsync();
-            DebugLog("StartupAsync - settings loaded, creating window...");
+            ISettingsService settingsService;
+            try
+            {
+                settingsService = Services.GetRequiredService<ISettingsService>();
+                DebugLog("StartupAsync - ISettingsService resolved");
+            }
+            catch (Exception ex)
+            {
+                DebugLog($"StartupAsync - FAILED to resolve ISettingsService: {ex}");
+                return;
+            }
+
+            try
+            {
+                await settingsService.LoadAsync();
+                DebugLog("StartupAsync - settings loaded, creating window...");
+            }
+            catch (Exception ex)
+            {
+                DebugLog($"StartupAsync - FAILED to load settings: {ex}");
+                return;
+            }
 
             _mainWindow = Services.GetRequiredService<MainWindow>();
             DebugLog("StartupAsync - MainWindow resolved, activating...");
             _mainWindow.Activate();
-            DebugLog("StartupAsync - MainWindow activated");
+            DebugLog($"StartupAsync - MainWindow activated, Handle={_mainWindow.AppWindow?.Id}");
             _mainWindow.Closed += OnMainWindowClosed;
 
             DebugLog("StartupAsync - initializing tray icon...");
