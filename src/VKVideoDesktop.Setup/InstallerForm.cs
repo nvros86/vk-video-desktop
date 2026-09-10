@@ -644,23 +644,101 @@ SOFTWARE."
             return true;
         }
 
-        SetupLogger.Warn("Windows App Runtime не найден, начинаем скачивание...");
-        var tempFile = Path.Combine(Path.GetTempPath(), $"VKSetup_WinRT_{Guid.NewGuid():N}.msixinstaller");
+        SetupLogger.Warn("Windows App Runtime не найден");
+
+        SetupLogger.Info("Попытка установки через winget...");
         try
         {
-            SetProgress("Скачивание Windows App Runtime...", 5);
-            using (var client = new System.Net.Http.HttpClient())
+            SetProgress("Установка Windows App Runtime через winget...", 3);
+            var wingetPsi = new ProcessStartInfo("winget",
+                "install --id Microsoft.WindowsAppRuntime.1.7 --accept-source-agreements --accept-package-agreements")
             {
-                client.Timeout = TimeSpan.FromMinutes(5);
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("VKVideoDesktop/1.0");
-                SetupLogger.Info("Скачивание с https://aka.ms/windowsappruntimeinstall-x64 ...");
-                var data = client.GetByteArrayAsync(
-                    "https://aka.ms/windowsappruntimeinstall-x64", ct).GetAwaiter().GetResult();
-                File.WriteAllBytes(tempFile, data);
-                SetupLogger.Info($"Скачано: {data.Length / 1024} КБ");
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+            using var wingetProc = Process.Start(wingetPsi);
+            if (wingetProc != null)
+            {
+                var wingetOutput = wingetProc.StandardOutput.ReadToEnd();
+                var wingetError = wingetProc.StandardError.ReadToEnd();
+                wingetProc.WaitForExit(300_000);
+                SetupLogger.Info($"winget exit code: {wingetProc.ExitCode}");
+                if (!string.IsNullOrEmpty(wingetOutput)) SetupLogger.Info($"winget stdout: {wingetOutput.Trim()}");
+                if (!string.IsNullOrEmpty(wingetError)) SetupLogger.Info($"winget stderr: {wingetError.Trim()}");
+
+                if (wingetProc.ExitCode == 0 && IsWindowsAppRuntimeInstalled())
+                {
+                    SetupLogger.Info("Windows App Runtime установлен через winget");
+                    return true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            SetupLogger.Info($"winget недоступен: {ex.Message}");
+        }
+
+        SetupLogger.Info("Скачивание Windows App Runtime с direct URL...");
+        var tempFile = Path.Combine(Path.GetTempPath(), $"VKSetup_WinRT_{Guid.NewGuid():N}.exe");
+        try
+        {
+            var downloadUrls = new[]
+            {
+                "https://aka.ms/windowsappsdk/1.7/1.7.260224002/windowsappruntimeinstall-x64.exe",
+                "https://aka.ms/windowsappsdk/1.7/1.7.250310001/windowsappruntimeinstall-x64.exe"
+            };
+
+            bool downloaded = false;
+            foreach (var url in downloadUrls)
+            {
+                try
+                {
+                    SetProgress($"Скачивание Windows App Runtime...", 5);
+                    SetupLogger.Info($"Скачивание с {url} ...");
+                    using var handler = new System.Net.Http.HttpClientHandler
+                    {
+                        AllowAutoRedirect = true,
+                        MaxAutomaticRedirections = 10
+                    };
+                    using var client = new System.Net.Http.HttpClient(handler);
+                    client.Timeout = TimeSpan.FromMinutes(5);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("VKVideoDesktop/1.0");
+
+                    var response = client.GetAsync(url, ct).GetAwaiter().GetResult();
+                    response.EnsureSuccessStatusCode();
+                    var data = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    File.WriteAllBytes(tempFile, data);
+                    SetupLogger.Info($"Скачано: {data.Length / 1024} КБ из {response.Content.Headers.ContentLength / 1024} КБ");
+
+                    if (data.Length < 1_000_000)
+                    {
+                        SetupLogger.Warn($"Файл слишком маленький ({data.Length} байт) — возможно HTML-страница, пропускаем");
+                        try { File.Delete(tempFile); } catch { }
+                        continue;
+                    }
+
+                    downloaded = true;
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    SetupLogger.Warn($"Не удалось скачать с {url}: {ex.Message}");
+                }
             }
 
-            SetProgress("Установка Windows App Runtime... (может потребовать подтверждение)", 8);
+            if (!downloaded)
+            {
+                SetupLogger.Warn("Не удалось скачать Windows App Runtime, открываем страницу загрузки в браузере...");
+                SetProgress("Не удалось скачать автоматически. Открываю страницу загрузки...", 5);
+                Process.Start(new ProcessStartInfo(
+                    "https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads-archive")
+                { UseShellExecute = true });
+                return false;
+            }
+
+            SetProgress("Установка Windows App Runtime... (может потребовать подтверждение UAC)", 8);
             SetupLogger.Info("Запуск установщика Windows App Runtime...");
             var psi = new ProcessStartInfo(tempFile, "--quiet --accept-license --force")
             {
