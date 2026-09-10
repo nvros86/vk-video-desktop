@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:VKVideoDesktop.App.ViewModels"
-    Background="Transparent">
+    Background="{StaticResource VkBackgroundBrush}">
 
     <Grid Margin="24,16,24,80">
         <Grid.RowDefinitions>
@@ -14,7 +14,8 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}"
+                       Foreground="{StaticResource VkTextPrimaryBrush}" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                 <Button Content="Повторить все" Style="{StaticResource TextButtonStyle}"
                         Click="OnDownloadAllClick" />
@@ -24,14 +25,16 @@
         </Grid>
 
         <TextBlock Grid.Row="1" Text="Активные" Style="{StaticResource SubtitleTextBlockStyle}"
+                   Foreground="{StaticResource VkTextPrimaryBrush}"
                    Margin="0,0,0,8" Visibility="{x:Bind ViewModel.HasActiveDownloads}" />
 
         <StackPanel x:Name="EmptyState" Grid.Row="2" HorizontalAlignment="Center"
                     VerticalAlignment="Center" Spacing="12">
-            <FontIcon Glyph="&#xE896;" FontSize="48" Opacity="0.3" />
-            <TextBlock Text="Нет загрузок" Opacity="0.5" TextAlignment="Center" />
+            <FontIcon Glyph="&#xE896;" FontSize="48" Foreground="{StaticResource VkTextTertiaryBrush}" />
+            <TextBlock Text="Нет загрузок"
+                       Foreground="{StaticResource VkTextSecondaryBrush}" TextAlignment="Center" />
             <TextBlock Text="Скачивайте видео, и они появятся здесь."
-                       Opacity="0.4" TextAlignment="Center" FontSize="12" />
+                       Foreground="{StaticResource VkTextTertiaryBrush}" TextAlignment="Center" FontSize="12" />
         </StackPanel>
 
         <ListView x:Name="DownloadsList" Grid.Row="2"
@@ -39,7 +42,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="vm:DownloadItemViewModel">
                     <Grid Margin="0,0,0,8" Padding="12"
-                          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                          Background="{StaticResource VkCardBrush}"
                           CornerRadius="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -54,21 +57,28 @@
 
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
-                                       TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
-                            <TextBlock Text="{x:Bind StatusText}" Opacity="0.6" FontSize="12" />
+                                       TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="{x:Bind StatusText}" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
                             <ProgressBar Value="{x:Bind Progress}" Maximum="100"
-                                         Margin="0,4,0,4" />
+                                         Margin="0,4,0,4"
+                                         Foreground="{StaticResource VkProgressBrush}"
+                                         Background="{StaticResource VkProgressTrackBrush}" />
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{x:Bind ProgressText}" Opacity="0.5" FontSize="11" />
-                                <TextBlock Grid.Column="1" Text="{x:Bind SpeedText}" Opacity="0.5" FontSize="11"
-                                           Margin="12,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{x:Bind EtaText}" Opacity="0.5" FontSize="11"
-                                           Margin="12,0,0,0" />
+                                <TextBlock Grid.Column="0" Text="{x:Bind ProgressText}" FontSize="11"
+                                           Foreground="{StaticResource VkTextTertiaryBrush}" />
+                                <TextBlock Grid.Column="1" Text="{x:Bind SpeedText}" FontSize="11"
+                                           Margin="12,0,0,0"
+                                           Foreground="{StaticResource VkTextTertiaryBrush}" />
+                                <TextBlock Grid.Column="2" Text="{x:Bind EtaText}" FontSize="11"
+                                           Margin="12,0,0,0"
+                                           Foreground="{StaticResource VkTextTertiaryBrush}" />
                             </Grid>
                         </StackPanel>
 

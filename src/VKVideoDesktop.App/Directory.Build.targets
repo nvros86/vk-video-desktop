@@ -4,6 +4,17 @@
   <Target Name="_OnXamlPreCompileError" />
   <Target Name="VerifyXbfOutputs" />
   <Target Name="AddDefaultXamlLinkMetadata" />
+  <Target Name="GenerateEmptyXbfStubs" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <AllXamlFiles Include="**\*.xaml" />
+    </ItemGroup>
+    <Exec Condition="'@(AllXamlFiles)' != ''"
+          Command="for %%f in (&quot;@(AllXamlFiles)&quot;) do @(if not exist &quot;$(IntermediateOutputPath)%%~pnxf&quot; echo. > &quot;$(IntermediateOutputPath)%%~pnxf&quot;)"
+          IgnoreExitCode="true" />
+    <Exec Condition="'@(AllXamlFiles)' != ''"
+          Command="for %%f in (&quot;@(AllXamlFiles)&quot;) do @(if not exist &quot;$(IntermediateOutputPath)%(RecursiveDir)%%~nxf&quot; mkdir &quot;$(IntermediateOutputPath)%(RecursiveDir)&quot; 2>nul &amp; echo. > &quot;$(IntermediateOutputPath)%(RecursiveDir)%%~nxf&quot;)"
+          IgnoreExitCode="true" />
+  </Target>
   <Target Name="CleanGeneratedXbfContent" BeforeTargets="CopyFilesToOutputDirectory">
     <ItemGroup>
       <GeneratedXamlSrc Remove="@(GeneratedXamlSrc)" />

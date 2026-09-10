@@ -25,11 +25,13 @@ public sealed partial class MainWindow : Window
     {
         ["Home"] = typeof(HomePage),
         ["Search"] = typeof(SearchPage),
+        ["Profile"] = typeof(ProfilePage),
         ["Favorites"] = typeof(FavoritesPage),
+        ["Favorites2"] = typeof(FavoritesPage),
         ["Playlists"] = typeof(PlaylistsPage),
         ["History"] = typeof(HistoryPage),
         ["Downloads"] = typeof(DownloadsPage),
-        ["Profile"] = typeof(ProfilePage)
+        ["Settings"] = typeof(SettingsPage)
     };
 
     public MainWindow()
@@ -174,16 +176,18 @@ public sealed partial class MainWindow : Window
             NavView.SelectedItem = NavView.MenuItems[0];
         else if (e.SourcePageType == typeof(SearchPage))
             NavView.SelectedItem = NavView.MenuItems[1];
-        else if (e.SourcePageType == typeof(FavoritesPage))
-            NavView.SelectedItem = NavView.MenuItems[2];
-        else if (e.SourcePageType == typeof(PlaylistsPage))
-            NavView.SelectedItem = NavView.MenuItems[3];
-        else if (e.SourcePageType == typeof(HistoryPage))
-            NavView.SelectedItem = NavView.MenuItems[4];
-        else if (e.SourcePageType == typeof(DownloadsPage))
-            NavView.SelectedItem = NavView.MenuItems[5];
         else if (e.SourcePageType == typeof(ProfilePage))
+            NavView.SelectedItem = NavView.MenuItems[2];
+        else if (e.SourcePageType == typeof(FavoritesPage))
+            NavView.SelectedItem = NavView.MenuItems[3];
+        else if (e.SourcePageType == typeof(PlaylistsPage))
+            NavView.SelectedItem = NavView.MenuItems[5];
+        else if (e.SourcePageType == typeof(HistoryPage))
             NavView.SelectedItem = NavView.MenuItems[6];
+        else if (e.SourcePageType == typeof(DownloadsPage))
+            NavView.SelectedItem = NavView.MenuItems[7];
+        else if (e.SourcePageType == typeof(SettingsPage))
+            NavView.SelectedItem = NavView.MenuItems[8];
     }
 
     private void OnSearchBoxKeyDown(object sender, KeyRoutedEventArgs e)

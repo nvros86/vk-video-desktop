@@ -4,11 +4,11 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:VKVideoDesktop.App.ViewModels"
-    Background="Transparent">
+    Background="{StaticResource VkBackgroundBrush}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24,16,24,80" Spacing="16">
-            <Grid Height="200" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+            <Grid Height="200" CornerRadius="8" Background="{StaticResource VkCardBrush}">
                 <Image x:Name="BannerImage" Stretch="UniformToFill" Opacity="0.6" />
             </Grid>
 
@@ -20,16 +20,19 @@
                 </Grid.ColumnDefinitions>
 
                 <Ellipse Grid.Column="0" Width="80" Height="80" StrokeThickness="3"
-                         Stroke="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                         Stroke="{StaticResource VkCardBrush}">
                     <Ellipse.Fill>
                         <ImageBrush x:Name="AvatarBrush" Stretch="UniformToFill" />
                     </Ellipse.Fill>
                 </Ellipse>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="16,0,0,8">
-                    <TextBlock x:Name="ChannelNameText" Style="{StaticResource TitleTextBlockStyle}" />
-                    <TextBlock x:Name="ChannelUsernameText" Opacity="0.6" FontSize="13" />
-                    <TextBlock x:Name="SubscriberCountText" Opacity="0.5" FontSize="12" />
+                    <TextBlock x:Name="ChannelNameText" Style="{StaticResource TitleTextBlockStyle}"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" />
+                    <TextBlock x:Name="ChannelUsernameText" FontSize="13"
+                               Foreground="{StaticResource VkTextSecondaryBrush}" />
+                    <TextBlock x:Name="SubscriberCountText" FontSize="12"
+                               Foreground="{StaticResource VkTextTertiaryBrush}" />
                 </StackPanel>
 
                 <Button Grid.Column="2" Content="Подписаться" VerticalAlignment="Bottom"
@@ -37,10 +40,12 @@
             </Grid>
 
             <Expander Header="Описание">
-                <TextBlock x:Name="DescriptionText" TextWrapping="Wrap" Opacity="0.8" />
+                <TextBlock x:Name="DescriptionText" TextWrapping="Wrap"
+                           Foreground="{StaticResource VkTextSecondaryBrush}" />
             </Expander>
 
-            <TextBlock Text="Видео" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock Text="Видео" Style="{StaticResource SubtitleTextBlockStyle}"
+                       Foreground="{StaticResource VkTextPrimaryBrush}" />
             <ItemsControl x:Name="ChannelVideos">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -60,17 +65,19 @@
                                 </MenuFlyout>
                             </Button.ContextFlyout>
                             <StackPanel Width="280">
-                                <Grid Height="158" CornerRadius="4" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                                <Grid Height="158" CornerRadius="4" Background="{StaticResource VkCardBrush}">
                                     <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
                                     <TextBlock Text="{x:Bind DurationText}" HorizontalAlignment="Right"
-                                               VerticalAlignment="Bottom" Background="#CC000000"
-                                               Foreground="White" FontSize="11" Padding="4,2"
+                                               VerticalAlignment="Bottom" Background="{StaticResource VkOverlayBrush}"
+                                               Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="11" Padding="4,2"
                                                Margin="0,0,4,4" CornerRadius="2" />
                                 </Grid>
                                 <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
                                            TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
-                                           Margin="0,8,0,0" />
-                                <TextBlock Text="{x:Bind Author}" Opacity="0.6" FontSize="12" />
+                                           Margin="0,8,0,0"
+                                           Foreground="{StaticResource VkTextPrimaryBrush}" />
+                                <TextBlock Text="{x:Bind Author}" FontSize="12"
+                                           Foreground="{StaticResource VkTextSecondaryBrush}" />
                             </StackPanel>
                         </Button>
                     </DataTemplate>

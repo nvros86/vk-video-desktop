@@ -1,0 +1,51 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Main Background -->
+    <SolidColorBrush x:Key="VkBackgroundBrush" Color="#FF0A1628"/>
+    <SolidColorBrush x:Key="VkSurfaceBrush" Color="#FF0F1F35"/>
+    <SolidColorBrush x:Key="VkCardBrush" Color="#FF142240"/>
+    <SolidColorBrush x:Key="VkCardHoverBrush" Color="#FF1A2D52"/>
+    <SolidColorBrush x:Key="VkCardBorderBrush" Color="#FF1E3A5F"/>
+
+    <!-- Sidebar -->
+    <SolidColorBrush x:Key="VkSidebarBrush" Color="#FF080E1C"/>
+    <SolidColorBrush x:Key="VkSidebarItemHoverBrush" Color="#FF142240"/>
+    <SolidColorBrush x:Key="VkSidebarItemSelectedBrush" Color="#FF1A3366"/>
+
+    <!-- Top Bar -->
+    <SolidColorBrush x:Key="VkTopBarBrush" Color="#FF0D1B30"/>
+    <SolidColorBrush x:Key="VkTopBarBorderBrush" Color="#FF1A2D52"/>
+
+    <!-- Accent -->
+    <SolidColorBrush x:Key="VkAccentBrush" Color="#FF2688EB"/>
+    <SolidColorBrush x:Key="VkAccentHoverBrush" Color="#FF4DA3FF"/>
+    <SolidColorBrush x:Key="VkAccentDarkBrush" Color="#FF1A6BC4"/>
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="VkTextPrimaryBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="VkTextSecondaryBrush" Color="#FF8899B3"/>
+    <SolidColorBrush x:Key="VkTextTertiaryBrush" Color="#FF556680"/>
+
+    <!-- Overlay / Badge -->
+    <SolidColorBrush x:Key="VkOverlayBrush" Color="#99000000"/>
+    <SolidColorBrush x:Key="VkBadgeBackgroundBrush" Color="#FF2688EB"/>
+
+    <!-- Player -->
+    <SolidColorBrush x:Key="VkPlayerBackgroundBrush" Color="#FF050A12"/>
+    <SolidColorBrush x:Key="VkPlayerControlsBrush" Color="#CC050A12"/>
+
+    <!-- Status -->
+    <SolidColorBrush x:Key="VkSuccessBrush" Color="#FF2ECC71"/>
+    <SolidColorBrush x:Key="VkWarningBrush" Color="#FFFFC107"/>
+    <SolidColorBrush x:Key="VkErrorBrush" Color="#FFE53935"/>
+
+    <!-- Separator -->
+    <SolidColorBrush x:Key="VkSeparatorBrush" Color="#1A1E3A5F"/>
+
+    <!-- Progress Bar -->
+    <SolidColorBrush x:Key="VkProgressBrush" Color="#FF2688EB"/>
+    <SolidColorBrush x:Key="VkProgressTrackBrush" Color="#FF142240"/>
+
+</ResourceDictionary>

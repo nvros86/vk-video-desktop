@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:VKVideoDesktop.App.Views"
     xmlns:vm="using:VKVideoDesktop.App.ViewModels"
-    Background="Transparent">
+    Background="{StaticResource VkBackgroundBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -25,13 +25,13 @@
         <!-- Filters -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="24,0,0,16">
             <RadioButton Content="Все" IsChecked="True" Tag="All"
-                         Checked="OnFilterChanged" Style="{StaticResource FilterRadioButtonStyle}" />
+                         Checked="OnFilterChanged" Style="{StaticResource FilterPillStyle}" />
             <RadioButton Content="Видео" Tag="Videos"
-                         Checked="OnFilterChanged" Style="{StaticResource FilterRadioButtonStyle}" />
+                         Checked="OnFilterChanged" Style="{StaticResource FilterPillStyle}" />
             <RadioButton Content="Каналы" Tag="Channels"
-                         Checked="OnFilterChanged" Style="{StaticResource FilterRadioButtonStyle}" />
+                         Checked="OnFilterChanged" Style="{StaticResource FilterPillStyle}" />
             <RadioButton Content="Авторы" Tag="Authors"
-                         Checked="OnFilterChanged" Style="{StaticResource FilterRadioButtonStyle}" />
+                         Checked="OnFilterChanged" Style="{StaticResource FilterPillStyle}" />
             <ComboBox x:Name="SortComboBox" MinWidth="160" Margin="16,0,0,0"
                       SelectedIndex="0" SelectionChanged="OnSortChanged">
                 <ComboBoxItem Content="По релевантности" Tag="Relevance" />
@@ -52,8 +52,9 @@
                 <StackPanel x:Name="EmptyState" Visibility="Collapsed"
                             HorizontalAlignment="Center" VerticalAlignment="Center"
                             Margin="0,80,0,0" Spacing="12">
-                    <FontIcon Glyph="&#xE721;" FontSize="48" Opacity="0.3" />
-                    <TextBlock Text="Введите запрос для поиска" Opacity="0.5"
+                    <FontIcon Glyph="&#xE721;" FontSize="48" Foreground="{StaticResource VkTextTertiaryBrush}" />
+                    <TextBlock Text="Введите запрос для поиска"
+                               Foreground="{StaticResource VkTextSecondaryBrush}"
                                TextAlignment="Center" />
                 </StackPanel>
 
@@ -76,16 +77,19 @@
                                     <Grid Grid.Row="0" Height="158" CornerRadius="4,4,0,0">
                                         <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
                                         <TextBlock Text="{x:Bind DurationText}" HorizontalAlignment="Right"
-                                                   VerticalAlignment="Bottom" Background="#CC000000"
-                                                   Foreground="White" FontSize="11" Padding="4,2"
+                                                   VerticalAlignment="Bottom" Background="{StaticResource VkOverlayBrush}"
+                                                   Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="11" Padding="4,2"
                                                    Margin="0,0,4,4" CornerRadius="2" />
                                     </Grid>
                                     <StackPanel Grid.Row="1" Margin="0,8,0,0">
                                         <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
-                                                   TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                                                   TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource VkTextPrimaryBrush}" />
                                         <TextBlock Text="{x:Bind Author}" TextWrapping="NoWrap"
-                                                   TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="12" />
-                                        <TextBlock Text="{x:Bind ViewCountText}" Opacity="0.5" FontSize="11" />
+                                                   TextTrimming="CharacterEllipsis" FontSize="12"
+                                                   Foreground="{StaticResource VkTextSecondaryBrush}" />
+                                        <TextBlock Text="{x:Bind ViewCountText}" FontSize="11"
+                                                   Foreground="{StaticResource VkTextTertiaryBrush}" />
                                     </StackPanel>
                                 </Grid>
                             </Button>

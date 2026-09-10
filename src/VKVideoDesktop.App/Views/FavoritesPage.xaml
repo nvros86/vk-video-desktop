@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:VKVideoDesktop.App.ViewModels"
-    Background="Transparent">
+    Background="{StaticResource VkBackgroundBrush}">
 
     <Grid Margin="24,16,24,80">
         <Grid.RowDefinitions>
@@ -13,17 +13,19 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="Избранное" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock Text="Избранное" Style="{StaticResource SubtitleTextBlockStyle}"
+                       Foreground="{StaticResource VkTextPrimaryBrush}" />
             <Button Content="Очистить" HorizontalAlignment="Right"
                     Style="{StaticResource TextButtonStyle}" Click="OnClearClick" />
         </Grid>
 
         <StackPanel x:Name="EmptyState" Grid.Row="1" HorizontalAlignment="Center"
                     VerticalAlignment="Center" Spacing="12" Visibility="Collapsed">
-            <FontIcon Glyph="&#xE721;" FontSize="48" Opacity="0.3" />
-            <TextBlock Text="Ваш список избранного пуст" Opacity="0.5" TextAlignment="Center" />
+            <FontIcon Glyph="&#xE721;" FontSize="48" Foreground="{StaticResource VkTextTertiaryBrush}" />
+            <TextBlock Text="Ваш список избранного пуст"
+                       Foreground="{StaticResource VkTextSecondaryBrush}" TextAlignment="Center" />
             <TextBlock Text="Добавляйте видео в избранное, чтобы быстро находить их здесь."
-                       Opacity="0.4" TextAlignment="Center" FontSize="12" />
+                       Foreground="{StaticResource VkTextTertiaryBrush}" TextAlignment="Center" FontSize="12" />
         </StackPanel>
 
         <ItemsControl x:Name="FavoritesList" Grid.Row="1">
@@ -49,15 +51,17 @@
                                 <Grid Grid.Row="0" Height="158" CornerRadius="4,4,0,0">
                                     <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
                                     <TextBlock Text="{x:Bind DurationText}" HorizontalAlignment="Right"
-                                               VerticalAlignment="Bottom" Background="#CC000000"
-                                               Foreground="White" FontSize="11" Padding="4,2"
+                                               VerticalAlignment="Bottom" Background="{StaticResource VkOverlayBrush}"
+                                               Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="11" Padding="4,2"
                                                Margin="0,0,4,4" CornerRadius="2" />
                                 </Grid>
                                 <StackPanel Grid.Row="1" Margin="0,8,0,0">
                                     <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
-                                               TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                                               TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
+                                               Foreground="{StaticResource VkTextPrimaryBrush}" />
                                     <TextBlock Text="{x:Bind Author}" TextWrapping="NoWrap"
-                                               TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="12" />
+                                               TextTrimming="CharacterEllipsis" FontSize="12"
+                                               Foreground="{StaticResource VkTextSecondaryBrush}" />
                                 </StackPanel>
                             </Grid>
                         </Button>

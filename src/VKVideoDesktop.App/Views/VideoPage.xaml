@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:VKVideoDesktop.App.Views"
     xmlns:vm="using:VKVideoDesktop.App.ViewModels"
-    Background="Transparent">
+    Background="{StaticResource VkBackgroundBrush}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="0,0,0,80">
@@ -16,7 +16,7 @@
 
             <StackPanel Grid.Column="0" Margin="24,16">
                 <!-- Video Player -->
-                <Grid x:Name="PlayerContainer" Height="480" Background="#1E1E1E" CornerRadius="8,8,0,0">
+                <Grid x:Name="PlayerContainer" Height="480" Background="{StaticResource VkPlayerBackgroundBrush}" CornerRadius="8,8,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
@@ -34,7 +34,7 @@
                                            Visibility="Collapsed" />
                         <Button x:Name="PlayButton"
                                 HorizontalAlignment="Center" VerticalAlignment="Center"
-                                Background="#CC000000" Foreground="White"
+                                Background="{StaticResource VkOverlayBrush}" Foreground="{StaticResource VkTextPrimaryBrush}"
                                 Width="72" Height="72" CornerRadius="36"
                                 Click="OnPlayClick">
                             <FontIcon x:Name="PlayIcon" Glyph="&#xE768;" FontSize="32" />
@@ -42,7 +42,7 @@
                     </Grid>
 
                     <!-- Controls -->
-                    <Grid Grid.Row="1" Background="#CC000000" Padding="12,8">
+                    <Grid Grid.Row="1" Background="{StaticResource VkPlayerControlsBrush}" Padding="12,8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
@@ -55,37 +55,41 @@
                         </Grid.ColumnDefinitions>
 
                         <Button Grid.Column="0" x:Name="ControlPlayButton" Content="&#xE768;" Background="Transparent"
-                                Foreground="White" Click="OnPlayClick" />
+                                Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnPlayClick" />
                         <ProgressBar Grid.Column="1" x:Name="PositionBar" Value="0" Maximum="100"
-                                     Margin="12,0" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" x:Name="TimeText" Text="0:00 / 0:00" Foreground="White"
+                                     Margin="12,0" VerticalAlignment="Center"
+                                     Foreground="{StaticResource VkProgressBrush}"
+                                     Background="{StaticResource VkProgressTrackBrush}" />
+                        <TextBlock Grid.Column="2" x:Name="TimeText" Text="0:00 / 0:00"
+                                   Foreground="{StaticResource VkTextPrimaryBrush}"
                                    VerticalAlignment="Center" FontSize="12" Margin="0,0,12,0" />
 
                         <!-- Speed selector -->
                         <Button Grid.Column="3" x:Name="SpeedButton" Content="1x" Background="Transparent"
-                                Foreground="White" Click="OnSpeedClick" FontSize="11" Padding="6,2"
+                                Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnSpeedClick" FontSize="11" Padding="6,2"
                                 ToolTipService.ToolTip="Скорость воспроизведения" />
 
                         <!-- Quality selector -->
                         <Button Grid.Column="4" x:Name="QualityButton" Content="HQ" Background="Transparent"
-                                Foreground="White" Click="OnQualityClick" FontSize="11" Padding="6,2"
+                                Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnQualityClick" FontSize="11" Padding="6,2"
                                 ToolTipService.ToolTip="Качество видео" />
 
                         <!-- PiP -->
                         <Button Grid.Column="5" Content="&#xE740;" Background="Transparent"
-                                Foreground="White" Click="OnPipClick"
+                                Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnPipClick"
                                 ToolTipService.ToolTip="Картинка в картинке" />
 
                         <Button Grid.Column="6" x:Name="VolumeButton" Content="&#xE767;" Background="Transparent"
-                                Foreground="White" Click="OnVolumeClick" />
+                                Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnVolumeClick" />
                         <Button Grid.Column="7" Content="&#xE740;" Background="Transparent"
-                                Foreground="White" Click="OnFullscreenClick" />
+                                Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnFullscreenClick" />
                     </Grid>
                 </Grid>
 
                 <!-- Video Info -->
                 <TextBlock Text="{Binding CurrentVideo.Title}"
                            Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap"
+                           Foreground="{StaticResource VkTextPrimaryBrush}"
                            Margin="0,16,0,8" />
 
                 <Grid Margin="0,0,0,16">
@@ -104,9 +108,11 @@
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock Text="{Binding CurrentVideo.Author}"
-                                   FontWeight="SemiBold" />
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource VkTextPrimaryBrush}" />
                         <TextBlock Text="{Binding CurrentVideo.ViewCountText}"
-                                   Opacity="0.6" FontSize="12" />
+                                   FontSize="12"
+                                   Foreground="{StaticResource VkTextSecondaryBrush}" />
                     </StackPanel>
 
                     <Button Grid.Column="2" Content="Подписаться"
@@ -126,13 +132,15 @@
                 <!-- Description -->
                 <Expander Header="Описание">
                     <TextBlock Text="{Binding CurrentVideo.Description}"
-                               TextWrapping="Wrap" Opacity="0.8" />
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource VkTextSecondaryBrush}" />
                 </Expander>
             </StackPanel>
 
             <!-- Right Panel: Related Videos -->
             <StackPanel Grid.Column="1" Margin="0,16,24,0">
                 <TextBlock Text="Похожие видео" Style="{StaticResource SubtitleTextBlockStyle}"
+                           Foreground="{StaticResource VkTextPrimaryBrush}"
                            Margin="0,0,0,12" />
                 <ItemsControl ItemsSource="{x:Bind ViewModel.RelatedVideos}">
                     <ItemsControl.ItemTemplate>
@@ -148,16 +156,19 @@
                                           Margin="0,0,12,0">
                                         <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
                                         <TextBlock Text="{x:Bind DurationText}" HorizontalAlignment="Right"
-                                                   VerticalAlignment="Bottom" Background="#CC000000"
-                                                   Foreground="White" FontSize="10" Padding="3,1"
+                                                   VerticalAlignment="Bottom" Background="{StaticResource VkOverlayBrush}"
+                                                   Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="10" Padding="3,1"
                                                    Margin="0,0,3,3" CornerRadius="2" />
                                     </Grid>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
                                                    TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
-                                                   FontSize="13" />
-                                        <TextBlock Text="{x:Bind Author}" Opacity="0.6" FontSize="11" />
-                                        <TextBlock Text="{x:Bind ViewCountText}" Opacity="0.5" FontSize="11" />
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource VkTextPrimaryBrush}" />
+                                        <TextBlock Text="{x:Bind Author}" FontSize="11"
+                                                   Foreground="{StaticResource VkTextSecondaryBrush}" />
+                                        <TextBlock Text="{x:Bind ViewCountText}" FontSize="11"
+                                                   Foreground="{StaticResource VkTextTertiaryBrush}" />
                                     </StackPanel>
                                 </Grid>
                             </Button>

@@ -3,16 +3,18 @@
     x:Class="VKVideoDesktop.App.Views.LoginPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Background="Transparent">
+    Background="{StaticResource VkBackgroundBrush}">
 
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="500">
         <StackPanel Spacing="24" Margin="24">
             <TextBlock Text="Вход в VK Video" Style="{StaticResource TitleTextBlockStyle}"
+                       Foreground="{StaticResource VkTextPrimaryBrush}"
                        HorizontalAlignment="Center" />
 
             <TextBlock x:Name="Step1Text"
                        Text="1. Нажмите кнопку ниже, чтобы открыть страницу авторизации VK"
-                       TextWrapping="Wrap" HorizontalAlignment="Center" Opacity="0.7" />
+                       TextWrapping="Wrap" HorizontalAlignment="Center"
+                       Foreground="{StaticResource VkTextSecondaryBrush}" />
 
             <Button x:Name="LoginButton" Content="Войти через VK" HorizontalAlignment="Center"
                     Style="{StaticResource AccentButtonStyle}" Click="OnLoginClick"
@@ -20,7 +22,8 @@
 
             <TextBlock x:Name="Step2Text"
                        Text="2. После авторизации скопируйте URL из адресной строки браузера и вставьте его сюда"
-                       TextWrapping="Wrap" HorizontalAlignment="Center" Opacity="0.7"
+                       TextWrapping="Wrap" HorizontalAlignment="Center"
+                       Foreground="{StaticResource VkTextSecondaryBrush}"
                        Visibility="Collapsed" />
 
             <TextBox x:Name="TokenInput" PlaceholderText="Вставьте URL или токен сюда..."
@@ -34,7 +37,8 @@
                        HorizontalAlignment="Center" Visibility="Collapsed" />
 
             <TextBlock x:Name="LoadingText" Text="Проверка токена..."
-                       HorizontalAlignment="Center" Opacity="0.5"
+                       HorizontalAlignment="Center"
+                       Foreground="{StaticResource VkTextTertiaryBrush}"
                        Visibility="Collapsed" />
         </StackPanel>
     </Grid>

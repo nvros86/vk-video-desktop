@@ -7,7 +7,8 @@
     MinWidth="1280"
     MinHeight="720"
     Width="1400"
-    Height="900">
+    Height="900"
+    Background="{StaticResource VkBackgroundBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -17,30 +18,41 @@
         </Grid.RowDefinitions>
 
         <!-- Top Bar -->
-        <Grid Grid.Row="0" Padding="12,8" Height="48"
-              Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid Grid.Row="0" Padding="16,10" Height="52"
+              Background="{StaticResource VkTopBarBrush}"
+              BorderBrush="{StaticResource VkTopBarBorderBrush}"
+              BorderThickness="0,0,0,1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="VK Video Desktop"
-                       Style="{StaticResource TitleTextBlockStyle}"
-                       VerticalAlignment="Center" Margin="0,0,24,0" />
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <FontIcon Glyph="&#xE72B;" FontSize="20" Foreground="{StaticResource VkAccentBrush}" />
+                <TextBlock Text="VK Video Desktop"
+                           FontSize="16" FontWeight="SemiBold"
+                           Foreground="{StaticResource VkTextPrimaryBrush}"
+                           VerticalAlignment="Center" Margin="0,0,24,0" />
+            </StackPanel>
 
             <AutoSuggestBox Grid.Column="1" x:Name="SearchBox"
                             PlaceholderText="Поиск видео, каналов и авторов..."
                             QueryIcon="Find" Width="500" MaxWidth="600"
                             HorizontalAlignment="Center" VerticalAlignment="Center"
-                            KeyDown="OnSearchBoxKeyDown" />
+                            KeyDown="OnSearchBoxKeyDown"
+                            Background="{StaticResource VkCardBrush}"
+                            Foreground="{StaticResource VkTextPrimaryBrush}"
+                            BorderBrush="{StaticResource VkCardBorderBrush}"
+                            BorderThickness="1" CornerRadius="8" />
 
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12"
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
                         VerticalAlignment="Center">
-                <Button ToolTipService.ToolTip="Загрузки" Click="OnDownloadsClick">
+                <Button ToolTipService.ToolTip="Загрузки" Click="OnDownloadsClick"
+                        Background="Transparent" BorderThickness="0">
                     <Grid>
-                        <FontIcon Glyph="&#xE896;" />
-                        <Border x:Name="TopBarDownloadBadge" Background="Red" CornerRadius="8"
+                        <FontIcon Glyph="&#xE896;" Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        <Border x:Name="TopBarDownloadBadge" Background="{StaticResource VkAccentBrush}" CornerRadius="8"
                                 HorizontalAlignment="Right" VerticalAlignment="Top"
                                 Padding="4,1" Margin="0,-4,-8,0" Visibility="Collapsed">
                             <TextBlock x:Name="TopBarDownloadCount" Text="0" FontSize="9"
@@ -48,8 +60,9 @@
                         </Border>
                     </Grid>
                 </Button>
-                <Button ToolTipService.ToolTip="Настройки" Click="OnSettingsClick">
-                    <FontIcon Glyph="&#xE713;" />
+                <Button ToolTipService.ToolTip="Настройки" Click="OnSettingsClick"
+                        Background="Transparent" BorderThickness="0">
+                    <FontIcon Glyph="&#xE713;" Foreground="{StaticResource VkTextSecondaryBrush}" />
                 </Button>
             </StackPanel>
         </Grid>
@@ -62,46 +75,59 @@
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar Navigation -->
-            <NavigationView x:Name="NavView" Grid.Column="0" Width="240"
+            <NavigationView x:Name="NavView" Grid.Column="0" Width="220"
                             PaneDisplayMode="Left" IsSettingsVisible="False"
                             IsBackButtonVisible="Collapsed"
                             IsTitleBarAutoPaddingEnabled="False"
+                            Background="{StaticResource VkSidebarBrush}"
                             SelectionChanged="OnNavSelectionChanged"
-                            Loaded="OnNavViewLoaded">
+                            Loaded="OnNavViewLoaded"
+                            OpenPaneLength="220"
+                            CompactPaneLength="48">
                 <NavigationView.MenuItems>
-                    <NavigationViewItem Content="Главная" Tag="Home">
+                    <NavigationViewItem Content="Главная" Tag="Home" Style="{StaticResource SidebarItemStyle}">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE80F;" />
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
-                    <NavigationViewItem Content="Поиск" Tag="Search">
+                    <NavigationViewItem Content="Поиск" Tag="Search" Style="{StaticResource SidebarItemStyle}">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE721;" />
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
-                    <NavigationViewItem Content="Избранное" Tag="Favorites">
-                        <NavigationViewItem.Icon>
-                            <FontIcon Glyph="&#xE734;" />
-                        </NavigationViewItem.Icon>
-                    </NavigationViewItem>
-                    <NavigationViewItem Content="Плейлисты" Tag="Playlists">
+                    <NavigationViewItem Content="Мои видео" Tag="Profile" Style="{StaticResource SidebarItemStyle}">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE8B4;" />
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
-                    <NavigationViewItem Content="История" Tag="History">
+                    <NavigationViewItem Content="Подписки" Tag="Favorites" Style="{StaticResource SidebarItemStyle}">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE734;" />
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                    <NavigationViewItem Content="Избранное" Tag="Favorites2" Style="{StaticResource SidebarItemStyle}">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE734;" />
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                    <NavigationViewItem Content="Плейлисты" Tag="Playlists" Style="{StaticResource SidebarItemStyle}">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE8B4;" />
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                    <NavigationViewItem Content="История" Tag="History" Style="{StaticResource SidebarItemStyle}">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE81C;" />
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
-                    <NavigationViewItem Tag="Downloads">
+                    <NavigationViewItem Tag="Downloads" Style="{StaticResource SidebarItemStyle}">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE896;" />
                         </NavigationViewItem.Icon>
                         <NavigationViewItem.Content>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="Загрузки" VerticalAlignment="Center" />
-                                <Border x:Name="DownloadBadge" Background="{ThemeResource SystemControlBackgroundAccentBrush}"
+                                <Border x:Name="DownloadBadge" Background="{StaticResource VkAccentBrush}"
                                         CornerRadius="8" Padding="6,2" Visibility="Collapsed">
                                     <TextBlock x:Name="DownloadBadgeCount" Text="0" FontSize="11"
                                                Foreground="White" FontWeight="SemiBold" />
@@ -109,9 +135,9 @@
                             </StackPanel>
                         </NavigationViewItem.Content>
                     </NavigationViewItem>
-                    <NavigationViewItem Content="Профиль" Tag="Profile">
+                    <NavigationViewItem Content="Настройки" Tag="Settings" Style="{StaticResource SidebarItemStyle}">
                         <NavigationViewItem.Icon>
-                            <FontIcon Glyph="&#xE77B;" />
+                            <FontIcon Glyph="&#xE713;" />
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
                 </NavigationView.MenuItems>
@@ -122,7 +148,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <StackPanel x:Name="OfflineBanner" Grid.Row="0" Background="#FFFFC107" Padding="12,6"
+                    <StackPanel x:Name="OfflineBanner" Grid.Row="0" Background="{StaticResource VkWarningBrush}" Padding="12,6"
                                 HorizontalAlignment="Stretch" Visibility="Collapsed">
                         <TextBlock Text="Нет подключения. Скачанные видео доступны офлайн." FontSize="12" />
                     </StackPanel>
@@ -133,36 +159,46 @@
         </Grid>
 
         <!-- Mini Player Bar -->
-        <Grid x:Name="MiniPlayerBar" Grid.Row="2" Height="48" Padding="12,0"
-              Background="{ThemeResource LayerFillColorDefaultBrush}"
-              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        <Grid x:Name="MiniPlayerBar" Grid.Row="2" Height="52" Padding="16,0"
+              Background="{StaticResource VkSurfaceBrush}"
+              BorderBrush="{StaticResource VkTopBarBorderBrush}"
               BorderThickness="0,1,0,0"
               Visibility="Collapsed">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock x:Name="MiniPlayerTitle" Grid.Column="0"
-                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
-                       VerticalAlignment="Center" FontSize="13" />
+            <Image x:Name="MiniPlayerThumb" Grid.Column="0" Width="80" Height="46"
+                   Stretch="UniformToFill" CornerRadius="4" Margin="0,0,12,0" />
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+            <TextBlock x:Name="MiniPlayerTitle" Grid.Column="1"
+                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center" FontSize="13"
+                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
                         VerticalAlignment="Center">
-                <Button Click="OnMiniPlayerPlayClick" ToolTipService.ToolTip="Воспроизвести/Пауза">
-                    <FontIcon Glyph="&#xE768;" FontSize="14" />
+                <Button Click="OnMiniPlayerPlayClick" ToolTipService.ToolTip="Воспроизвести/Пауза"
+                        Background="Transparent" BorderThickness="0">
+                    <FontIcon Glyph="&#xE768;" FontSize="14" Foreground="{StaticResource VkTextPrimaryBrush}" />
                 </Button>
-                <Button Click="OnMiniPlayerPrevClick" ToolTipService.ToolTip="Предыдущее">
-                    <FontIcon Glyph="&#xE892;" FontSize="14" />
+                <Button Click="OnMiniPlayerPrevClick" ToolTipService.ToolTip="Предыдущее"
+                        Background="Transparent" BorderThickness="0">
+                    <FontIcon Glyph="&#xE892;" FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}" />
                 </Button>
-                <Button Click="OnMiniPlayerNextClick" ToolTipService.ToolTip="Следующее">
-                    <FontIcon Glyph="&#xE893;" FontSize="14" />
+                <Button Click="OnMiniPlayerNextClick" ToolTipService.ToolTip="Следующее"
+                        Background="Transparent" BorderThickness="0">
+                    <FontIcon Glyph="&#xE893;" FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}" />
                 </Button>
-                <Button Click="OnMiniPlayerFullscreenClick" ToolTipService.ToolTip="Полный экран">
-                    <FontIcon Glyph="&#xE740;" FontSize="14" />
+                <Button Click="OnMiniPlayerFullscreenClick" ToolTipService.ToolTip="Полный экран"
+                        Background="Transparent" BorderThickness="0">
+                    <FontIcon Glyph="&#xE740;" FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}" />
                 </Button>
-                <Button Click="OnMiniPlayerCloseClick" ToolTipService.ToolTip="Закрыть">
-                    <FontIcon Glyph="&#xE8BB;" FontSize="14" />
+                <Button Click="OnMiniPlayerCloseClick" ToolTipService.ToolTip="Закрыть"
+                        Background="Transparent" BorderThickness="0">
+                    <FontIcon Glyph="&#xE8BB;" FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}" />
                 </Button>
             </StackPanel>
         </Grid>
@@ -170,7 +206,7 @@
         <!-- Error Banner -->
         <Grid x:Name="ErrorBanner" Grid.Row="1" HorizontalAlignment="Stretch"
               VerticalAlignment="Top" Padding="12,8"
-              Background="#FFE53935" Foreground="White"
+              Background="{StaticResource VkErrorBrush}" Foreground="White"
               Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -187,8 +223,8 @@
         <Grid x:Name="DownloadsPanel" Grid.Row="1" Grid.ColumnSpan="2"
               HorizontalAlignment="Right" VerticalAlignment="Top"
               Width="360" Height="400" Margin="0,0,12,12"
-              Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+              Background="{StaticResource VkSurfaceBrush}"
+              BorderBrush="{StaticResource VkCardBorderBrush}"
               BorderThickness="1" CornerRadius="8"
               Visibility="Collapsed">
             <Grid.RowDefinitions>
@@ -198,7 +234,8 @@
 
             <Grid Grid.Row="0" Padding="12,8">
                 <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}"
-                           VerticalAlignment="Center" />
+                           VerticalAlignment="Center"
+                           Foreground="{StaticResource VkTextPrimaryBrush}" />
                 <Button Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets"
                         HorizontalAlignment="Right" Click="OnCloseDownloadsPanel"
                         Style="{StaticResource TextButtonStyle}" />

@@ -2,19 +2,21 @@
     x:Class="VKVideoDesktop.App.Views.ProfilePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Background="Transparent">
+    Background="{StaticResource VkBackgroundBrush}">
 
     <Grid Padding="24" MaxWidth="800" HorizontalAlignment="Center">
         <StackPanel Spacing="16">
             <StackPanel Orientation="Horizontal" Spacing="16">
-                <Ellipse Width="80" Height="80" Fill="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                <Ellipse Width="80" Height="80" Fill="{StaticResource VkCardBrush}">
                     <Ellipse.BitmapImage>
                         <BitmapImage UriSource="{x:Bind ViewModel.AvatarUrl, Mode=OneWay}" />
                     </Ellipse.BitmapImage>
                 </Ellipse>
                 <StackPanel VerticalAlignment="Center" Spacing="4">
-                    <TextBlock Text="{x:Bind ViewModel.UserName, Mode=OneWay}" FontSize="24" FontWeight="Bold" />
-                    <TextBlock Text="{x:Bind ViewModel.UserDomain, Mode=OneWay}" FontSize="14" Opacity="0.6" />
+                    <TextBlock Text="{x:Bind ViewModel.UserName, Mode=OneWay}" FontSize="24" FontWeight="Bold"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" />
+                    <TextBlock Text="{x:Bind ViewModel.UserDomain, Mode=OneWay}" FontSize="14"
+                               Foreground="{StaticResource VkTextSecondaryBrush}" />
                 </StackPanel>
             </StackPanel>
 
@@ -29,7 +31,7 @@
             </NavigationView>
 
             <Button Content="Выйти" Click="OnLogoutClick" HorizontalAlignment="Left"
-                    Background="{ThemeResource SystemControlBackgroundAccentBrush}" Foreground="White"
+                    Background="{StaticResource VkAccentBrush}" Foreground="White"
                     Padding="24,8" Margin="0,16,0,0" />
         </StackPanel>
     </Grid>
