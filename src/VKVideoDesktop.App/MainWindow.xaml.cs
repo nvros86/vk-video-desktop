@@ -63,7 +63,16 @@ public sealed partial class MainWindow : Window
     internal void SetupUI()
     {
         InitializeComponent();
+        Title = "VK Video Desktop";
         ExtendsContentIntoTitleBar = false;
+
+        var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(
+            Microsoft.UI.Win32Interop.GetWindowIdFromWindow((IntPtr)WinRT.Interop.WindowNative.GetWindowHandle(this)));
+        appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 1400, Height = 900 });
+        var presenter = (Microsoft.UI.Windowing.OverlappedPresenter)appWindow.Presenter;
+        presenter.IsMinimizable = true;
+        presenter.IsMaximizable = true;
+        presenter.IsResizable = true;
         ContentFrame.Navigated += OnFrameNavigated;
         ContentFrame.KeyDown += OnGlobalKeyDown;
     }

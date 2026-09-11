@@ -7,10 +7,10 @@
     <Grid Padding="24" MaxWidth="800" HorizontalAlignment="Center">
         <StackPanel Spacing="16">
             <StackPanel Orientation="Horizontal" Spacing="16">
-                <Ellipse Width="80" Height="80" Fill="{StaticResource VkCardBrush}">
-                    <Ellipse.BitmapImage>
-                        <BitmapImage UriSource="{x:Bind ViewModel.AvatarUrl, Mode=OneWay}" />
-                    </Ellipse.BitmapImage>
+                <Ellipse Width="80" Height="80">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="{x:Bind ViewModel.AvatarUrl, Mode=OneWay}" Stretch="UniformToFill" />
+                    </Ellipse.Fill>
                 </Ellipse>
                 <StackPanel VerticalAlignment="Center" Spacing="4">
                     <TextBlock Text="{x:Bind ViewModel.UserName, Mode=OneWay}" FontSize="24" FontWeight="Bold"

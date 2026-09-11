@@ -103,11 +103,11 @@
 
     <Page.Resources>
         <MenuFlyout x:Name="DownloadItemMenuFlyout">
-            <MenuFlyoutItem Content="Открыть файл" Click="OnOpenFileClick" />
-            <MenuFlyoutItem Content="Открыть папку" Click="OnOpenFolderClick" />
-            <MenuFlyoutItem Content="Копировать путь" Click="OnCopyPathClick" />
+            <MenuFlyoutItem Text="Открыть файл" Click="OnOpenFileClick" />
+            <MenuFlyoutItem Text="Открыть папку" Click="OnOpenFolderClick" />
+            <MenuFlyoutItem Text="Копировать путь" Click="OnCopyPathClick" />
             <MenuFlyoutSeparator />
-            <MenuFlyoutItem Content="Удалить запись" Click="OnDeleteRecordClick" Foreground="Red" />
+            <MenuFlyoutItem Text="Удалить запись" Click="OnDeleteRecordClick" Foreground="Red" />
         </MenuFlyout>
     </Page.Resources>
 </Page>

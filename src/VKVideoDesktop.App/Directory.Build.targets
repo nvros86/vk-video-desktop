@@ -1,25 +1,5 @@
-﻿<Project>
-  <Target Name="MarkupCompilePass1" />
-  <Target Name="MarkupCompilePass2" />
-  <Target Name="_OnXamlPreCompileError" />
-  <Target Name="VerifyXbfOutputs" />
-  <Target Name="AddDefaultXamlLinkMetadata" />
-  <Target Name="GenerateEmptyXbfStubs" BeforeTargets="CoreCompile">
-    <ItemGroup>
-      <AllXamlFiles Include="**\*.xaml" />
-    </ItemGroup>
-    <MakeDir Directories="$(IntermediateOutputPath)%(RecursiveDir)" Condition="'@(AllXamlFiles)' != ''" />
-  </Target>
-  <Target Name="CleanGeneratedXbfContent" BeforeTargets="CopyFilesToOutputDirectory">
-    <ItemGroup>
-      <GeneratedXamlSrc Remove="@(GeneratedXamlSrc)" />
-      <Content Remove="@(Content)" Condition="$([System.String]::new('%(FullPath)').EndsWith('.xbf'))" />
-    </ItemGroup>
-  </Target>
-  <Target Name="RemoveXbfCopyInputs" BeforeTargets="CoreCompile">
-    <ItemGroup>
-      <Content Remove="@(Content)" Condition="$([System.String]::new('%(FullPath)').EndsWith('.xbf'))" />
-      <ContentWithTargetPath Remove="@(ContentWithTargetPath)" Condition="$([System.String]::new('%(FullPath)').EndsWith('.xbf'))" />
-    </ItemGroup>
-  </Target>
+<Project>
+  <PropertyGroup>
+    <UseXamlCompilerExecutable>false</UseXamlCompilerExecutable>
+  </PropertyGroup>
 </Project>

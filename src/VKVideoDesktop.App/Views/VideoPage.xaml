@@ -155,10 +155,12 @@
                                     <Grid Grid.Column="0" Width="160" Height="90" CornerRadius="4"
                                           Margin="0,0,12,0">
                                         <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
-                                        <TextBlock Text="{x:Bind DurationText}" HorizontalAlignment="Right"
-                                                   VerticalAlignment="Bottom" Background="{StaticResource VkOverlayBrush}"
-                                                   Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="10" Padding="3,1"
-                                                   Margin="0,0,3,3" CornerRadius="2" />
+                                        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                Background="{StaticResource VkOverlayBrush}" CornerRadius="2"
+                                                Margin="0,0,3,3" Padding="3,1">
+                                            <TextBlock Text="{x:Bind DurationText}"
+                                                       Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="10" />
+                                        </Border>
                                     </Grid>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"

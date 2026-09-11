@@ -3,12 +3,7 @@
     x:Class="VKVideoDesktop.App.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="VK Video Desktop"
-    MinWidth="1280"
-    MinHeight="720"
-    Width="1400"
-    Height="900"
-    Background="{StaticResource VkBackgroundBrush}">
+    Title="VK Video Desktop">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -50,7 +45,7 @@
                         VerticalAlignment="Center">
                 <Button ToolTipService.ToolTip="Загрузки" Click="OnDownloadsClick"
                         Background="Transparent" BorderThickness="0">
-                    <Grid>
+    <Grid Background="{StaticResource VkBackgroundBrush}">
                         <FontIcon Glyph="&#xE896;" Foreground="{StaticResource VkTextSecondaryBrush}" />
                         <Border x:Name="TopBarDownloadBadge" Background="{StaticResource VkAccentBrush}" CornerRadius="8"
                                 HorizontalAlignment="Right" VerticalAlignment="Top"
@@ -170,8 +165,11 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Image x:Name="MiniPlayerThumb" Grid.Column="0" Width="80" Height="46"
-                   Stretch="UniformToFill" CornerRadius="4" Margin="0,0,12,0" />
+            <Border Grid.Column="0" Width="80" Height="46" CornerRadius="4"
+                    Margin="0,0,12,0">
+                <Image x:Name="MiniPlayerThumb"
+                       Stretch="UniformToFill" />
+            </Border>
 
             <TextBlock x:Name="MiniPlayerTitle" Grid.Column="1"
                        TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
@@ -206,14 +204,14 @@
         <!-- Error Banner -->
         <Grid x:Name="ErrorBanner" Grid.Row="1" HorizontalAlignment="Stretch"
               VerticalAlignment="Top" Padding="12,8"
-              Background="{StaticResource VkErrorBrush}" Foreground="White"
+              Background="{StaticResource VkErrorBrush}"
               Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="ErrorBannerText" Grid.Column="0" VerticalAlignment="Center"
-                       FontSize="13" TextWrapping="Wrap" />
+                       FontSize="13" TextWrapping="Wrap" Foreground="White" />
             <Button Grid.Column="1" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets"
                     Background="Transparent" Foreground="White"
                     Click="OnCloseErrorBanner" />

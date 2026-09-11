@@ -6,14 +6,13 @@ using WinRT.Interop;
 
 namespace VKVideoDesktop.App.Views;
 
-public sealed partial class MiniPlayerWindow : Window
+public sealed class MiniPlayerWindow : Window
 {
     private readonly PlaybackService _playbackService;
     private AppWindow _appWindow = null!;
 
     public MiniPlayerWindow()
     {
-        InitializeComponent();
         _playbackService = App.GetService<PlaybackService>();
 
         Title = "VK Video Mini";

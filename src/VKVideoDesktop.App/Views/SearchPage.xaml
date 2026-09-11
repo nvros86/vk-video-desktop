@@ -76,10 +76,12 @@
                                     </Grid.RowDefinitions>
                                     <Grid Grid.Row="0" Height="158" CornerRadius="4,4,0,0">
                                         <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
-                                        <TextBlock Text="{x:Bind DurationText}" HorizontalAlignment="Right"
-                                                   VerticalAlignment="Bottom" Background="{StaticResource VkOverlayBrush}"
-                                                   Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="11" Padding="4,2"
-                                                   Margin="0,0,4,4" CornerRadius="2" />
+                                        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                Background="{StaticResource VkOverlayBrush}" CornerRadius="2"
+                                                Margin="0,0,4,4" Padding="4,2">
+                                            <TextBlock Text="{x:Bind DurationText}"
+                                                       Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="11" />
+                                        </Border>
                                     </Grid>
                                     <StackPanel Grid.Row="1" Margin="0,8,0,0">
                                         <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"

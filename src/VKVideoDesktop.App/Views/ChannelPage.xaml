@@ -67,10 +67,12 @@
                             <StackPanel Width="280">
                                 <Grid Height="158" CornerRadius="4" Background="{StaticResource VkCardBrush}">
                                     <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
-                                    <TextBlock Text="{x:Bind DurationText}" HorizontalAlignment="Right"
-                                               VerticalAlignment="Bottom" Background="{StaticResource VkOverlayBrush}"
-                                               Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="11" Padding="4,2"
-                                               Margin="0,0,4,4" CornerRadius="2" />
+                                    <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                Background="{StaticResource VkOverlayBrush}" CornerRadius="2"
+                                                Margin="0,0,4,4" Padding="4,2">
+                                            <TextBlock Text="{x:Bind DurationText}"
+                                                       Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="11" />
+                                        </Border>
                                 </Grid>
                                 <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
                                            TextTrimming="CharacterEllipsis" FontWeight="SemiBold"

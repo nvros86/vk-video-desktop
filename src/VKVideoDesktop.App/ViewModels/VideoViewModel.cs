@@ -37,6 +37,7 @@ public sealed class VideoViewModel : ViewModelBase
     public string Author { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
     public string DurationText { get; set; } = string.Empty;
+    public string ViewCountText { get; set; } = string.Empty;
     public string PlaybackUrl { get; set; } = string.Empty;
 
     public VideoDisplayViewModel CurrentVideo { get; } = new();
@@ -61,6 +62,7 @@ public sealed class VideoViewModel : ViewModelBase
         Author = video.ChannelName ?? string.Empty;
         ThumbnailUrl = video.ThumbnailUrl;
         DurationText = FormatDuration(video.Duration);
+        ViewCountText = FormatViewCount(video.ViewCount);
         PlaybackUrl = video.PlaybackUrl ?? string.Empty;
     }
 
@@ -143,6 +145,17 @@ public sealed class VideoViewModel : ViewModelBase
         return duration.TotalHours >= 1
             ? $"{(int)duration.TotalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}"
             : $"{(int)duration.TotalMinutes}:{duration.Seconds:D2}";
+    }
+
+    private static string FormatViewCount(long count)
+    {
+        return count switch
+        {
+            >= 1_000_000_000 => $"{count / 1_000_000_000.0:0.#} млрд",
+            >= 1_000_000 => $"{count / 1_000_000.0:0.#} млн",
+            >= 1_000 => $"{count / 1_000.0:0.#} тыс.",
+            _ => count.ToString("N0")
+        };
     }
 }
 

@@ -16,66 +16,87 @@
                 <TextBlock Text="Общие" Style="{StaticResource SubtitleTextBlockStyle}"
                            Foreground="{StaticResource VkTextPrimaryBrush}" />
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Язык" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Язык" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox x:Name="LanguageCombo" SelectedIndex="0" Width="150"
+                    <ComboBox Grid.Column="1" x:Name="LanguageCombo" SelectedIndex="0" Width="150"
                               SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="Русский" />
                         <ComboBoxItem Content="English" />
                     </ComboBox>
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Тема" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Тема" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox x:Name="ThemeCombo" SelectedIndex="0" Width="150"
+                    <ComboBox Grid.Column="1" x:Name="ThemeCombo" SelectedIndex="0" Width="150"
                               SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="Тёмная" />
                         <ComboBoxItem Content="Светлая" />
                         <ComboBoxItem Content="Системная" />
                     </ComboBox>
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Запуск с Windows" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Запуск с Windows" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch x:Name="StartWithWindowsToggle" IsOn="False"
+                    <ToggleSwitch Grid.Column="1" x:Name="StartWithWindowsToggle" IsOn="False"
                                   Toggled="OnSettingChanged_Toggle" />
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Сворачивать в трей" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Сворачивать в трей" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch x:Name="MinimizeToTrayToggle" IsOn="True"
+                    <ToggleSwitch Grid.Column="1" x:Name="MinimizeToTrayToggle" IsOn="True"
                                   Toggled="OnSettingChanged_Toggle" />
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Уведомления" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Уведомления" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch x:Name="NotificationsToggle" IsOn="True"
+                    <ToggleSwitch Grid.Column="1" x:Name="NotificationsToggle" IsOn="True"
                                   Toggled="OnSettingChanged_Toggle" />
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Громкость по умолчанию" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Громкость по умолчанию" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <Slider x:Name="VolumeSlider" Minimum="0" Maximum="100" Width="200"
+                    <Slider Grid.Column="1" x:Name="VolumeSlider" Minimum="0" Maximum="100" Width="200"
                             ValueChanged="OnVolumeChanged" />
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Скорость воспроизведения" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Скорость воспроизведения" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox x:Name="SpeedComboBox" Width="200" SelectionChanged="OnSpeedChanged">
+                    <ComboBox Grid.Column="1" x:Name="SpeedComboBox" Width="200" SelectionChanged="OnSpeedChanged">
                         <ComboBoxItem Content="0.5x" Tag="0.5" />
                         <ComboBoxItem Content="0.75x" Tag="0.75" />
                         <ComboBoxItem Content="1x" Tag="1" />
@@ -83,21 +104,24 @@
                         <ComboBoxItem Content="1.5x" Tag="1.5" />
                         <ComboBoxItem Content="2x" Tag="2" />
                     </ComboBox>
-                </StackPanel>
+                </Grid>
             </StackPanel>
 
-            <Divider Foreground="{StaticResource VkSeparatorBrush}" />
+            <Border Height="1" Background="{StaticResource VkSeparatorBrush}" />
 
             <!-- Video -->
             <StackPanel Spacing="16">
                 <TextBlock Text="Видео" Style="{StaticResource SubtitleTextBlockStyle}"
                            Foreground="{StaticResource VkTextPrimaryBrush}" />
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Качество по умолчанию" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Качество по умолчанию" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox x:Name="QualityCombo" SelectedIndex="2" Width="150"
+                    <ComboBox Grid.Column="1" x:Name="QualityCombo" SelectedIndex="2" Width="150"
                               SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="240p" />
                         <ComboBoxItem Content="360p" />
@@ -107,41 +131,50 @@
                         <ComboBoxItem Content="1440p" />
                         <ComboBoxItem Content="2160p" />
                     </ComboBox>
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Автовоспроизведение" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Автовоспроизведение" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch x:Name="AutoplayToggle" IsOn="True"
+                    <ToggleSwitch Grid.Column="1" x:Name="AutoplayToggle" IsOn="True"
                                   Toggled="OnSettingChanged_Toggle" />
-                </StackPanel>
+                </Grid>
             </StackPanel>
 
-            <Divider Foreground="{StaticResource VkSeparatorBrush}" />
+            <Border Height="1" Background="{StaticResource VkSeparatorBrush}" />
 
             <!-- Downloads -->
             <StackPanel Spacing="16">
                 <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}"
                            Foreground="{StaticResource VkTextPrimaryBrush}" />
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Папка загрузок" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Папка загрузок" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <StackPanel Orientation="Horizontal" Spacing="8">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                         <TextBlock x:Name="DownloadFolderText" Text="C:\Users\Videos\VK Video"
                                    VerticalAlignment="Center"
                                    Foreground="{StaticResource VkTextSecondaryBrush}" />
                         <Button Content="Изменить" Click="OnChangeFolderClick" />
                     </StackPanel>
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Макс. одновременных загрузок" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Макс. одновременных загрузок" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox x:Name="MaxDownloadsCombo" SelectedIndex="1" Width="80"
+                    <ComboBox Grid.Column="1" x:Name="MaxDownloadsCombo" SelectedIndex="1" Width="80"
                               SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="1" />
                         <ComboBoxItem Content="2" />
@@ -149,13 +182,16 @@
                         <ComboBoxItem Content="4" />
                         <ComboBoxItem Content="5" />
                     </ComboBox>
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Ограничение скорости" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Ограничение скорости" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox x:Name="SpeedLimitCombo" SelectedIndex="0" Width="150"
+                    <ComboBox Grid.Column="1" x:Name="SpeedLimitCombo" SelectedIndex="0" Width="150"
                               SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="Без ограничений" />
                         <ComboBoxItem Content="512 КБ/с" />
@@ -164,50 +200,65 @@
                         <ComboBoxItem Content="5 МБ/с" />
                         <ComboBoxItem Content="10 МБ/с" />
                     </ComboBox>
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Количество повторных попыток" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Количество повторных попыток" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <NumberBox x:Name="RetryCountBox" Value="3" Minimum="0" Maximum="10" Width="80"
+                    <NumberBox Grid.Column="1" x:Name="RetryCountBox" Value="3" Minimum="0" Maximum="10" Width="80"
                                ValueChanged="OnRetryCountChanged" />
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Автовозобновление при запуске" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Автовозобновление при запуске" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch x:Name="AutoResumeToggle" IsOn="True"
+                    <ToggleSwitch Grid.Column="1" x:Name="AutoResumeToggle" IsOn="True"
                                   Toggled="OnSettingChanged_Toggle" />
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Уведомления о загрузках" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Уведомления о загрузках" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch IsOn="True" />
-                </StackPanel>
+                    <ToggleSwitch Grid.Column="1" IsOn="True" />
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Удалять .part при отмене" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Удалять .part при отмене" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch x:Name="DeletePartToggle" IsOn="True"
+                    <ToggleSwitch Grid.Column="1" x:Name="DeletePartToggle" IsOn="True"
                                   Toggled="OnSettingChanged_Toggle" />
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <TextBlock Text="Способ загрузки" VerticalAlignment="Center"
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Способ загрузки" VerticalAlignment="Center"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox x:Name="QualityBehaviorCombo" SelectedIndex="0" Width="250"
+                    <ComboBox Grid.Column="1" x:Name="QualityBehaviorCombo" SelectedIndex="0" Width="250"
                               SelectionChanged="OnSettingChanged_Combo">
                         <ComboBoxItem Content="Показывать выбор качества" />
                         <ComboBoxItem Content="Использовать последнее качество" />
                         <ComboBoxItem Content="Использовать максимальное качество" />
                     </ComboBox>
-                </StackPanel>
+                </Grid>
 
                 <TextBlock Text="Сетевые настройки" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,8"
                            Foreground="{StaticResource VkTextPrimaryBrush}" />
@@ -217,26 +268,29 @@
                          PlaceholderText="http://proxy:port" LostFocus="OnProxyAddressChanged" />
             </StackPanel>
 
-            <Divider Foreground="{StaticResource VkSeparatorBrush}" />
+            <Border Height="1" Background="{StaticResource VkSeparatorBrush}" />
 
             <!-- Cache -->
             <StackPanel Spacing="16">
                 <TextBlock Text="Кэш" Style="{StaticResource SubtitleTextBlockStyle}"
                            Foreground="{StaticResource VkTextPrimaryBrush}" />
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            JustifyContent="SpaceBetween">
-                    <StackPanel>
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
                         <TextBlock Text="Очистить кэш изображений"
                                    Foreground="{StaticResource VkTextPrimaryBrush}" />
                         <TextBlock Text="Миниатюры и аватары каналов"
                                    Foreground="{StaticResource VkTextTertiaryBrush}" FontSize="12" />
                     </StackPanel>
-                    <Button Content="Очистить" Click="OnClearCacheClick" />
-                </StackPanel>
+                    <Button Grid.Column="1" Content="Очистить" Click="OnClearCacheClick" />
+                </Grid>
             </StackPanel>
 
-            <Divider Foreground="{StaticResource VkSeparatorBrush}" />
+            <Border Height="1" Background="{StaticResource VkSeparatorBrush}" />
 
             <!-- About -->
             <StackPanel Spacing="8">
