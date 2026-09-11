@@ -13,6 +13,13 @@
     <DisableXamlGeneratedMain>true</DisableXamlGeneratedMain>
     <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+    <Version>1.0.0-beta</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <Product>VK Video Desktop</Product>
+    <Company>VK Video Desktop</Company>
+    <Copyright>Copyright © 2026 VK Video Desktop</Copyright>
+    <Description>Production-ready Windows client for VK Video with download manager</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\VKVideoDesktop.Core\VKVideoDesktop.Core.csproj" />

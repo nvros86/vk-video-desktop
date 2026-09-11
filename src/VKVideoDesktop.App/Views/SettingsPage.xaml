@@ -296,9 +296,9 @@
             <StackPanel Spacing="8">
                 <TextBlock Text="О приложении" Style="{StaticResource SubtitleTextBlockStyle}"
                            Foreground="{StaticResource VkTextPrimaryBrush}" />
-                <TextBlock Text="VK Video Desktop v1.0.0"
+                <TextBlock Text="VK Video Desktop v1.0.0-beta"
                            Foreground="{StaticResource VkTextSecondaryBrush}" />
-                <TextBlock Text="Production-ready Windows client for VK Video"
+                <TextBlock Text="Бета-версия • Production-ready Windows client for VK Video"
                            Foreground="{StaticResource VkTextTertiaryBrush}" FontSize="12" />
             </StackPanel>
 
