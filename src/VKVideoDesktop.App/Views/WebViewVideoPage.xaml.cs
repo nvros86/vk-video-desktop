@@ -37,7 +37,8 @@ public sealed partial class WebViewVideoPage : Page
             {
                 try
                 {
-                    await WebView.EnsureCoreWebView2Async();
+                    var env = await WebView2Helper.GetEnvironmentAsync();
+                    await WebView.EnsureCoreWebView2Async(env);
                     WebView.CoreWebView2.Navigate(_videoUrl);
                 }
                 catch (Exception)
@@ -55,7 +56,8 @@ public sealed partial class WebViewVideoPage : Page
             _videoUrl = url;
             try
             {
-                await WebView.EnsureCoreWebView2Async();
+                var env = await WebView2Helper.GetEnvironmentAsync();
+                await WebView.EnsureCoreWebView2Async(env);
                 WebView.CoreWebView2.Navigate(url);
             }
             catch (Exception)

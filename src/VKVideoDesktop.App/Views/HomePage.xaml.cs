@@ -15,6 +15,38 @@ public sealed partial class HomePage : Page
     public MainViewModel ViewModel { get; }
     private readonly ILogger<HomePage> _logger;
     private readonly LocalizationService _localization;
+    private bool _isGuestMode;
+    private string _currentVkSection = "";
+
+    private const string VkHideSidebarCss = @"
+        (function() {
+            var style = document.createElement('style');
+            style.textContent = `
+                nav-left-menu, .leftMenu, .LeftMenu, .vk-left-menu,
+                [class*=""LeftBlock""], [class*=""leftBlock""],
+                [class*=""left_menu""], [class*=""left-menu""],
+                [class*=""VKNavigation""], [class*=""vkNavigation""],
+                .mosaic-player, .VideoFilters, .VideoFilters__title,
+                header.Header, .Header, [class*=""TopNav""],
+                [class*=""topNav""], [class*=""app_header""],
+                .VideoPage__left, .videoplayer_ui__nav {
+                    display: none !important;
+                }
+                .VideoPage, .VideoPage__content,
+                .VideosSection, .VideosSection__content,
+                .video_grid, .VideoCards,
+                .VideoCard, .VideoCard__info,
+                .VideoCardList, .VideoCardList__card,
+                .video_list, .video_row {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
+                body {
+                    overflow-x: hidden !important;
+                }
+            `;
+            document.head.appendChild(style);
+        })();";
 
     public HomePage()
     {
@@ -34,29 +66,106 @@ public sealed partial class HomePage : Page
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        var settings = App.GetService<ISettingsService>();
+        _isGuestMode = string.IsNullOrEmpty(settings.Settings.AccessToken);
+
+        if (_isGuestMode)
+        {
+            _logger.LogInformation("[HomePage] Guest mode - showing WebView2 with vk.com/video");
+            AuthorizedFeed.Visibility = Visibility.Collapsed;
+            GuestWebView.Visibility = Visibility.Visible;
+            await InitGuestWebViewAsync();
+        }
+        else
+        {
+            _logger.LogInformation("[HomePage] Authorized - loading native feed");
+            AuthorizedFeed.Visibility = Visibility.Visible;
+            GuestWebView.Visibility = Visibility.Collapsed;
+            await LoadAuthorizedFeedAsync();
+        }
+    }
+
+    private async System.Threading.Tasks.Task InitGuestWebViewAsync()
+    {
+        try
+        {
+            var env = await WebView2Helper.GetEnvironmentAsync();
+            await GuestWebView2.EnsureCoreWebView2Async(env);
+
+            GuestWebView2.CoreWebView2.Settings.IsStatusBarEnabled = false;
+            GuestWebView2.CoreWebView2.Settings.AreDevToolsEnabled = false;
+            GuestWebView2.CoreWebView2.Settings.IsZoomControlEnabled = true;
+
+            GuestWebView2.CoreWebView2.NewWindowRequested += OnWebViewNewWindowRequested;
+            GuestWebView2.CoreWebView2.NavigationCompleted += OnGuestWebViewNavigationCompleted;
+
+            NavigateToVkSection("home");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[HomePage] Failed to init Guest WebView2");
+        }
+    }
+
+    private void OnGuestWebViewNavigationCompleted(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
+    {
+        _ = InjectCssToHideVkSidebar();
+    }
+
+    private async System.Threading.Tasks.Task InjectCssToHideVkSidebar()
+    {
+        try
+        {
+            if (GuestWebView2.CoreWebView2 != null)
+            {
+                await GuestWebView2.CoreWebView2.ExecuteScriptAsync(VkHideSidebarCss);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "[HomePage] CSS injection failed (non-critical)");
+        }
+    }
+
+    public void NavigateToVkSection(string section)
+    {
+        if (!_isGuestMode || GuestWebView2.CoreWebView2 == null) return;
+
+        _currentVkSection = section;
+        string url = section switch
+        {
+            "home" => "https://vk.com/video",
+            "trending" => "https://vk.com/video?section=trending",
+            "clips" => "https://vk.com/clips",
+            "music" => "https://vk.com/video?section= music_video",
+            "movies" => "https://vk.com/video?section=movies",
+            _ => "https://vk.com/video"
+        };
+
+        GuestWebView2.CoreWebView2.Navigate(url);
+    }
+
+    private async System.Threading.Tasks.Task LoadAuthorizedFeedAsync()
+    {
         _logger.LogInformation("[HomePage] OnLoaded - loading recommendations...");
         try
         {
             await ViewModel.LoadRecommendationsAsync();
-            _logger.LogInformation("[HomePage] Loaded: History={HistoryCount}, Recommendations={RecommendationsCount}", ViewModel.HistoryEntries.Count, ViewModel.Recommendations.Count);
+            _logger.LogInformation("[HomePage] Loaded: History={HistoryCount}, Recommendations={RecommendationsCount}",
+                ViewModel.HistoryEntries.Count, ViewModel.Recommendations.Count);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "[HomePage] OnLoaded failed");
         }
+    }
 
-        var settings = App.GetService<ISettingsService>();
-        if (!settings.Settings.IsAuthorized)
+    private void OnWebViewNewWindowRequested(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NewWindowRequestedEventArgs e)
+    {
+        e.Handled = true;
+        if (!string.IsNullOrEmpty(e.Uri))
         {
-            _logger.LogInformation("[HomePage] User not authorized - showing login prompt");
-            LoginRequiredState.Visibility = Visibility.Visible;
-            EmptyState.Visibility = Visibility.Collapsed;
-        }
-        else
-        {
-            LoginRequiredState.Visibility = Visibility.Collapsed;
-            EmptyState.Visibility = (ViewModel.HistoryEntries.Count == 0 && ViewModel.Recommendations.Count == 0)
-                ? Visibility.Visible : Visibility.Collapsed;
+            GuestWebView2.CoreWebView2.Navigate(e.Uri);
         }
     }
 

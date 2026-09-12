@@ -88,7 +88,7 @@ public sealed partial class SearchPage : Page
     {
         if (e.Key == Windows.System.VirtualKey.Enter)
         {
-            OnSearchQuerySubmitted(SearchBox, null);
+            OnSearchQuerySubmitted(SearchBox, new AutoSuggestBoxQuerySubmittedEventArgs());
         }
     }
 

@@ -25,12 +25,20 @@ public sealed partial class ProfilePage : Page
     {
         try
         {
+            LoadingState.Visibility = Visibility.Visible;
+            MainContent.Visibility = Visibility.Collapsed;
+
             var settings = App.GetService<ISettingsService>();
             var videoProvider = App.GetService<IVideoProvider>();
             var favoritesService = App.GetService<IFavoritesService>();
 
             if (!string.IsNullOrEmpty(settings.Settings.AccessToken))
             {
+                // Authenticated user
+                QuickActions.Visibility = Visibility.Visible;
+                StatsRow.Visibility = Visibility.Visible;
+                GuestPrompt.Visibility = Visibility.Collapsed;
+
                 var channel = await videoProvider.GetChannelAsync("0", CancellationToken.None);
                 if (channel != null)
                 {
@@ -59,15 +67,33 @@ public sealed partial class ProfilePage : Page
             }
             else
             {
+                // Guest mode
+                QuickActions.Visibility = Visibility.Collapsed;
+                StatsRow.Visibility = Visibility.Collapsed;
+                GuestPrompt.Visibility = Visibility.Visible;
+
                 UserNameText.Text = "Гость";
-                UserDomainText.Text = "Войдите, чтобы получить доступ ко всем функциям";
+                UserDomainText.Text = "";
+                UserStatusText.Text = "";
             }
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "[ProfilePage] Failed to load profile info");
             UserNameText.Text = "Гость";
+            UserDomainText.Text = "";
+            GuestPrompt.Visibility = Visibility.Visible;
         }
+        finally
+        {
+            LoadingState.Visibility = Visibility.Collapsed;
+            MainContent.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void OnGuestLoginClick(object sender, RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(LoginPage));
     }
 
     private void OnQuickActionClick(object sender, RoutedEventArgs e)

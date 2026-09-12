@@ -14,6 +14,7 @@ public sealed partial class LoginPage : Page
     private readonly ILogger<LoginPage> _logger;
     private readonly LocalizationService _localization;
     private const string OAuthRedirectPrefix = "https://oauth.vk.com/blank.html";
+    private bool _webViewReady;
 
     public LoginPage()
     {
@@ -27,6 +28,7 @@ public sealed partial class LoginPage : Page
     private async void OnLoginClick(object sender, RoutedEventArgs e)
     {
         ShowState(WebViewState);
+        WebViewLoadingOverlay.Visibility = Visibility.Visible;
 
         try
         {
@@ -48,18 +50,31 @@ public sealed partial class LoginPage : Page
     {
         try
         {
-            await LoginWebView.EnsureCoreWebView2Async();
+            var env = await WebView2Helper.GetEnvironmentAsync();
+            await LoginWebView.EnsureCoreWebView2Async(env);
+            _webViewReady = true;
             LoginWebView.CoreWebView2.NavigationStarting += OnWebViewNavigationStarting;
+            LoginWebView.CoreWebView2.NavigationCompleted += OnWebViewNavigationCompleted;
             LoginWebView.CoreWebView2.Navigate(authUrl);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[LoginPage] WebView2 init failed");
-            ShowError(_localization["LoginErrorAuthFailed"]);
+            _logger.LogError(ex, "[LoginPage] WebView2 init failed - showing browser fallback");
+            _webViewReady = false;
+            OpenInBrowserButton.Visibility = Visibility.Visible;
+            ShowError("WebView2 не установлен. Установите WebView2 Runtime или используйте кнопку «Открыть в браузере».");
         }
     }
 
-    private async void OnWebViewNavigationStarting(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
+    private void OnWebViewNavigationCompleted(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            WebViewLoadingOverlay.Visibility = Visibility.Collapsed;
+        });
+    }
+
+    private void OnWebViewNavigationStarting(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
     {
         if (string.IsNullOrEmpty(e.Uri))
             return;
@@ -136,11 +151,13 @@ public sealed partial class LoginPage : Page
 
     private void OnBackToIntroClick(object sender, RoutedEventArgs e)
     {
-        if (LoginWebView.CoreWebView2 != null)
+        if (_webViewReady && LoginWebView.CoreWebView2 != null)
         {
             LoginWebView.CoreWebView2.NavigationStarting -= OnWebViewNavigationStarting;
+            LoginWebView.CoreWebView2.NavigationCompleted -= OnWebViewNavigationCompleted;
             LoginWebView.CoreWebView2.Navigate("about:blank");
         }
+        WebViewLoadingOverlay.Visibility = Visibility.Collapsed;
         ShowState(IntroState);
     }
 

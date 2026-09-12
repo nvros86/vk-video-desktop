@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Interfaces;
@@ -34,6 +35,22 @@ public sealed class VkVideoProvider : IVideoProvider
         return $"{BaseUrl}/method/{method}?{queryString}";
     }
 
+    private async Task<T?> GetApiAsync<T>(string url, string methodName, CancellationToken cancellationToken)
+    {
+        var response = await _httpClient.GetFromJsonAsync<VkResponse<T>>(url, cancellationToken);
+        if (response == null)
+        {
+            _logger.LogWarning("VK API {Method}: null response", methodName);
+            return default;
+        }
+        if (response.Error != null)
+        {
+            _logger.LogWarning("VK API {Method} error {Code}: {Message}", methodName, response.Error.ErrorCode, response.Error.ErrorMsg);
+            return default;
+        }
+        return response.Response;
+    }
+
     public async Task<IReadOnlyList<Video>> SearchAsync(
         string query,
         SearchFilter filter,
@@ -60,6 +77,12 @@ public sealed class VkVideoProvider : IVideoProvider
                 }
             });
             var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
+
+            if (response?.Error != null)
+            {
+                _logger.LogWarning("VK API video.search error {Code}: {Message}", response.Error.ErrorCode, response.Error.ErrorMsg);
+                return Array.Empty<Video>();
+            }
 
             if (response?.Response?.Items == null)
                 return Array.Empty<Video>();
@@ -112,6 +135,12 @@ public sealed class VkVideoProvider : IVideoProvider
             });
             var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoListResult>>(url, cancellationToken);
 
+            if (response?.Error != null)
+            {
+                _logger.LogWarning("VK API video.get error {Code}: {Message}", response.Error.ErrorCode, response.Error.ErrorMsg);
+                return null;
+            }
+
             return response?.Response?.Items?.FirstOrDefault()?.MapToVideo();
         }
         catch (OperationCanceledException)
@@ -160,6 +189,12 @@ public sealed class VkVideoProvider : IVideoProvider
                 ["fields"] = "photo_200,photo_400_orig,description,subscriptions_count"
             });
             var response = await _httpClient.GetFromJsonAsync<VkResponse<VkUserListResult>>(url, cancellationToken);
+
+            if (response?.Error != null)
+            {
+                _logger.LogWarning("VK API users.get error {Code}: {Message}", response.Error.ErrorCode, response.Error.ErrorMsg);
+                return null;
+            }
 
             var user = response?.Response?.Items?.FirstOrDefault();
             if (user == null) return null;
@@ -233,7 +268,15 @@ public sealed class VkVideoProvider : IVideoProvider
                     ["count"] = "20"
                 });
                 var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
-                result = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
+                if (response?.Error != null)
+                {
+                    _logger.LogWarning("VK API video.get (user) error {Code}: {Message}", response.Error.ErrorCode, response.Error.ErrorMsg);
+                    result = Array.Empty<Video>();
+                }
+                else
+                {
+                    result = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
+                }
             }
             else
             {
@@ -251,6 +294,11 @@ public sealed class VkVideoProvider : IVideoProvider
                             ["count"] = "10"
                         });
                         var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
+                        if (response?.Error != null)
+                        {
+                            _logger.LogWarning("VK API video.get community {OwnerId} error {Code}: {Message}", ownerId, response.Error.ErrorCode, response.Error.ErrorMsg);
+                            continue;
+                        }
                         var videos = response?.Response?.Items?.Select(MapVideo)?.ToList();
                         if (videos != null && videos.Count > 0)
                         {
@@ -320,6 +368,12 @@ public sealed class VkVideoProvider : IVideoProvider
                 ["count"] = "20"
             });
             var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
+
+            if (response?.Error != null)
+            {
+                _logger.LogWarning("VK API video.get channel {ChannelId} error {Code}: {Message}", channelId, response.Error.ErrorCode, response.Error.ErrorMsg);
+                return Array.Empty<Video>();
+            }
 
             IReadOnlyList<Video> result2 = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
             return result2;
@@ -403,8 +457,10 @@ public sealed class VkVideoProvider : IVideoProvider
 
     private sealed class VkError
     {
-        public int Error_Code { get; set; }
-        public string? Error_Msg { get; set; }
+        [JsonPropertyName("error_code")]
+        public int ErrorCode { get; set; }
+        [JsonPropertyName("error_msg")]
+        public string? ErrorMsg { get; set; }
     }
 
     private sealed class VkVideoSearchResult

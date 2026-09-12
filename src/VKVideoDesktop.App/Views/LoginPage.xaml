@@ -9,6 +9,7 @@
         <!-- Intro State -->
         <StackPanel x:Name="IntroState" HorizontalAlignment="Center" VerticalAlignment="Center"
                     MaxWidth="480" Spacing="20" Padding="32">
+            <!-- VK Logo -->
             <Grid Width="80" Height="80" HorizontalAlignment="Center">
                 <Ellipse Fill="{StaticResource VkAccentGlowBrush}" />
                 <FontIcon Glyph="&#xE72B;" FontSize="36" Foreground="{StaticResource VkAccentBrush}"
@@ -23,9 +24,17 @@
                        Foreground="{StaticResource VkTextSecondaryBrush}"
                        HorizontalAlignment="Center" TextAlignment="Center" />
 
-            <Button x:Uid="LoginButton" HorizontalAlignment="Center"
+            <Button x:Name="LoginButton" x:Uid="LoginButton" HorizontalAlignment="Center"
                     Style="{StaticResource AccentButtonStyle}" Click="OnLoginClick"
                     Padding="40,14" CornerRadius="24" FontSize="15" Margin="0,8,0,0" />
+
+            <!-- WebView2 not available fallback -->
+            <Button x:Name="OpenInBrowserButton" Content="&#xE774; Открыть в браузере"
+                    HorizontalAlignment="Center"
+                    Background="Transparent" Foreground="{StaticResource VkTextSecondaryBrush}"
+                    BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                    CornerRadius="20" Padding="20,10" FontSize="13" Margin="0,4,0,0"
+                    Click="OnOpenInBrowserClick" Visibility="Collapsed" />
 
             <TextBlock x:Uid="LoginStep2" FontSize="13" TextWrapping="Wrap"
                        Foreground="{StaticResource VkTextTertiaryBrush}"
@@ -40,6 +49,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
+            <!-- Top bar -->
             <Grid Grid.Row="0" Padding="16,10" Background="{StaticResource VkSurfaceBrush}"
                   BorderBrush="{StaticResource VkTopBarBorderBrush}" BorderThickness="0,0,0,1">
                 <Grid.ColumnDefinitions>
@@ -61,10 +71,24 @@
                            HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                 <Button Grid.Column="2" Content="&#xE774;" FontFamily="Segoe MDL2 Assets"
-                        Style="{StaticResource TextButtonStyle}" Click="OnOpenInBrowserClick" />
+                        Style="{StaticResource TextButtonStyle}" Click="OnOpenInBrowserClick"
+                        ToolTipService.ToolTip="Открыть в браузере" />
             </Grid>
 
             <WebView2 x:Name="LoginWebView" Grid.Row="1" />
+
+            <!-- WebView2 loading overlay -->
+            <StackPanel x:Name="WebViewLoadingOverlay" Grid.Row="1"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Background="{StaticResource VkBackgroundBrush}" Spacing="12"
+                        Padding="40,30" CornerRadius="12"
+                        BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1">
+                <ProgressRing IsActive="True" Width="36" Height="36"
+                              Foreground="{StaticResource VkAccentBrush}" />
+                <TextBlock Text="Загрузка страницы авторизации..." FontSize="13"
+                           Foreground="{StaticResource VkTextSecondaryBrush}"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
         </Grid>
 
         <!-- Loading State -->
@@ -80,7 +104,11 @@
         <!-- Success State -->
         <StackPanel x:Name="SuccessState" Visibility="Collapsed"
                     HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
-            <FontIcon Glyph="&#xE73E;" FontSize="64" Foreground="{StaticResource VkSuccessBrush}" />
+            <Grid Width="80" Height="80" HorizontalAlignment="Center">
+                <Ellipse Fill="{StaticResource VkSuccessBrush}" Opacity="0.15" />
+                <FontIcon Glyph="&#xE73E;" FontSize="40" Foreground="{StaticResource VkSuccessBrush}"
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
             <TextBlock x:Uid="LoginSuccess" FontSize="20" FontWeight="SemiBold"
                        Foreground="{StaticResource VkTextPrimaryBrush}"
                        HorizontalAlignment="Center" />
@@ -90,17 +118,28 @@
         <StackPanel x:Name="ErrorState" Visibility="Collapsed"
                     HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16"
                     MaxWidth="400" Padding="32">
-            <FontIcon Glyph="&#xEA39;" FontSize="64" Opacity="0.6"
-                      Foreground="{StaticResource VkErrorBrush}" />
+            <Grid Width="80" Height="80" HorizontalAlignment="Center">
+                <Ellipse Fill="{StaticResource VkErrorBrush}" Opacity="0.15" />
+                <FontIcon Glyph="&#xEA39;" FontSize="40" Foreground="{StaticResource VkErrorBrush}"
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
             <TextBlock x:Uid="LoginErrorTitle" FontSize="20" FontWeight="SemiBold"
                        Foreground="{StaticResource VkTextPrimaryBrush}"
                        HorizontalAlignment="Center" />
             <TextBlock x:Name="ErrorDetailText" FontSize="13" TextWrapping="Wrap"
                        Foreground="{StaticResource VkTextSecondaryBrush}"
                        HorizontalAlignment="Center" TextAlignment="Center" />
-            <Button x:Uid="LoginRetryButton" HorizontalAlignment="Center"
-                    Style="{StaticResource AccentButtonStyle}" Click="OnLoginClick"
-                    Padding="32,10" CornerRadius="20" Margin="0,8,0,0" />
+            <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center"
+                        Margin="0,8,0,0">
+                <Button x:Uid="LoginRetryButton"
+                        Style="{StaticResource AccentButtonStyle}" Click="OnLoginClick"
+                        Padding="32,10" CornerRadius="20" />
+                <Button Content="Назад" Click="OnBackToIntroClick"
+                        Background="{StaticResource VkCardBrush}"
+                        Foreground="{StaticResource VkTextPrimaryBrush}"
+                        BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                        CornerRadius="20" Padding="32,10" />
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Page>
