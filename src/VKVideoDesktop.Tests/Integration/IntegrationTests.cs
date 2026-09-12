@@ -65,7 +65,7 @@ public class TestSettingsService : IDisposable
         }
     }
 
-    public async Task SaveAsync()
+    public Task SaveAsync()
     {
         var plaintext = _settings.AccessToken;
         if (!string.IsNullOrEmpty(plaintext))
@@ -85,6 +85,7 @@ public class TestSettingsService : IDisposable
         }
 
         _settings.AccessToken = plaintext;
+        return Task.CompletedTask;
     }
 
     private static object GetFileLock(string path)

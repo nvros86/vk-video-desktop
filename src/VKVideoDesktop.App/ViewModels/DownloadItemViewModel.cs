@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Models;
 
@@ -55,9 +57,10 @@ public sealed class DownloadItemViewModel : ViewModelBase
             if (task.RemainingTime.HasValue && task.RemainingTime.Value.TotalSeconds > 0)
             {
                 var remaining = task.RemainingTime.Value;
+                var loc = App.Services.GetRequiredService<LocalizationService>();
                 EtaText = remaining.TotalHours >= 1
-                    ? $"~{(int)remaining.TotalHours}ч {remaining.Minutes}м"
-                    : $"~{(int)remaining.TotalMinutes}м {remaining.Seconds}с";
+                    ? $"~{string.Format(loc["TimeHoursMinutes"], (int)remaining.TotalHours, remaining.Minutes)}"
+                    : $"~{string.Format(loc["TimeMinutesSeconds"], (int)remaining.TotalMinutes, remaining.Seconds)}";
             }
         }
         else
@@ -68,16 +71,20 @@ public sealed class DownloadItemViewModel : ViewModelBase
         }
     }
 
-    private static string GetStatusText(DownloadStatus status) => status switch
+    private static string GetStatusText(DownloadStatus status)
     {
-        DownloadStatus.Queued => "В очереди",
-        DownloadStatus.Resolving => "Определение источника...",
-        DownloadStatus.Downloading => "Загрузка...",
-        DownloadStatus.Paused => "Приостановлено",
-        DownloadStatus.Completed => "Завершено",
-        DownloadStatus.Failed => "Ошибка",
-        DownloadStatus.Cancelled => "Отменено",
-        DownloadStatus.Retrying => "Повторная попытка...",
-        _ => "Неизвестно"
-    };
+        var loc = App.Services.GetRequiredService<LocalizationService>();
+        return status switch
+        {
+            DownloadStatus.Queued => loc["DownloadStatusQueued"],
+            DownloadStatus.Resolving => loc["DownloadStatusResolving"],
+            DownloadStatus.Downloading => loc["DownloadStatusDownloading"],
+            DownloadStatus.Paused => loc["DownloadStatusPaused"],
+            DownloadStatus.Completed => loc["DownloadStatusCompleted"],
+            DownloadStatus.Failed => loc["DownloadStatusFailed"],
+            DownloadStatus.Cancelled => loc["DownloadStatusCancelled"],
+            DownloadStatus.Retrying => loc["DownloadStatusRetrying"],
+            _ => loc["DownloadStatusUnknown"]
+        };
+    }
 }

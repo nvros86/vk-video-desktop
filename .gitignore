@@ -1,18 +1,28 @@
-## Ignore NuGet packages
-**/[Pp]ackages/
-*.nupkg
-**/[Tt]emp/
+## Build outputs
 **/[Bb]in/
 **/[Oo]bj/
 **/[Dd]ebug/
 **/[Rr]elease/
-
-## Build outputs
 publish/
-publish-setup/
 VKVideoDesktop-win-x64.zip
 VKVideoDesktop-Setup-*.exe
+
+## Smoke test artifacts
+smoke-test/
+
+## Setup build artifacts (embedded in installer exe)
+src/VKVideoDesktop.Setup/app.zip
+src/VKVideoDesktop.Setup/uninstall.exe
+src/VKVideoDesktop.Setup/uninstall/
+
+## Screenshots (not part of source)
+*.png
+!src/**/*.png
+
+## Binary artifacts in root
 installer.zip
+*.ico
+!src/**/*.ico
 
 ## Visual Studio
 .vs/
@@ -30,14 +40,11 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]uild/
-[Ll]og/
-[Ll]ogs/
 
 ## NuGet
+**/[Pp]ackages/
 *.nupkg
 *.snupkg
-**/[Pp]ackages/*
 !**/[Pp]ackages/build/
 
 ## Rider
@@ -57,6 +64,13 @@ desktop.ini
 *.msixbundle
 *.appinstaller
 *.pfx
-publish/
 msix/
 msix_staging/
+
+## OpenCode
+.opencode/node_modules/
+.opencode/package.json
+.opencode/package-lock.json
+
+## Logs (local only)
+**/[Ll]ogs/

@@ -1,3 +1,5 @@
+using VKVideoDesktop.Application.Services;
+
 namespace VKVideoDesktop.App.ViewModels;
 
 public sealed class PlaylistViewModel : ViewModelBase
@@ -11,5 +13,5 @@ public sealed class PlaylistViewModel : ViewModelBase
     public string Title { get => _title; set => SetProperty(ref _title, value); }
     public string Description { get => _description; set => SetProperty(ref _description, value); }
     public int VideoCount { get => _videoCount; set => SetProperty(ref _videoCount, value); }
-    public string VideoCountText => $"{VideoCount} видео";
+    public string VideoCountText => string.Format(App.GetService<LocalizationService>()["PlaylistVideoCount"], VideoCount);
 }

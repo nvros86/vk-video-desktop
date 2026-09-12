@@ -9,54 +9,57 @@ namespace VKVideoDesktop.Application.Services;
 public sealed class LocalizationService
 {
     private readonly Dictionary<string, Dictionary<string, string>> _resources = new();
-    private readonly string _resourcesPath;
+    private readonly object _lock = new();
 
     public string CurrentLanguage { get; private set; } = "ru-RU";
     public IReadOnlyList<string> AvailableLanguages { get; } = new[] { "ru-RU", "en-US" };
 
     public event EventHandler? LanguageChanged;
 
-    public LocalizationService(string resourcesPath)
+    public LocalizationService()
     {
-        _resourcesPath = resourcesPath;
-        LoadResources("en-US");
-        LoadResources("ru-RU");
-
         var systemLang = CultureInfo.CurrentUICulture.Name;
         if (systemLang.StartsWith("ru"))
             CurrentLanguage = "ru-RU";
         else
             CurrentLanguage = "en-US";
+
+        LoadResources("ru-RU");
+        LoadResources("en-US");
     }
 
     public string this[string key]
     {
         get
         {
-            if (_resources.TryGetValue(CurrentLanguage, out var lang) &&
-                lang.TryGetValue(key, out var value))
-                return value;
+            lock (_lock)
+            {
+                if (_resources.TryGetValue(CurrentLanguage, out var lang) &&
+                    lang.TryGetValue(key, out var value))
+                    return value;
 
-            if (_resources.TryGetValue("en-US", out var fallback) &&
-                fallback.TryGetValue(key, out var fallbackValue))
-                return fallbackValue;
+                if (_resources.TryGetValue("en-US", out var fallback) &&
+                    fallback.TryGetValue(key, out var fallbackValue))
+                    return fallbackValue;
 
-            return key;
+                return key;
+            }
         }
     }
 
     public void SetLanguage(string language)
     {
-        if (AvailableLanguages.Contains(language) && language != CurrentLanguage)
-        {
-            CurrentLanguage = language;
-            LanguageChanged?.Invoke(this, EventArgs.Empty);
-        }
+        if (!AvailableLanguages.Contains(language) || language == CurrentLanguage)
+            return;
+
+        CurrentLanguage = language;
+        LanguageChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void LoadResources(string language)
     {
-        var path = Path.Combine(_resourcesPath, "Resources", "Strings", language, "Resources.resw");
+        var basePath = AppContext.BaseDirectory;
+        var path = Path.Combine(basePath, "Resources", "Strings", language, "Resources.resw");
         if (!File.Exists(path)) return;
 
         try
@@ -75,7 +78,10 @@ public sealed class LocalizationService
                 }
             }
 
-            _resources[language] = resources;
+            lock (_lock)
+            {
+                _resources[language] = resources;
+            }
         }
         catch
         {

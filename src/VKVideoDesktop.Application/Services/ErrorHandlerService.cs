@@ -6,29 +6,31 @@ namespace VKVideoDesktop.Application.Services;
 public sealed class ErrorHandlerService
 {
     private readonly ILogger<ErrorHandlerService> _logger;
+    private readonly LocalizationService _localization;
 
-    public ErrorHandlerService(ILogger<ErrorHandlerService> logger)
+    public ErrorHandlerService(ILogger<ErrorHandlerService> logger, LocalizationService localization)
     {
         _logger = logger;
+        _localization = localization;
     }
 
     public string GetUserFriendlyMessage(ErrorType errorType, string? details = null)
     {
         return errorType switch
         {
-            ErrorType.NetworkError => "Ошибка сети. Проверьте подключение к интернету.",
-            ErrorType.AuthenticationError => "Ошибка авторизации. Пожалуйста, войдите в VK снова.",
-            ErrorType.AccessDenied => "Доступ запрещён. У вас нет прав для просмотра этого контента.",
-            ErrorType.VideoUnavailable => "Видео недоступно. Возможно, оно было удалено или скрыто.",
-            ErrorType.DownloadUnavailable => "Скачивание недоступно для этого видео.",
-            ErrorType.RateLimited => "Слишком много запросов. Подождите немного и попробуйте снова.",
-            ErrorType.ServerError => "Ошибка сервера VK. Попробуйте позже.",
-            ErrorType.StorageError => "Ошибка сохранения. Проверьте свободное место на диске.",
-            ErrorType.InsufficientSpace => "Недостаточно свободного места на диске.",
-            ErrorType.Timeout => "Превышено время ожидания. Проверьте скорость подключения.",
-            ErrorType.Cancelled => "Операция отменена.",
+            ErrorType.NetworkError => _localization["NetworkError"],
+            ErrorType.AuthenticationError => _localization["AuthError"],
+            ErrorType.AccessDenied => _localization["ErrorAccessDenied"],
+            ErrorType.VideoUnavailable => _localization["VideoUnavailable"],
+            ErrorType.DownloadUnavailable => _localization["ErrorDownloadUnavailable"],
+            ErrorType.RateLimited => _localization["ErrorRateLimit"],
+            ErrorType.ServerError => _localization["ServerError"],
+            ErrorType.StorageError => _localization["StorageError"],
+            ErrorType.InsufficientSpace => _localization["ErrorNoSpace"],
+            ErrorType.Timeout => _localization["ErrorTimeout"],
+            ErrorType.Cancelled => _localization["ErrorCancelled"],
             _ => string.IsNullOrEmpty(details)
-                ? "Произошла неизвестная ошибка. Попробуйте снова."
+                ? _localization["ErrorUnknown"]
                 : $"Ошибка: {details}"
         };
     }

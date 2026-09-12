@@ -1,5 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+using VKVideoDesktop.Application.Services;
+using Microsoft.Extensions.Logging;
 using VKVideoDesktop.App.ViewModels;
 using Windows.Storage;
 
@@ -8,12 +11,35 @@ namespace VKVideoDesktop.App.Views;
 public sealed partial class DownloadsPage : Page
 {
     public DownloadsViewModel ViewModel { get; }
+    private readonly ILogger<DownloadsPage> _logger;
+    private readonly LocalizationService _localization;
 
     public DownloadsPage()
     {
+        _logger = App.GetService<ILogger<DownloadsPage>>();
+        _logger.LogInformation("[DownloadsPage] Constructor");
         InitializeComponent();
         ViewModel = App.GetService<DownloadsViewModel>();
         DataContext = ViewModel;
+        _localization = App.GetService<LocalizationService>();
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        _ = LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            await ViewModel.LoadDownloadsAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load downloads");
+        }
     }
 
     private void OnPauseClick(object sender, RoutedEventArgs e)
@@ -46,19 +72,19 @@ public sealed partial class DownloadsPage : Page
         {
             var flyout = new MenuFlyout();
             var openFileItem = new MenuFlyoutItem();
-            openFileItem.Text = "Открыть файл";
+            openFileItem.Text = _localization["DownloadsOpenFile"];
             openFileItem.Tag = dl;
             openFileItem.Click += OnOpenFileClick;
             flyout.Items.Add(openFileItem);
 
             var openFolderItem = new MenuFlyoutItem();
-            openFolderItem.Text = "Открыть папку";
+            openFolderItem.Text = _localization["DownloadsOpenFolder"];
             openFolderItem.Tag = dl;
             openFolderItem.Click += OnOpenFolderClick;
             flyout.Items.Add(openFolderItem);
 
             var copyItem = new MenuFlyoutItem();
-            copyItem.Text = "Копировать путь";
+            copyItem.Text = _localization["DownloadsCopyPath"];
             copyItem.Tag = dl;
             copyItem.Click += OnCopyPathClick;
             flyout.Items.Add(copyItem);
@@ -66,7 +92,7 @@ public sealed partial class DownloadsPage : Page
             flyout.Items.Add(new MenuFlyoutSeparator());
 
             var deleteItem = new MenuFlyoutItem();
-            deleteItem.Text = "Удалить запись";
+            deleteItem.Text = _localization["DownloadsDeleteRecord"];
             deleteItem.Tag = dl;
             deleteItem.Click += OnDeleteRecordClick;
             flyout.Items.Add(deleteItem);
@@ -123,8 +149,24 @@ public sealed partial class DownloadsPage : Page
         await ViewModel.ClearCompletedAsync();
     }
 
-    private async void OnDownloadAllClick(object sender, RoutedEventArgs e)
+    private async void OnAddDownloadClick(object sender, RoutedEventArgs e)
     {
-        await ViewModel.RetryAllFailedAsync();
+        var dialog = new ContentDialog
+        {
+            Title = "Добавить загрузку",
+            PrimaryButtonText = "Скачать",
+            CloseButtonText = "Отмена",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = XamlRoot
+        };
+
+        var textBox = new TextBox { PlaceholderText = "Введите URL видео", Margin = new Thickness(0, 12, 0, 0) };
+        dialog.Content = textBox;
+
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(textBox.Text))
+        {
+            // TODO: Implement download from URL
+        }
     }
 }

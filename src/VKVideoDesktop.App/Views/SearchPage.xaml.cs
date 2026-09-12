@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml.Input;
 using VKVideoDesktop.App.ViewModels;
 
@@ -9,10 +10,13 @@ public sealed partial class SearchPage : Page
 {
     private MainViewModel ViewModel { get; }
     private readonly DispatcherTimer _debounceTimer;
+    private readonly ILogger<SearchPage> _logger;
     private string? _lastQuery;
 
     public SearchPage()
     {
+        _logger = App.GetService<ILogger<SearchPage>>();
+        _logger.LogInformation("[SearchPage] Constructor");
         InitializeComponent();
         ViewModel = App.GetService<MainViewModel>();
 
@@ -20,11 +24,12 @@ public sealed partial class SearchPage : Page
         _debounceTimer.Tick += OnDebounceTick;
 
         EmptyState.Visibility = Visibility.Visible;
-        ResultsList.Visibility = Visibility.Collapsed;
+        ResultsItemsControl.Visibility = Visibility.Collapsed;
     }
 
     protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
+        _logger.LogInformation("[SearchPage] OnNavigatedTo");
         base.OnNavigatedTo(e);
         if (e.Parameter is string query && !string.IsNullOrEmpty(query))
         {
@@ -39,14 +44,14 @@ public sealed partial class SearchPage : Page
         _debounceTimer.Start();
     }
 
-    private async void OnDebounceTick(object sender, object e)
+    private async void OnDebounceTick(object? sender, object e)
     {
         _debounceTimer.Stop();
 
         var query = SearchBox.Text?.Trim();
         if (string.IsNullOrEmpty(query))
         {
-            ResultsList.Visibility = Visibility.Collapsed;
+            ResultsItemsControl.Visibility = Visibility.Collapsed;
             EmptyState.Visibility = Visibility.Visible;
             LoadMoreButton.Visibility = Visibility.Collapsed;
             return;
@@ -60,7 +65,7 @@ public sealed partial class SearchPage : Page
         try
         {
             await ViewModel.SearchAsync(query);
-            ResultsList.Visibility = ViewModel.SearchResults.Count > 0
+            ResultsItemsControl.Visibility = ViewModel.SearchResults.Count > 0
                 ? Visibility.Visible
                 : Visibility.Collapsed;
 
@@ -79,7 +84,15 @@ public sealed partial class SearchPage : Page
         }
     }
 
-    private void OnSearchSubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    private void OnSearchBoxKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            OnSearchQuerySubmitted(SearchBox, null);
+        }
+    }
+
+    private void OnSearchQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
         _debounceTimer.Stop();
         var query = SearchBox.Text?.Trim();
@@ -90,25 +103,7 @@ public sealed partial class SearchPage : Page
         }
     }
 
-    private void OnFilterChanged(object sender, RoutedEventArgs e)
-    {
-        var query = SearchBox.Text?.Trim();
-        if (!string.IsNullOrEmpty(query))
-        {
-            _ = ViewModel.SearchAsync(query);
-        }
-    }
-
-    private void OnSortChanged(object sender, SelectionChangedEventArgs e)
-    {
-        var query = SearchBox.Text?.Trim();
-        if (!string.IsNullOrEmpty(query))
-        {
-            _ = ViewModel.SearchAsync(query);
-        }
-    }
-
-    private void OnVideoClick(object sender, RoutedEventArgs e)
+    private void OnVideoItemClick(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.Tag is string videoId)
         {

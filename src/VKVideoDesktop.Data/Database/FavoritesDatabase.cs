@@ -8,22 +8,31 @@ public sealed class FavoritesDatabase : IFavoritesService
 {
     private readonly string _connectionString;
 
-    public FavoritesDatabase()
+    public FavoritesDatabase() : this(GetDefaultConnectionString()) { }
+
+    public FavoritesDatabase(string connectionString)
+    {
+        _connectionString = connectionString;
+        InitializeDatabase();
+    }
+
+    private static string GetDefaultConnectionString()
     {
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var dir = Path.Combine(appData, "VKVideoDesktop");
         Directory.CreateDirectory(dir);
         var dbPath = Path.Combine(dir, "app.db");
-        _connectionString = $"Data Source={dbPath}";
-        InitializeDatabase();
+        return $"Data Source={dbPath}";
     }
 
     private void InitializeDatabase()
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
-        var cmd = connection.CreateCommand();
-        cmd.CommandText = @"
+        SchemaMigration.EnsureMigrationsTable(connection);
+        SchemaMigration.Apply(connection, 1, "Initial Favorites schema", new[]
+        {
+            @"
             CREATE TABLE IF NOT EXISTS Favorites (
                 Id TEXT PRIMARY KEY,
                 VideoId TEXT NOT NULL UNIQUE,
@@ -32,8 +41,8 @@ public sealed class FavoritesDatabase : IFavoritesService
                 ThumbnailUrl TEXT,
                 Duration INTEGER,
                 AddedAt TEXT NOT NULL
-            )";
-        cmd.ExecuteNonQuery();
+            )"
+        });
     }
 
     public async Task<IReadOnlyList<FavoriteEntry>> GetAllAsync()

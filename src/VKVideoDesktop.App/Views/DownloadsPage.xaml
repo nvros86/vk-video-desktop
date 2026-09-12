@@ -3,111 +3,114 @@
     x:Class="VKVideoDesktop.App.Views.DownloadsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VKVideoDesktop.App.Views"
     xmlns:vm="using:VKVideoDesktop.App.ViewModels"
     Background="{StaticResource VkBackgroundBrush}">
 
-    <Grid Margin="24,16,24,80">
+    <Grid RowSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}"
-                       Foreground="{StaticResource VkTextPrimaryBrush}" />
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <Button Content="Повторить все" Style="{StaticResource TextButtonStyle}"
-                        Click="OnDownloadAllClick" />
-                <Button Content="Очистить завершённые" Style="{StaticResource TextButtonStyle}"
-                        Click="OnClearCompletedClick" />
+        <!-- Header -->
+        <Grid Grid.Row="0" Padding="24,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Загрузки" FontSize="24" FontWeight="Bold"
+                           Foreground="{StaticResource VkTextPrimaryBrush}" VerticalAlignment="Center" />
+                <Border Background="{StaticResource VkAccentBrush}" CornerRadius="10"
+                        Padding="8,3" VerticalAlignment="Center"
+                        Visibility="{x:Bind ViewModel.HasActiveDownloads, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="{x:Bind ViewModel.ActiveDownloadsCount}" FontSize="12" FontWeight="Bold"
+                               Foreground="White" />
+                </Border>
             </StackPanel>
+
+            <Button Grid.Column="1" Content="+ Добавить загрузку" Padding="12,6"
+                    Style="{StaticResource AccentButtonStyle}" CornerRadius="6"
+                    Click="OnAddDownloadClick" />
         </Grid>
 
-        <TextBlock Grid.Row="1" Text="Активные" Style="{StaticResource SubtitleTextBlockStyle}"
-                   Foreground="{StaticResource VkTextPrimaryBrush}"
-                   Margin="0,0,0,8" Visibility="{x:Bind ViewModel.HasActiveDownloads}" />
-
-        <StackPanel x:Name="EmptyState" Grid.Row="2" HorizontalAlignment="Center"
-                    VerticalAlignment="Center" Spacing="12">
-            <FontIcon Glyph="&#xE896;" FontSize="48" Foreground="{StaticResource VkTextTertiaryBrush}" />
-            <TextBlock Text="Нет загрузок"
-                       Foreground="{StaticResource VkTextSecondaryBrush}" TextAlignment="Center" />
-            <TextBlock Text="Скачивайте видео, и они появятся здесь."
-                       Foreground="{StaticResource VkTextTertiaryBrush}" TextAlignment="Center" FontSize="12" />
+        <!-- Tabs -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Padding="24,0">
+            <RadioButton Content="Активные" IsChecked="True" Style="{StaticResource FilterPillStyle}" />
+            <RadioButton Content="Завершенные" Style="{StaticResource FilterPillStyle}" />
+            <RadioButton Content="Все" Style="{StaticResource FilterPillStyle}" />
         </StackPanel>
 
-        <ListView x:Name="DownloadsList" Grid.Row="2"
-                  ItemsSource="{x:Bind ViewModel.Downloads}">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="vm:DownloadItemViewModel">
-                    <Grid Margin="0,0,0,8" Padding="12"
-                          Background="{StaticResource VkCardBrush}"
-                          CornerRadius="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+        <!-- Empty State -->
+        <StackPanel x:Name="EmptyState" Grid.Row="2" Visibility="Collapsed"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Margin="0,40">
+            <FontIcon Glyph="&#xE896;" FontSize="64" Opacity="0.3" Foreground="{StaticResource VkTextTertiaryBrush}" />
+            <TextBlock Text="Нет загрузок" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"
+                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+            <TextBlock Text="Скачивайте видео для просмотра офлайн" Opacity="0.6" HorizontalAlignment="Center"
+                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+        </StackPanel>
 
-                        <Grid Grid.Column="0" Width="120" Height="68" CornerRadius="4"
-                              Margin="0,0,12,0">
-                            <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
+        <!-- Downloads List -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="0,0,0,80">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.Downloads}" Margin="24,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DownloadItemViewModel">
+                        <Grid Style="{StaticResource DownloadCardStyle}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Thumbnail -->
+                            <Border Grid.Column="0" Width="120" Height="68" CornerRadius="6"
+                                    Margin="0,0,12,0">
+                                <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
+                            </Border>
+
+                            <!-- Info -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
+                                           TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
+                                           Foreground="{StaticResource VkTextPrimaryBrush}" />
+                                <TextBlock Text="{x:Bind StatusText}" FontSize="12"
+                                           Foreground="{StaticResource VkTextSecondaryBrush}" />
+                                <ProgressBar Value="{x:Bind Progress}" Maximum="100"
+                                             Style="{StaticResource DownloadProgressStyle}" />
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{x:Bind ProgressText}" FontSize="11"
+                                               Foreground="{StaticResource VkTextTertiaryBrush}" />
+                                    <TextBlock Text="{x:Bind SpeedText}" FontSize="11"
+                                               Foreground="{StaticResource VkTextTertiaryBrush}" />
+                                    <TextBlock Text="{x:Bind EtaText}" FontSize="11"
+                                               Foreground="{StaticResource VkTextTertiaryBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Actions -->
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
+                                        VerticalAlignment="Center">
+                                <Button ToolTipService.ToolTip="Пауза" Background="Transparent"
+                                        BorderThickness="0" Padding="8" Click="OnPauseClick"
+                                        Tag="{x:Bind DownloadId}" Visibility="{x:Bind IsDownloading}">
+                                    <FontIcon Glyph="&#xE769;" FontSize="14"
+                                              Foreground="{StaticResource VkTextSecondaryBrush}" />
+                                </Button>
+                                <Button ToolTipService.ToolTip="Отмена" Background="Transparent"
+                                        BorderThickness="0" Padding="8" Click="OnCancelClick"
+                                        Tag="{x:Bind DownloadId}">
+                                    <FontIcon Glyph="&#xE711;" FontSize="14"
+                                              Foreground="{StaticResource VkErrorBrush}" />
+                                </Button>
+                            </StackPanel>
                         </Grid>
-
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
-                                       TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
-                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
-                            <TextBlock Text="{x:Bind StatusText}" FontSize="12"
-                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
-                            <ProgressBar Value="{x:Bind Progress}" Maximum="100"
-                                         Margin="0,4,0,4"
-                                         Foreground="{StaticResource VkProgressBrush}"
-                                         Background="{StaticResource VkProgressTrackBrush}" />
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{x:Bind ProgressText}" FontSize="11"
-                                           Foreground="{StaticResource VkTextTertiaryBrush}" />
-                                <TextBlock Grid.Column="1" Text="{x:Bind SpeedText}" FontSize="11"
-                                           Margin="12,0,0,0"
-                                           Foreground="{StaticResource VkTextTertiaryBrush}" />
-                                <TextBlock Grid.Column="2" Text="{x:Bind EtaText}" FontSize="11"
-                                           Margin="12,0,0,0"
-                                           Foreground="{StaticResource VkTextTertiaryBrush}" />
-                            </Grid>
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="4"
-                                    Margin="12,0,0,0">
-                            <Button Content="⏸" Click="OnPauseClick"
-                                    Tag="{x:Bind DownloadId}"
-                                    Visibility="{x:Bind IsDownloading}" />
-                            <Button Content="▶" Click="OnResumeClick"
-                                    Tag="{x:Bind DownloadId}"
-                                    Visibility="{x:Bind IsPaused}" />
-                            <Button Content="✕" Click="OnCancelClick"
-                                    Tag="{x:Bind DownloadId}" />
-                            <Button Content="⋯" Click="OnMoreClick"
-                                    Tag="{x:Bind}" />
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
-
-    <Page.Resources>
-        <MenuFlyout x:Name="DownloadItemMenuFlyout">
-            <MenuFlyoutItem Text="Открыть файл" Click="OnOpenFileClick" />
-            <MenuFlyoutItem Text="Открыть папку" Click="OnOpenFolderClick" />
-            <MenuFlyoutItem Text="Копировать путь" Click="OnCopyPathClick" />
-            <MenuFlyoutSeparator />
-            <MenuFlyoutItem Text="Удалить запись" Click="OnDeleteRecordClick" Foreground="Red" />
-        </MenuFlyout>
-    </Page.Resources>
 </Page>

@@ -13,10 +13,11 @@ public sealed class MainViewModel : ViewModelBase
     private readonly VideoService _videoService;
     private readonly IHistoryService _historyService;
     private readonly ILogger<MainViewModel> _logger;
+    private readonly LocalizationService _localization;
 
     private string _searchQuery = string.Empty;
     private bool _isLoading;
-    private string _currentSection = "Главная";
+    private string _currentSection = "";
     private int _searchOffset;
 
     public MainViewModel(
@@ -29,6 +30,8 @@ public sealed class MainViewModel : ViewModelBase
         _videoService = videoService;
         _historyService = historyService;
         _logger = logger;
+        _localization = App.GetService<LocalizationService>();
+        _currentSection = _localization["HomeTab"];
     }
 
     public string SearchQuery
@@ -62,10 +65,12 @@ public sealed class MainViewModel : ViewModelBase
         try
         {
             IsLoading = true;
+            _logger.LogInformation("[MainViewModel] LoadRecommendationsAsync - start");
 
             try
             {
                 var recommendations = await _searchService.GetRecommendationsAsync();
+                _logger.LogInformation("[MainViewModel] Recommendations loaded: {Count}", recommendations.Count);
                 Recommendations.Clear();
                 foreach (var video in recommendations)
                 {
@@ -74,9 +79,11 @@ public sealed class MainViewModel : ViewModelBase
                     Recommendations.Add(vm);
                 }
             }
-            catch
+            catch (Exception ex1)
             {
+                _logger.LogWarning("[MainViewModel] Recommendations failed ({ExceptionType}), trying popular...", ex1.GetType().Name);
                 var popular = await _searchService.GetPopularAsync();
+                _logger.LogInformation("[MainViewModel] Popular loaded: {Count}", popular.Count);
                 Recommendations.Clear();
                 foreach (var video in popular)
                 {
@@ -87,6 +94,7 @@ public sealed class MainViewModel : ViewModelBase
             }
 
             var history = await _historyService.GetAllAsync();
+            _logger.LogInformation("[MainViewModel] History loaded: {Count}", history.Count);
             HistoryEntries.Clear();
             foreach (var entry in history.Take(10))
             {
@@ -97,7 +105,7 @@ public sealed class MainViewModel : ViewModelBase
                     Author = entry.Author,
                     ThumbnailUrl = entry.ThumbnailUrl,
                     DurationText = FormatDuration(entry.Duration),
-                    LastPositionText = $"Продолжить с {FormatDuration(entry.LastPosition)}",
+                    LastPositionText = string.Format(_localization["HistoryContinueFrom"], FormatDuration(entry.LastPosition)),
                     Progress = entry.Duration.TotalSeconds > 0
                         ? entry.LastPosition.TotalSeconds / entry.Duration.TotalSeconds * 100
                         : 0
@@ -108,7 +116,7 @@ public sealed class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load recommendations");
+            _logger.LogError(ex, "[MainViewModel] LoadRecommendationsAsync failed");
         }
         finally
         {

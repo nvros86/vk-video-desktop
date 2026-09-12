@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Interfaces;
+
 using VKVideoDesktop.Core.Models;
 
 namespace VKVideoDesktop.Infrastructure.Download;
@@ -36,9 +37,11 @@ public sealed class DownloadEngine : IDownloadEngine
         try
         {
             ValidateUrl(sourceUrl);
+            _logger.LogInformation("[DownloadEngine] Starting download: {FileName}", Path.GetFileName(destinationPath));
 
             if (!HasEnoughDiskSpace(destinationPath, totalBytes))
             {
+                _logger.LogWarning("[DownloadEngine] Insufficient disk space for: {Path}", destinationPath);
                 return new DownloadResult
                 {
                     IsSuccess = false,
@@ -107,6 +110,7 @@ public sealed class DownloadEngine : IDownloadEngine
 
             var buffer = new byte[BufferSize];
             int bytesRead;
+            bool diskSpaceExhausted = false;
 
             while ((bytesRead = await contentStream.ReadAsync(buffer, cancellationToken)) > 0)
             {
@@ -122,6 +126,7 @@ public sealed class DownloadEngine : IDownloadEngine
                     if (drive.AvailableFreeSpace < 1024 * 1024)
                     {
                         _logger.LogWarning("Disk space critically low during download");
+                        diskSpaceExhausted = true;
                         break;
                     }
                 }
@@ -158,6 +163,31 @@ public sealed class DownloadEngine : IDownloadEngine
 
             await fileStream.FlushAsync(cancellationToken);
 
+            if (diskSpaceExhausted)
+            {
+                _logger.LogWarning("Download incomplete due to insufficient disk space: {Path}", destinationPath);
+                return new DownloadResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "Недостаточно свободного места на диске",
+                    ErrorType = ErrorType.InsufficientSpace,
+                    BytesWritten = downloadedBytes
+                };
+            }
+
+            if (totalBytes.HasValue && totalBytes.Value > 0 && downloadedBytes < totalBytes.Value)
+            {
+                _logger.LogWarning("Incomplete download: expected {Expected} bytes, got {Actual} bytes",
+                    totalBytes.Value, downloadedBytes);
+                return new DownloadResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Неполная загрузка: получено {downloadedBytes} из {totalBytes.Value} байт",
+                    ErrorType = ErrorType.UnknownError,
+                    BytesWritten = downloadedBytes
+                };
+            }
+
             if (File.Exists(temporaryPath) && !File.Exists(destinationPath))
             {
                 File.Move(temporaryPath, destinationPath);
@@ -176,7 +206,7 @@ public sealed class DownloadEngine : IDownloadEngine
         }
         catch (OperationCanceledException)
         {
-            _logger.LogInformation("Download cancelled: {Path}", temporaryPath);
+            _logger.LogWarning("[DownloadEngine] Cancelled: {Path}", temporaryPath);
             return new DownloadResult
             {
                 IsSuccess = false,
@@ -187,7 +217,7 @@ public sealed class DownloadEngine : IDownloadEngine
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex, "Network error during download: {Path}", temporaryPath);
+            _logger.LogError(ex, "[DownloadEngine] Network error: {Path}", temporaryPath);
             return new DownloadResult
             {
                 IsSuccess = false,
@@ -207,7 +237,7 @@ public sealed class DownloadEngine : IDownloadEngine
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error during download: {Path}", temporaryPath);
+            _logger.LogError(ex, "[DownloadEngine] Unexpected error: {Path}", temporaryPath);
             return new DownloadResult
             {
                 IsSuccess = false,

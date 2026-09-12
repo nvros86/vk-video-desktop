@@ -110,39 +110,50 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     public App()
     {
-        DebugLog("App constructor - InitializeComponent...");
+        Log.Information("=== Application Starting ===");
+        Log.Information("OS: {OSVersion}, 64-bit: {Is64Bit}", Environment.OSVersion, Environment.Is64BitOperatingSystem);
+        Log.Information("CLR: {CLRVersion}, BaseDir: {BaseDir}", Environment.Version, AppContext.BaseDirectory);
+        Log.Information("App constructor - InitializeComponent...");
         InitializeComponent();
-        DebugLog("App constructor - done, starting DI...");
+        Log.Information("App constructor - done, starting DI...");
 
         _wndProcDelegate = WndProc;
 
-        var logDir = System.IO.Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "VKVideoDesktop", "log");
-        System.IO.Directory.CreateDirectory(logDir);
+        var logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VKVideoDesktop", "Logs");
 
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
             if (e.ExceptionObject is Exception ex)
-                WriteCrashLog(logDir, "UnhandledException", ex);
+            {
+                LogMetricsSnapshot();
+                Log.Fatal(ex, "Crash: {CrashType}", "UnhandledException");
+            }
         };
 
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
-            WriteCrashLog(logDir, "UnobservedTaskException", e.Exception);
+            LogMetricsSnapshot();
+            Log.Fatal(e.Exception, "Crash: {CrashType}", "UnobservedTaskException");
             e.SetObserved();
+        };
+
+        Microsoft.UI.Xaml.Application.Current.UnhandledException += (_, e) =>
+        {
+            LogMetricsSnapshot();
+            Log.Fatal(e.Exception, "Crash: {CrashType}", "WinUIUnhandledException");
+            e.Handled = true;
         };
 
         var resourcesPath = AppContext.BaseDirectory;
 
-        DebugLog("Building host...");
+        Log.Information("Building host...");
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
                 services.AddHttpClient();
                 var logPath = System.IO.Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "VKVideoDesktop", "log", "app-.log");
+                    "VKVideoDesktop", "Logs", $"log-{DateTime.Now:yyyyMMdd}.txt");
 
                 services.AddLogging(builder =>
                 {
@@ -157,14 +168,13 @@ public partial class App : Microsoft.UI.Xaml.Application
                         .CreateLogger());
                 });
 
-                services.AddSingleton(new LocalizationService(resourcesPath));
+                services.AddSingleton<LocalizationService>();
 
                 services.AddSingleton<ISettingsService, SettingsService>();
                 services.AddSingleton<IAuthenticationService, VkAuthenticationService>();
                 services.AddSingleton<IVideoProvider, VkVideoProvider>();
                 services.AddSingleton<IDownloadEngine, DownloadEngine>();
                 services.AddSingleton<IDownloadRepository, DownloadDatabase>();
-                services.AddSingleton<IDownloadSourceResolver, VkVideoSourceResolver>();
                 services.AddSingleton<IVideoDownloadProvider, VkVideoDownloadProvider>();
                 services.AddSingleton<IDownloadManager, DownloadManager>();
                 services.AddSingleton<IThumbnailCache, ThumbnailCache>();
@@ -187,78 +197,78 @@ public partial class App : Microsoft.UI.Xaml.Application
                 services.AddSingleton<DownloadsViewModel>();
 
                 services.AddSingleton<NotificationService>();
+                services.AddSingleton<Core.Metrics.AppMetrics>();
             })
             .Build();
 
         Services = _host.Services;
-        DebugLog("App constructor - host built, Services assigned");
+        Log.Information("App constructor - host built, Services assigned");
     }
 
-    protected override async void OnLaunched(LaunchActivatedEventArgs args)
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        DebugLog("OnLaunched called");
+        Log.Information("OnLaunched called");
     }
 
     public async Task StartupAsync(MainWindow? window = null, string? arguments = null)
     {
         _mainWindow = window;
-        DebugLog("StartupAsync - entry");
+        Log.Information("StartupAsync - entry");
         try
         {
-            DebugLog("StartupAsync - starting host...");
-            await _host.StartAsync();
-            DebugLog("StartupAsync - host started OK");
+            Log.Information("StartupAsync - starting host (background)...");
+            await Task.Run(async () => await _host.StartAsync());
+            Log.Information("StartupAsync - host started OK");
 
-            DebugLog("StartupAsync - loading settings (sync)...");
+            Log.Information("StartupAsync - loading settings...");
             try
             {
-                var settingsPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "VKVideoDesktop", "settings.json");
-
-                if (File.Exists(settingsPath))
-                {
-                    var json = File.ReadAllText(settingsPath);
-                    if (json.Contains("AccessToken"))
-                    {
-                        DebugLog("StartupAsync - settings has DPAPI token, deleting file");
-                        try { File.Delete(settingsPath); } catch { }
-                        DebugLog("StartupAsync - deleted OK");
-                    }
-                    else
-                    {
-                        var settingsService = Services.GetRequiredService<ISettingsService>();
-                        await settingsService.LoadAsync();
-                        DebugLog("StartupAsync - settings loaded");
-                    }
-                }
-                else
-                {
-                    DebugLog("StartupAsync - no settings file");
-                }
+                var settingsService = Services.GetRequiredService<ISettingsService>();
+                await settingsService.LoadAsync();
+                Log.Information("StartupAsync - settings loaded");
             }
             catch (Exception ex)
             {
-                DebugLog($"StartupAsync - settings err: {ex.GetType().Name}: {ex.Message}");
+                Log.Information("StartupAsync - settings err: {ExType}: {ExMessage}", ex.GetType().Name, ex.Message);
             }
 
-            DebugLog("StartupAsync - subscribing to window events...");
+            Log.Information("StartupAsync - subscribing to window events...");
             if (_mainWindow != null)
             {
                 _mainWindow.Closed += OnMainWindowClosed;
                 _mainWindow.InitServices();
-                DebugLog("StartupAsync - services injected into MainWindow");
+                Log.Information("StartupAsync - services injected into MainWindow");
                 _mainWindow.DispatcherQueue.TryEnqueue(() =>
                 {
                     _mainWindow.NavigateToHome();
                 });
             }
 
-            DebugLog("StartupAsync - init tray...");
-            try { InitializeTrayIcon(); DebugLog("StartupAsync - tray OK"); }
-            catch (Exception ex) { DebugLog($"StartupAsync - tray err: {ex.Message}"); }
+            Log.Information("StartupAsync - recovering incomplete downloads...");
+            try
+            {
+                var settingsService = Services.GetRequiredService<ISettingsService>();
+                if (settingsService.Settings.AutoResumeAfterStartup)
+                {
+                    var downloadManager = Services.GetRequiredService<IDownloadManager>();
+                    await downloadManager.RecoverIncompleteDownloadsAsync();
+                    Log.Information("StartupAsync - downloads recovered OK");
+                }
+                else
+                {
+                    Log.Information("StartupAsync - auto-resume disabled, skipping recovery");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Information("StartupAsync - download recovery err: {ExMessage}", ex.Message);
+            }
 
-            DebugLog("StartupAsync - ALL DONE!");
+            Log.Information("StartupAsync - init tray...");
+            try { InitializeTrayIcon(); Log.Information("StartupAsync - tray OK"); }
+            catch (Exception ex) { Log.Information("StartupAsync - tray err: {ExMessage}", ex.Message); }
+
+            Log.Information("StartupAsync - ALL DONE!");
 
             if (arguments?.StartsWith("vkvideo://") == true || arguments?.StartsWith("vkvideo:") == true)
             {
@@ -275,8 +285,25 @@ public partial class App : Microsoft.UI.Xaml.Application
         }
         catch (Exception ex)
         {
-            DebugLog($"StartupAsync FAILED: {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+            Log.Information("StartupAsync FAILED: {ExType}: {ExMessage}\n{StackTrace}", ex.GetType().Name, ex.Message, ex.StackTrace);
         }
+    }
+
+    private void LogMetricsSnapshot()
+    {
+        try
+        {
+            if (Services?.GetService(typeof(Core.Metrics.AppMetrics)) is Core.Metrics.AppMetrics metrics)
+            {
+                var s = metrics.GetSnapshot();
+                Log.Information("Metrics: API calls={ApiCalls}, failures={ApiFailures}, avg latency={AvgMs:N0}ms",
+                    s.ApiCalls, s.ApiFailures, s.ApiAvgDurationMs);
+                Log.Information("Metrics: Downloads started={Started}, completed={Completed}, failed={Failed}, cancelled={Cancelled}",
+                    s.DownloadsStarted, s.DownloadsCompleted, s.DownloadsFailed, s.DownloadsCancelled);
+                Log.Information("Metrics: Retries={Retries}", s.Retries);
+            }
+        }
+        catch { }
     }
 
     private void OnMainWindowClosed(object? sender, WindowEventArgs args)
@@ -356,57 +383,6 @@ public partial class App : Microsoft.UI.Xaml.Application
         }
     }
 
-    private static void DebugLog(string message)
-    {
-        try
-        {
-            var path = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "VKVideoDesktop", "log", "debug.log");
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path)!);
-            System.IO.File.AppendAllText(path, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [App] {message}{Environment.NewLine}");
-        }
-        catch { }
-    }
-
-    private static void WriteCrashLog(string logDir, string type, Exception ex)
-    {
-        try
-        {
-            var crashPath = System.IO.Path.Combine(logDir, $"crash-{DateTime.Now:yyyy-MM-dd_HHmmss}.log");
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"=== VK Video Desktop Crash Report ===");
-            sb.AppendLine($"Дата: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-            sb.AppendLine($"Тип: {type}");
-            sb.AppendLine($"Версия ОС: {Environment.OSVersion}");
-            sb.AppendLine($"64-bit: {Environment.Is64BitOperatingSystem}");
-            sb.AppendLine($"CLR: {Environment.Version}");
-            sb.AppendLine();
-            sb.AppendLine($"Исключение: {ex.GetType().FullName}");
-            sb.AppendLine($"Сообщение: {ex.Message}");
-            if (ex.InnerException != null)
-            {
-                sb.AppendLine();
-                sb.AppendLine($"Внутреннее исключение: {ex.InnerException.GetType().FullName}");
-                sb.AppendLine($"Сообщение: {ex.InnerException.Message}");
-            }
-            sb.AppendLine();
-            sb.AppendLine($"Стек вызовов:");
-            sb.AppendLine(ex.StackTrace);
-            if (ex.Data.Count > 0)
-            {
-                sb.AppendLine();
-                sb.AppendLine($"Дополнительные данные:");
-                foreach (System.Collections.DictionaryEntry entry in ex.Data)
-                    sb.AppendLine($"  {entry.Key}: {entry.Value}");
-            }
-            System.IO.File.WriteAllText(crashPath, sb.ToString());
-        }
-        catch
-        {
-        }
-    }
-
     private IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
         if (msg == WM_TRAYICON)
@@ -431,9 +407,10 @@ public partial class App : Microsoft.UI.Xaml.Application
     private void ShowTrayContextMenu(IntPtr hWnd)
     {
         var hMenu = CreatePopupMenu();
-        AppendMenu(hMenu, 0, ID_TRAY_SHOW, "Показать");
-        AppendMenu(hMenu, 0x0800, 0, null);
-        AppendMenu(hMenu, 0, ID_TRAY_EXIT, "Выход");
+        var localization = Services.GetRequiredService<LocalizationService>();
+        AppendMenu(hMenu, 0, ID_TRAY_SHOW, localization["TrayShow"]);
+        AppendMenu(hMenu, 0x0800, 0, string.Empty);
+        AppendMenu(hMenu, 0, ID_TRAY_EXIT, localization["TrayExit"]);
 
         SetForegroundWindow(hWnd);
 
@@ -462,10 +439,6 @@ public partial class App : Microsoft.UI.Xaml.Application
         }
 
         _mainWindow.Activate();
-
-        var handle = _mainWindow.AppWindow.Id.Value;
-        var interop = Marshal.GetIUnknownForObject(_mainWindow);
-        _ = interop;
     }
 
     private void ExitApp()

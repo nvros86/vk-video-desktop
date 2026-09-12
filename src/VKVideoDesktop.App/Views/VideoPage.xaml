@@ -67,17 +67,17 @@
                         <!-- Speed selector -->
                         <Button Grid.Column="3" x:Name="SpeedButton" Content="1x" Background="Transparent"
                                 Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnSpeedClick" FontSize="11" Padding="6,2"
-                                ToolTipService.ToolTip="Скорость воспроизведения" />
+                                x:Uid="VideoSpeedTooltip" />
 
                         <!-- Quality selector -->
                         <Button Grid.Column="4" x:Name="QualityButton" Content="HQ" Background="Transparent"
                                 Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnQualityClick" FontSize="11" Padding="6,2"
-                                ToolTipService.ToolTip="Качество видео" />
+                                x:Uid="VideoQualityTooltip" />
 
                         <!-- PiP -->
                         <Button Grid.Column="5" Content="&#xE740;" Background="Transparent"
                                 Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnPipClick"
-                                ToolTipService.ToolTip="Картинка в картинке" />
+                                x:Uid="VideoPiPTooltip" />
 
                         <Button Grid.Column="6" x:Name="VolumeButton" Content="&#xE767;" Background="Transparent"
                                 Foreground="{StaticResource VkTextPrimaryBrush}" Click="OnVolumeClick" />
@@ -115,51 +115,84 @@
                                    Foreground="{StaticResource VkTextSecondaryBrush}" />
                     </StackPanel>
 
-                    <Button Grid.Column="2" Content="Подписаться"
+                    <Button Grid.Column="2" Content="Подписаться" CornerRadius="20" Padding="20,10"
                             Style="{StaticResource AccentButtonStyle}" />
                 </Grid>
 
                 <!-- Actions -->
                 <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
-                    <Button Content="❤️ Избранное" Click="OnFavoriteClick" />
-                    <Button Content="➕ Плейлист" />
-                    <Button Content="⬇ Скачать" Click="OnDownloadClick" />
-                    <Button Content="↗ Поделиться" />
-                    <Button Content="🌐 WebView2" Click="OnWebViewFallbackClick"
-                            ToolTipService.ToolTip="Открыть в WebView2" />
+                    <Button Content="Избранное" Click="OnFavoriteClick"
+                            Background="{StaticResource VkCardBrush}" Foreground="{StaticResource VkTextPrimaryBrush}"
+                            BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                            CornerRadius="20" Padding="16,8" />
+                    <Button Content="Плейлист"
+                            Background="{StaticResource VkCardBrush}" Foreground="{StaticResource VkTextPrimaryBrush}"
+                            BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                            CornerRadius="20" Padding="16,8" />
+                    <Button Content="Скачать" Click="OnDownloadClick"
+                            Background="{StaticResource VkCardBrush}" Foreground="{StaticResource VkTextPrimaryBrush}"
+                            BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                            CornerRadius="20" Padding="16,8" />
+                    <Button Content="Поделиться"
+                            Background="{StaticResource VkCardBrush}" Foreground="{StaticResource VkTextPrimaryBrush}"
+                            BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                            CornerRadius="20" Padding="16,8" />
+                    <Button Content="Открыть в WebView" Click="OnWebViewFallbackClick"
+                            Background="{StaticResource VkCardBrush}" Foreground="{StaticResource VkTextPrimaryBrush}"
+                            BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                            CornerRadius="20" Padding="16,8" />
                 </StackPanel>
 
                 <!-- Description -->
-                <Expander Header="Описание">
+                <Expander Header="Описание" Margin="0,0,0,16">
                     <TextBlock Text="{Binding CurrentVideo.Description}"
                                TextWrapping="Wrap"
                                Foreground="{StaticResource VkTextSecondaryBrush}" />
                 </Expander>
+
+                <!-- Comments Section -->
+                <StackPanel Margin="0,16,0,0">
+                    <TextBlock Text="Комментарии" FontSize="18" FontWeight="SemiBold"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" Margin="0,0,0,12" />
+                    <Grid Background="{StaticResource VkCardBrush}" CornerRadius="8" Padding="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Grid.Column="0" Width="32" Height="32" Margin="0,0,12,0"
+                                 Fill="{StaticResource VkCardHoverBrush}" />
+                        <TextBox Grid.Column="1" PlaceholderText="Написать комментарий..."
+                                 Background="Transparent"
+                                 Foreground="{StaticResource VkTextPrimaryBrush}"
+                                 BorderThickness="0" />
+                    </Grid>
+                </StackPanel>
             </StackPanel>
 
             <!-- Right Panel: Related Videos -->
             <StackPanel Grid.Column="1" Margin="0,16,24,0">
-                <TextBlock Text="Похожие видео" Style="{StaticResource SubtitleTextBlockStyle}"
+                <TextBlock Text="Похожие видео" FontSize="18" FontWeight="SemiBold"
                            Foreground="{StaticResource VkTextPrimaryBrush}"
                            Margin="0,0,0,12" />
                 <ItemsControl ItemsSource="{x:Bind ViewModel.RelatedVideos}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:VideoDisplayViewModel">
                             <Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                    Click="OnRelatedVideoClick" Tag="{x:Bind Id}" Margin="0,0,0,8">
+                                    Click="OnRelatedVideoClick" Tag="{x:Bind Id}" Margin="0,0,0,8"
+                                    Background="Transparent" BorderThickness="0" Padding="0">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Grid Grid.Column="0" Width="160" Height="90" CornerRadius="4"
+                                    <Grid Grid.Column="0" Width="160" Height="90" CornerRadius="6"
                                           Margin="0,0,12,0">
                                         <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
                                         <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                                Background="{StaticResource VkOverlayBrush}" CornerRadius="2"
-                                                Margin="0,0,3,3" Padding="3,1">
+                                                Background="{StaticResource VkOverlayBrush}" CornerRadius="4"
+                                                Margin="0,0,4,4" Padding="4,2">
                                             <TextBlock Text="{x:Bind DurationText}"
-                                                       Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="10" />
+                                                       Foreground="White" FontSize="10" />
                                         </Border>
                                     </Grid>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">

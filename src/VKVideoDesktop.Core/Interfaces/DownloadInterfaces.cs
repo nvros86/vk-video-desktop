@@ -44,12 +44,7 @@ public interface IDownloadEngine
         CancellationToken cancellationToken);
 }
 
-public interface IDownloadSourceResolver
-{
-    Task<IReadOnlyList<DownloadOption>> ResolveAsync(
-        Video video,
-        CancellationToken cancellationToken);
-}
+
 
 public interface IFileWriter
 {

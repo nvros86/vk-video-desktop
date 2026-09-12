@@ -8,217 +8,233 @@
     Background="{StaticResource VkBackgroundBrush}">
 
     <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,0,80">
+            <StackPanel Spacing="28" Margin="24,16">
+
+                <!-- Featured Banner -->
+                <Grid CornerRadius="12" Height="220">
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#FF0F2847" Offset="0"/>
+                            <GradientStop Color="#FF1A3D6E" Offset="0.5"/>
+                            <GradientStop Color="#FF0A1E3D" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="32,24" VerticalAlignment="Center" Spacing="8">
+                        <TextBlock x:Uid="HomeBannerTitle" FontSize="28" FontWeight="Bold"
+                                   Foreground="{StaticResource VkTextPrimaryBrush}" />
+                        <TextBlock x:Uid="HomeBannerDesc"
+                                   FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}"
+                                   TextWrapping="Wrap" MaxWidth="400" />
+                        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+                            <Button x:Uid="HomeWatch" Style="{StaticResource AccentButtonStyle}"
+                                    CornerRadius="20" Padding="20,10" FontSize="14" />
+                            <Button x:Uid="HomeCollections"
+                                    Background="Transparent" Foreground="{StaticResource VkTextSecondaryBrush}"
+                                    BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                                    CornerRadius="20" Padding="16,10" FontSize="13" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Image Grid.Column="1" Source="https://picsum.photos/seed/russia/400/220"
+                           Stretch="UniformToFill" HorizontalAlignment="Right"
+                           Width="350" Opacity="0.6" />
+                </Grid>
+
+                <!-- Continue Watching -->
+                <StackPanel Visibility="{x:Bind ViewModel.HasHistory, Mode=OneWay}">
+                    <TextBlock x:Uid="HomeContinueWatching" Style="{StaticResource SectionHeaderStyle}"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="18" />
+                    <ItemsControl ItemsSource="{x:Bind ViewModel.HistoryEntries}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:HistoryEntryViewModel">
+                                <Button HorizontalAlignment="Left" Margin="0,0,12,0"
+                                        Click="OnHistoryItemClick" Tag="{x:Bind VideoId}"
+                                        Background="Transparent" BorderThickness="0" Padding="0">
+                                    <Button.ContextFlyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem x:Uid="HomePlay" Click="OnContextHistoryPlay" Tag="{x:Bind VideoId}" />
+                                            <MenuFlyoutItem x:Uid="HomeAddToFav" Click="OnContextHistoryFavorite" Tag="{x:Bind VideoId}" />
+                                            <MenuFlyoutSeparator />
+                                            <MenuFlyoutItem x:Uid="HomeRemoveFromHistory" Click="OnContextHistoryRemove" Tag="{x:Bind VideoId}" />
+                                            <MenuFlyoutItem x:Uid="HomeOpenVK" Click="OnContextHistoryOpenInVk" Tag="{x:Bind VideoId}" />
+                                        </MenuFlyout>
+                                    </Button.ContextFlyout>
+                                    <Grid Width="220">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0" Height="124" CornerRadius="8">
+                                            <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
+                                            <Border Background="{StaticResource VkOverlayBrush}" CornerRadius="4"
+                                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                    Margin="0,0,6,6" Padding="6,2">
+                                                <TextBlock Text="{x:Bind DurationText}" Foreground="White" FontSize="11" FontWeight="SemiBold" />
+                                            </Border>
+                                            <ProgressBar Value="{x:Bind Progress}" Maximum="100"
+                                                         HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                                         Width="220" Height="3" Background="Transparent"
+                                                         Foreground="{StaticResource VkAccentBrush}" />
+                                        </Grid>
+                                        <StackPanel Grid.Row="1" Margin="0,8,0,0">
+                                            <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
+                                                       TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                                            <TextBlock Text="{x:Bind Author}" TextWrapping="NoWrap"
+                                                       TextTrimming="CharacterEllipsis" FontSize="12"
+                                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- Category Tabs -->
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <RadioButton x:Uid="HomeCategoryAll" IsChecked="True" Style="{StaticResource FilterPillStyle}" />
+                        <RadioButton x:Uid="HomeCategoryFeatured" Style="{StaticResource FilterPillStyle}" />
+                        <RadioButton x:Uid="HomeCategoryMusic" Style="{StaticResource FilterPillStyle}" />
+                        <RadioButton x:Uid="HomeCategoryMovies" Style="{StaticResource FilterPillStyle}" />
+                        <RadioButton x:Uid="HomeCategoryTech" Style="{StaticResource FilterPillStyle}" />
+                        <RadioButton x:Uid="HomeCategorySport" Style="{StaticResource FilterPillStyle}" />
+                        <RadioButton x:Uid="HomeCategoryGames" Style="{StaticResource FilterPillStyle}" />
+                        <RadioButton x:Uid="HomeCategoryCooking" Style="{StaticResource FilterPillStyle}" />
+                        <RadioButton x:Uid="HomeCategoryTravel" Style="{StaticResource FilterPillStyle}" />
+                        <RadioButton x:Uid="HomeCategoryHome" Style="{StaticResource FilterPillStyle}" />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Recommended Channels -->
+                <StackPanel>
+                    <Grid>
+                        <TextBlock x:Uid="HomeRecommendedChannels" Style="{StaticResource SectionHeaderStyle}"
+                                   Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="18" />
+                        <Button Content="Все" HorizontalAlignment="Right"
+                                Style="{StaticResource TextLinkButtonStyle}" />
+                    </Grid>
+                    <ItemsControl ItemsSource="{x:Bind ViewModel.Channels}" Margin="0,12,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="16" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ChannelViewModel">
+                                <StackPanel Width="140" HorizontalAlignment="Left">
+                                    <Ellipse Width="80" Height="80" HorizontalAlignment="Center">
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="{x:Bind AvatarUrl}" Stretch="UniformToFill" />
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Text="{x:Bind Name}" TextAlignment="Center"
+                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                               FontWeight="SemiBold" Margin="0,8,0,0"
+                                               Foreground="{StaticResource VkTextPrimaryBrush}" />
+                                    <TextBlock Text="{x:Bind SubscriberCountText}" TextAlignment="Center"
+                                               FontSize="12"
+                                               Foreground="{StaticResource VkTextSecondaryBrush}" />
+                                    <Button x:Uid="HomeSubscribe" HorizontalAlignment="Center"
+                                            Margin="0,8,0,0" Style="{StaticResource AccentButtonStyle}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- Recommendations -->
+                <StackPanel>
+                    <TextBlock x:Uid="HomeRecommendations" Style="{StaticResource SectionHeaderStyle}"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="18" />
+                    <ItemsControl ItemsSource="{x:Bind ViewModel.Recommendations}" Margin="0,12,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:VideoViewModel">
+                                <Button HorizontalAlignment="Left" Margin="0,0,12,12"
+                                        Click="OnVideoItemClick" Tag="{x:Bind Id}"
+                                        Background="Transparent" BorderThickness="0" Padding="0">
+                                    <Button.ContextFlyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem x:Uid="HomePlay" Click="OnContextPlay" Tag="{x:Bind Id}" />
+                                            <MenuFlyoutItem x:Uid="HomeAddToFav" Click="OnContextFavorite" Tag="{x:Bind Id}" />
+                                            <MenuFlyoutItem x:Uid="HomeDownload" Click="OnContextDownload" Tag="{x:Bind Id}" />
+                                            <MenuFlyoutSeparator />
+                                            <MenuFlyoutItem x:Uid="HomeAddToQueue" Click="OnAddToQueueClick" Tag="{x:Bind}" />
+                                            <MenuFlyoutItem x:Uid="HomeAddToPlaylist" Click="OnAddToPlaylistClick" Tag="{x:Bind}" />
+                                            <MenuFlyoutSeparator />
+                                            <MenuFlyoutItem x:Uid="HomeShare" Click="OnShareClick" Tag="{x:Bind}" />
+                                            <MenuFlyoutItem x:Uid="HomeOpenVK" Click="OnContextOpenInVk" Tag="{x:Bind Id}" />
+                                        </MenuFlyout>
+                                    </Button.ContextFlyout>
+                                    <Grid Width="280">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0" Height="158" CornerRadius="8">
+                                            <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
+                                            <Border Background="{StaticResource VkOverlayBrush}" CornerRadius="4"
+                                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                    Margin="0,0,6,6" Padding="6,2">
+                                                <TextBlock Text="{x:Bind DurationText}" Foreground="White" FontSize="11" FontWeight="SemiBold" />
+                                            </Border>
+                                        </Grid>
+                                        <StackPanel Grid.Row="1" Margin="0,8,0,0">
+                                            <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
+                                                       TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                                            <TextBlock Text="{x:Bind Author}" TextWrapping="NoWrap"
+                                                       TextTrimming="CharacterEllipsis" FontSize="12"
+                                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                                            <TextBlock Text="{x:Bind ViewCountText}" FontSize="11"
+                                                       Foreground="{StaticResource VkTextTertiaryBrush}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+
         <StackPanel x:Name="EmptyState" Visibility="Collapsed" HorizontalAlignment="Center"
-                    VerticalAlignment="Center" Spacing="12" Margin="40">
+                    VerticalAlignment="Center" Spacing="12" Margin="40" Canvas.ZIndex="10">
             <FontIcon Glyph="&#xE786;" FontSize="64" Opacity="0.3" Foreground="{StaticResource VkTextTertiaryBrush}" />
-            <TextBlock Text="Нет контента" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"
+            <TextBlock x:Uid="HomeEmpty" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"
                        Foreground="{StaticResource VkTextPrimaryBrush}" />
-            <TextBlock Text="Поищите видео или откройте каналы" Opacity="0.6" HorizontalAlignment="Center"
+            <TextBlock x:Uid="HomeEmptyDesc" Opacity="0.6" HorizontalAlignment="Center"
                        Foreground="{StaticResource VkTextSecondaryBrush}" />
         </StackPanel>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,0,80">
-        <StackPanel Spacing="28" Margin="24,16">
-
-            <!-- Featured Banner -->
-            <Grid CornerRadius="12" Height="220">
-                <Grid.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#FF0F2847" Offset="0"/>
-                        <GradientStop Color="#FF1A3D6E" Offset="0.5"/>
-                        <GradientStop Color="#FF0A1E3D" Offset="1"/>
-                    </LinearGradientBrush>
-                </Grid.Background>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0" Margin="32,24" VerticalAlignment="Center" Spacing="8">
-                    <TextBlock Text="Путешествие по России" FontSize="28" FontWeight="Bold"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <TextBlock Text="Красивые места, которые стоит увидеть. Самые яркие видео"
-                               FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}"
-                               TextWrapping="Wrap" MaxWidth="400" />
-                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
-                        <Button Content="&#xE768; Смотреть" Style="{StaticResource AccentButtonStyle}"
-                                CornerRadius="20" Padding="20,10" FontSize="14" />
-                        <Button Content="+ 8 коллекций"
-                                Background="Transparent" Foreground="{StaticResource VkTextSecondaryBrush}"
-                                BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
-                                CornerRadius="20" Padding="16,10" FontSize="13" />
-                    </StackPanel>
-                </StackPanel>
-
-                <Image Grid.Column="1" Source="https://picsum.photos/seed/russia/400/220"
-                       Stretch="UniformToFill" HorizontalAlignment="Right"
-                       Width="350" Opacity="0.6" />
-            </Grid>
-
-            <!-- Continue Watching -->
-            <StackPanel Visibility="{x:Bind ViewModel.HasHistory, Mode=OneWay}">
-                <TextBlock Text="Продолжить просмотр" Style="{StaticResource SectionHeaderStyle}"
-                           Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="18" />
-                <ItemsControl ItemsSource="{x:Bind ViewModel.HistoryEntries}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:HistoryEntryViewModel">
-                            <Button HorizontalAlignment="Left" Margin="0,0,12,0"
-                                    Click="OnHistoryItemClick" Tag="{x:Bind VideoId}"
-                                    Background="Transparent" BorderThickness="0" Padding="0">
-                                <Button.ContextFlyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem Text="Смотреть" Click="OnContextHistoryPlay" Tag="{x:Bind VideoId}" />
-                                        <MenuFlyoutItem Text="Добавить в избранное" Click="OnContextHistoryFavorite" Tag="{x:Bind VideoId}" />
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutItem Text="Удалить из истории" Click="OnContextHistoryRemove" Tag="{x:Bind VideoId}" />
-                                        <MenuFlyoutItem Text="Открыть в VK" Click="OnContextHistoryOpenInVk" Tag="{x:Bind VideoId}" />
-                                    </MenuFlyout>
-                                </Button.ContextFlyout>
-                                <Grid Width="220">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0" Height="124" CornerRadius="8">
-                                        <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
-                                        <Border Background="{StaticResource VkOverlayBrush}" CornerRadius="4"
-                                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                                Margin="0,0,6,6" Padding="6,2">
-                                            <TextBlock Text="{x:Bind DurationText}" Foreground="White" FontSize="11" FontWeight="SemiBold" />
-                                        </Border>
-                                        <ProgressBar Value="{x:Bind Progress}" Maximum="100"
-                                                     HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                                                     Width="220" Height="3" Background="Transparent"
-                                                     Foreground="{StaticResource VkAccentBrush}" />
-                                    </Grid>
-                                    <StackPanel Grid.Row="1" Margin="0,8,0,0">
-                                        <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
-                                                   TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource VkTextPrimaryBrush}" />
-                                        <TextBlock Text="{x:Bind Author}" TextWrapping="NoWrap"
-                                                   TextTrimming="CharacterEllipsis" FontSize="12"
-                                                   Foreground="{StaticResource VkTextSecondaryBrush}" />
-                                    </StackPanel>
-                                </Grid>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-
-            <!-- Category Tabs -->
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <RadioButton Content="Все" IsChecked="True" Style="{StaticResource FilterPillStyle}" />
-                    <RadioButton Content="Выборка" Style="{StaticResource FilterPillStyle}" />
-                    <RadioButton Content="Музыка" Style="{StaticResource FilterPillStyle}" />
-                    <RadioButton Content="Фильмы" Style="{StaticResource FilterPillStyle}" />
-                    <RadioButton Content="Технологии" Style="{StaticResource FilterPillStyle}" />
-                    <RadioButton Content="Спорт" Style="{StaticResource FilterPillStyle}" />
-                    <RadioButton Content="Игры" Style="{StaticResource FilterPillStyle}" />
-                    <RadioButton Content="Кулинария" Style="{StaticResource FilterPillStyle}" />
-                    <RadioButton Content="Путешествия" Style="{StaticResource FilterPillStyle}" />
-                    <RadioButton Content="Дом" Style="{StaticResource FilterPillStyle}" />
-                </StackPanel>
-            </ScrollViewer>
-
-            <!-- Recommended Channels -->
-            <StackPanel>
-                <TextBlock Text="Рекомендуемые каналы" Style="{StaticResource SectionHeaderStyle}"
-                           Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="18" />
-                <ItemsControl ItemsSource="{x:Bind ViewModel.Channels}" Margin="0,12,0,0">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="16" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:ChannelViewModel">
-                            <StackPanel Width="140" HorizontalAlignment="Left">
-                                <Ellipse Width="80" Height="80" HorizontalAlignment="Center">
-                                    <Ellipse.Fill>
-                                        <ImageBrush ImageSource="{x:Bind AvatarUrl}" Stretch="UniformToFill" />
-                                    </Ellipse.Fill>
-                                </Ellipse>
-                                <TextBlock Text="{x:Bind Name}" TextAlignment="Center"
-                                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
-                                           FontWeight="SemiBold" Margin="0,8,0,0"
-                                           Foreground="{StaticResource VkTextPrimaryBrush}" />
-                                <TextBlock Text="{x:Bind SubscriberCountText}" TextAlignment="Center"
-                                           FontSize="12"
-                                           Foreground="{StaticResource VkTextSecondaryBrush}" />
-                                <Button Content="Подписаться" HorizontalAlignment="Center"
-                                        Margin="0,8,0,0" Style="{StaticResource AccentButtonStyle}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-
-            <!-- Recommendations -->
-            <StackPanel>
-                <TextBlock Text="Рекомендации для вас" Style="{StaticResource SectionHeaderStyle}"
-                           Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="18" />
-                <ItemsControl ItemsSource="{x:Bind ViewModel.Recommendations}" Margin="0,12,0,0">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:VideoViewModel">
-                            <Button HorizontalAlignment="Left" Margin="0,0,12,12"
-                                    Click="OnVideoItemClick" Tag="{x:Bind Id}"
-                                    Background="Transparent" BorderThickness="0" Padding="0">
-                                <Button.ContextFlyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem Text="Смотреть" Click="OnContextPlay" Tag="{x:Bind Id}" />
-                                        <MenuFlyoutItem Text="Добавить в избранное" Click="OnContextFavorite" Tag="{x:Bind Id}" />
-                                        <MenuFlyoutItem Text="Скачать" Click="OnContextDownload" Tag="{x:Bind Id}" />
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutItem Text="Добавить в очередь" Click="OnAddToQueueClick" Tag="{x:Bind}" />
-                                        <MenuFlyoutItem Text="Добавить в плейлист" Click="OnAddToPlaylistClick" Tag="{x:Bind}" />
-                                        <MenuFlyoutSeparator />
-                                        <MenuFlyoutItem Text="Поделиться" Click="OnShareClick" Tag="{x:Bind}" />
-                                        <MenuFlyoutItem Text="Открыть в VK" Click="OnContextOpenInVk" Tag="{x:Bind Id}" />
-                                    </MenuFlyout>
-                                </Button.ContextFlyout>
-                                <Grid Width="280">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0" Height="158" CornerRadius="8">
-                                        <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
-                                        <Border Background="{StaticResource VkOverlayBrush}" CornerRadius="4"
-                                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                                Margin="0,0,6,6" Padding="6,2">
-                                            <TextBlock Text="{x:Bind DurationText}" Foreground="White" FontSize="11" FontWeight="SemiBold" />
-                                        </Border>
-                                    </Grid>
-                                    <StackPanel Grid.Row="1" Margin="0,8,0,0">
-                                        <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap"
-                                                   TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource VkTextPrimaryBrush}" />
-                                        <TextBlock Text="{x:Bind Author}" TextWrapping="NoWrap"
-                                                   TextTrimming="CharacterEllipsis" FontSize="12"
-                                                   Foreground="{StaticResource VkTextSecondaryBrush}" />
-                                        <TextBlock Text="{x:Bind ViewCountText}" FontSize="11"
-                                                   Foreground="{StaticResource VkTextTertiaryBrush}" />
-                                    </StackPanel>
-                                </Grid>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-
+        <StackPanel x:Name="LoginRequiredState" Visibility="Collapsed" HorizontalAlignment="Center"
+                    VerticalAlignment="Center" Spacing="16" Margin="40" Canvas.ZIndex="10">
+            <FontIcon Glyph="&#xE77B;" FontSize="64" Opacity="0.3" Foreground="{StaticResource VkTextTertiaryBrush}" />
+            <TextBlock x:Uid="HomeLoginRequired" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"
+                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+            <TextBlock x:Uid="HomeLoginRequiredDesc" Opacity="0.6" HorizontalAlignment="Center"
+                       Foreground="{StaticResource VkTextSecondaryBrush}" TextWrapping="Wrap" MaxWidth="400" />
+            <Button x:Uid="HomeLoginButton" HorizontalAlignment="Center" Margin="0,8,0,0"
+                    Style="{StaticResource AccentButtonStyle}" CornerRadius="20" Padding="24,12"
+                    Click="OnLoginButtonClick" />
         </StackPanel>
-    </ScrollViewer>
     </Grid>
 </Page>

@@ -7,59 +7,76 @@
     xmlns:vm="using:VKVideoDesktop.App.ViewModels"
     Background="{StaticResource VkBackgroundBrush}">
 
-    <Grid>
+    <Grid RowSpacing="16">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Search Input -->
-        <AutoSuggestBox Grid.Row="0" x:Name="SearchBox"
-                        PlaceholderText="Поиск видео, каналов и авторов..."
-                        QueryIcon="Find" Margin="24,16" Width="600"
-                        HorizontalAlignment="Center"
-                        TextChanged="OnSearchTextChanged"
-                        QuerySubmitted="OnSearchSubmitted" />
+        <!-- Search Header -->
+        <Grid Grid.Row="0" Padding="24,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <AutoSuggestBox x:Name="SearchBox"
+                            PlaceholderText="Поиск видео, каналов и авторов..."
+                            QueryIcon="Find" MaxWidth="600"
+                            HorizontalAlignment="Left"
+                            KeyDown="OnSearchBoxKeyDown"
+                            Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay}"
+                            QuerySubmitted="OnSearchQuerySubmitted"
+                            Background="{StaticResource VkCardBrush}"
+                            Foreground="{StaticResource VkTextPrimaryBrush}"
+                            BorderBrush="{StaticResource VkCardBorderBrush}"
+                            BorderThickness="1" CornerRadius="8" />
+
+            <Button Grid.Column="1" Content="Фильтры" Padding="12,6"
+                    Background="{StaticResource VkCardBrush}"
+                    Foreground="{StaticResource VkTextSecondaryBrush}"
+                    BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                    CornerRadius="6" Margin="8,0,0,0" />
+        </Grid>
 
         <!-- Filters -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="24,0,0,16">
-            <RadioButton Content="Все" IsChecked="True" Tag="All"
-                         Checked="OnFilterChanged" Style="{StaticResource FilterPillStyle}" />
-            <RadioButton Content="Видео" Tag="Videos"
-                         Checked="OnFilterChanged" Style="{StaticResource FilterPillStyle}" />
-            <RadioButton Content="Каналы" Tag="Channels"
-                         Checked="OnFilterChanged" Style="{StaticResource FilterPillStyle}" />
-            <RadioButton Content="Авторы" Tag="Authors"
-                         Checked="OnFilterChanged" Style="{StaticResource FilterPillStyle}" />
-            <ComboBox x:Name="SortComboBox" MinWidth="160" Margin="16,0,0,0"
-                      SelectedIndex="0" SelectionChanged="OnSortChanged">
-                <ComboBoxItem Content="По релевантности" Tag="Relevance" />
-                <ComboBoxItem Content="По дате" Tag="Date" />
-                <ComboBoxItem Content="По просмотрам" Tag="Views" />
-                <ComboBoxItem Content="По длительности" Tag="Duration" />
-            </ComboBox>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Padding="24,0">
+            <RadioButton x:Uid="SearchFilterAll" IsChecked="True" Style="{StaticResource FilterPillStyle}" />
+            <RadioButton x:Uid="SearchFilterVideos" Style="{StaticResource FilterPillStyle}" />
+            <RadioButton x:Uid="SearchFilterChannels" Style="{StaticResource FilterPillStyle}" />
+            <RadioButton x:Uid="SearchFilterPlaylists" Style="{StaticResource FilterPillStyle}" />
+        </StackPanel>
+
+        <!-- Sort Options -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Padding="24,0">
+            <TextBlock Text="Сортировка:" VerticalAlignment="Center" FontSize="12"
+                       Foreground="{StaticResource VkTextSecondaryBrush}" Margin="0,0,4,0" />
+            <RadioButton x:Uid="SearchSortRelevance" IsChecked="True" Style="{StaticResource FilterPillStyle}" />
+            <RadioButton x:Uid="SearchSortDate" Style="{StaticResource FilterPillStyle}" />
+            <RadioButton x:Uid="SearchSortViews" Style="{StaticResource FilterPillStyle}" />
+            <RadioButton x:Uid="SearchSortDuration" Style="{StaticResource FilterPillStyle}" />
         </StackPanel>
 
         <!-- Results -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="24,0,24,80">
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Padding="0,0,0,80">
+            <StackPanel Margin="24,0">
                 <!-- Loading -->
-                <ProgressRing x:Name="LoadingRing" IsActive="False"
-                              HorizontalAlignment="Center" Margin="0,40,0,0" />
+                <ProgressRing x:Name="LoadingRing" IsActive="False" HorizontalAlignment="Center" Margin="0,40" />
 
                 <!-- Empty State -->
-                <StackPanel x:Name="EmptyState" Visibility="Collapsed"
-                            HorizontalAlignment="Center" VerticalAlignment="Center"
-                            Margin="0,80,0,0" Spacing="12">
-                    <FontIcon Glyph="&#xE721;" FontSize="48" Foreground="{StaticResource VkTextTertiaryBrush}" />
-                    <TextBlock Text="Введите запрос для поиска"
-                               Foreground="{StaticResource VkTextSecondaryBrush}"
-                               TextAlignment="Center" />
+                <StackPanel x:Name="EmptyState" Visibility="Collapsed" HorizontalAlignment="Center"
+                            VerticalAlignment="Center" Spacing="12" Margin="0,40">
+                    <FontIcon Glyph="&#xE721;" FontSize="64" Opacity="0.3" Foreground="{StaticResource VkTextTertiaryBrush}" />
+                    <TextBlock Text="Начните поиск" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" />
+                    <TextBlock Text="Введите запрос для поиска видео" Opacity="0.6" HorizontalAlignment="Center"
+                               Foreground="{StaticResource VkTextSecondaryBrush}" />
                 </StackPanel>
 
                 <!-- Results Grid -->
-                <ItemsControl x:Name="ResultsList" Margin="0,0,0,0">
+                <ItemsControl x:Name="ResultsItemsControl" Margin="0,16,0,0">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="4" />
@@ -68,19 +85,19 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:VideoViewModel">
                             <Button HorizontalAlignment="Left" Margin="0,0,12,12"
-                                    Click="OnVideoClick" Tag="{x:Bind Id}">
+                                    Click="OnVideoItemClick" Tag="{x:Bind Id}"
+                                    Background="Transparent" BorderThickness="0" Padding="0">
                                 <Grid Width="280">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0" Height="158" CornerRadius="4,4,0,0">
+                                    <Grid Grid.Row="0" Height="158" CornerRadius="8">
                                         <Image Source="{x:Bind ThumbnailUrl}" Stretch="UniformToFill" />
-                                        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                                Background="{StaticResource VkOverlayBrush}" CornerRadius="2"
-                                                Margin="0,0,4,4" Padding="4,2">
-                                            <TextBlock Text="{x:Bind DurationText}"
-                                                       Foreground="{StaticResource VkTextPrimaryBrush}" FontSize="11" />
+                                        <Border Background="{StaticResource VkOverlayBrush}" CornerRadius="4"
+                                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                Margin="0,0,6,6" Padding="6,2">
+                                            <TextBlock Text="{x:Bind DurationText}" Foreground="White" FontSize="11" FontWeight="SemiBold" />
                                         </Border>
                                     </Grid>
                                     <StackPanel Grid.Row="1" Margin="0,8,0,0">
@@ -99,8 +116,11 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <Button x:Name="LoadMoreButton" Content="Загрузить ещё" Click="OnLoadMoreClick"
-                        HorizontalAlignment="Center" Margin="0,16" Visibility="Collapsed" />
+                <!-- Load More Button -->
+                <Button x:Name="LoadMoreButton" Content="Загрузить ещё" HorizontalAlignment="Center"
+                        Margin="0,16,0,24" Visibility="Collapsed"
+                        Style="{StaticResource AccentActionButtonStyle}"
+                        Click="OnLoadMoreClick" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

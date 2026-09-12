@@ -9,20 +9,48 @@ namespace VKVideoDesktop.Infrastructure.Download;
 
 public sealed class VkVideoDownloadProvider : IVideoDownloadProvider
 {
-    private readonly IDownloadSourceResolver _resolver;
     private readonly IDownloadEngine _engine;
 
-    public VkVideoDownloadProvider(IDownloadSourceResolver resolver, IDownloadEngine engine)
+    public VkVideoDownloadProvider(IDownloadEngine engine)
     {
-        _resolver = resolver;
         _engine = engine;
     }
 
-    public async Task<IReadOnlyList<DownloadOption>> GetAvailableDownloadsAsync(
+    public Task<IReadOnlyList<DownloadOption>> GetAvailableDownloadsAsync(
         Video video,
         CancellationToken cancellationToken = default)
     {
-        return await _resolver.ResolveAsync(video, cancellationToken);
+        var options = new List<DownloadOption>();
+
+        if (video.QualityUrls != null)
+        {
+            foreach (var kv in video.QualityUrls)
+            {
+                if (!string.IsNullOrEmpty(kv.Value))
+                {
+                    options.Add(new DownloadOption
+                    {
+                        Quality = kv.Key,
+                        Format = "mp4",
+                        SourceUrl = kv.Value,
+                        Size = null
+                    });
+                }
+            }
+        }
+
+        if (options.Count == 0 && !string.IsNullOrEmpty(video.PlaybackUrl))
+        {
+            options.Add(new DownloadOption
+            {
+                Quality = "unknown",
+                Format = "mp4",
+                SourceUrl = video.PlaybackUrl,
+                Size = null
+            });
+        }
+
+        return Task.FromResult<IReadOnlyList<DownloadOption>>(options);
     }
 
     public async Task<DownloadResult> DownloadAsync(

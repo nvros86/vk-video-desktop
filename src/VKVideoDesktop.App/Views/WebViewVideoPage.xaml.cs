@@ -2,6 +2,8 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using VKVideoDesktop.Application.Services;
+using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Core.Models;
 using Windows.System;
 
@@ -10,14 +12,20 @@ namespace VKVideoDesktop.App.Views;
 public sealed partial class WebViewVideoPage : Page
 {
     private string? _videoUrl;
+    private readonly ILogger<WebViewVideoPage> _logger;
+    private readonly LocalizationService _localization;
 
     public WebViewVideoPage()
     {
+        _logger = App.GetService<ILogger<WebViewVideoPage>>();
+        _logger.LogInformation("[WebViewVideoPage] Constructor");
         InitializeComponent();
+        _localization = App.GetService<LocalizationService>();
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        _logger.LogInformation("[WebViewVideoPage] OnNavigatedTo");
         base.OnNavigatedTo(e);
 
         if (e.Parameter is Video video)
@@ -39,7 +47,7 @@ public sealed partial class WebViewVideoPage : Page
             }
             else
             {
-                TitleText.Text = "Video unavailable";
+                TitleText.Text = _localization["VideoUnavailableWeb"];
             }
         }
         else if (e.Parameter is string url)

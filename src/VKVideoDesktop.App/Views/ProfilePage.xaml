@@ -7,9 +7,9 @@
     <Grid Padding="24" MaxWidth="800" HorizontalAlignment="Center">
         <StackPanel Spacing="16">
             <StackPanel Orientation="Horizontal" Spacing="16">
-                <Ellipse Width="80" Height="80">
+                <Ellipse Width="80" Height="80" x:Name="AvatarEllipse">
                     <Ellipse.Fill>
-                        <ImageBrush ImageSource="{x:Bind ViewModel.AvatarUrl, Mode=OneWay}" Stretch="UniformToFill" />
+                        <ImageBrush x:Name="AvatarBrush" Stretch="UniformToFill" />
                     </Ellipse.Fill>
                 </Ellipse>
                 <StackPanel VerticalAlignment="Center" Spacing="4">
@@ -22,15 +22,15 @@
 
             <NavigationView x:Name="ProfileNav" SelectionChanged="OnProfileNavSelectionChanged">
                 <NavigationView.MenuItems>
-                    <NavigationViewItem Content="Мои видео" Tag="MyVideos" />
-                    <NavigationViewItem Content="Избранное" Tag="Favorites" />
-                    <NavigationViewItem Content="Плейлисты" Tag="Playlists" />
-                    <NavigationViewItem Content="История" Tag="History" />
-                    <NavigationViewItem Content="Настройки" Tag="Settings" />
+                    <NavigationViewItem x:Uid="ProfileMyVideos" Tag="MyVideos" />
+                    <NavigationViewItem x:Uid="ProfileFavorites" Tag="Favorites" />
+                    <NavigationViewItem x:Uid="ProfilePlaylists" Tag="Playlists" />
+                    <NavigationViewItem x:Uid="ProfileHistory" Tag="History" />
+                    <NavigationViewItem x:Uid="ProfileSettings" Tag="Settings" />
                 </NavigationView.MenuItems>
             </NavigationView>
 
-            <Button Content="Выйти" Click="OnLogoutClick" HorizontalAlignment="Left"
+            <Button x:Uid="ProfileLogout" Click="OnLogoutClick" HorizontalAlignment="Left"
                     Background="{StaticResource VkAccentBrush}" Foreground="White"
                     Padding="24,8" Margin="0,16,0,0" />
         </StackPanel>

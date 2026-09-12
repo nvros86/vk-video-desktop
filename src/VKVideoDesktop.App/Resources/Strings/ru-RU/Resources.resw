@@ -114,9 +114,6 @@
   <data name="Loading" xml:space="preserve">
     <value>Загрузка...</value>
   </data>
-  <data name="SearchPlaceholder" xml:space="preserve">
-    <value>Поиск видео...</value>
-  </data>
   <data name="MiniPlayerTitle" xml:space="preserve">
     <value>Mini Player</value>
   </data>
@@ -131,12 +128,6 @@
   </data>
   <data name="LoginSuccess" xml:space="preserve">
     <value>Вход выполнен успешно</value>
-  </data>
-  <data name="LoginStep1" xml:space="preserve">
-    <value>Нажмите кнопку для входа через VK</value>
-  </data>
-  <data name="LoginStep2" xml:space="preserve">
-    <value>Вставьте ссылку из браузера</value>
   </data>
   <data name="TokenInvalid" xml:space="preserve">
     <value>Неверный токен. Попробуйте снова.</value>
@@ -167,5 +158,651 @@
   </data>
   <data name="ClearSearch" xml:space="preserve">
     <value>Очистить поиск</value>
+  </data>
+
+  <!-- SettingsPage -->
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="SettingsGeneral" xml:space="preserve">
+    <value>Общие</value>
+  </data>
+  <data name="SettingsLanguage" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="SettingsTheme" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="SettingsThemeDark" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="SettingsThemeLight" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="SettingsThemeSystem" xml:space="preserve">
+    <value>Системная</value>
+  </data>
+  <data name="SettingsStartWithWindows" xml:space="preserve">
+    <value>Запуск с Windows</value>
+  </data>
+  <data name="SettingsMinimizeToTray" xml:space="preserve">
+    <value>Сворачивать в трей</value>
+  </data>
+  <data name="SettingsNotifications" xml:space="preserve">
+    <value>Уведомления</value>
+  </data>
+  <data name="SettingsDefaultVolume" xml:space="preserve">
+    <value>Громкость по умолчанию</value>
+  </data>
+  <data name="SettingsPlaybackSpeed" xml:space="preserve">
+    <value>Скорость воспроизведения</value>
+  </data>
+  <data name="SettingsVideo" xml:space="preserve">
+    <value>Видео</value>
+  </data>
+  <data name="SettingsDefaultQuality" xml:space="preserve">
+    <value>Качество по умолчанию</value>
+  </data>
+  <data name="SettingsAutoplay" xml:space="preserve">
+    <value>Автовоспроизведение</value>
+  </data>
+  <data name="SettingsDownloads" xml:space="preserve">
+    <value>Загрузки</value>
+  </data>
+  <data name="SettingsDownloadFolder" xml:space="preserve">
+    <value>Папка загрузок</value>
+  </data>
+  <data name="SettingsChange" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="SettingsMaxConcurrent" xml:space="preserve">
+    <value>Макс. одновременных загрузок</value>
+  </data>
+  <data name="SettingsSpeedLimit" xml:space="preserve">
+    <value>Ограничение скорости</value>
+  </data>
+  <data name="SettingsSpeedLimitNone" xml:space="preserve">
+    <value>Без ограничений</value>
+  </data>
+  <data name="SettingsSpeedLimit512" xml:space="preserve">
+    <value>512 КБ/с</value>
+  </data>
+  <data name="SettingsSpeedLimit1m" xml:space="preserve">
+    <value>1 МБ/с</value>
+  </data>
+  <data name="SettingsSpeedLimit2m" xml:space="preserve">
+    <value>2 МБ/с</value>
+  </data>
+  <data name="SettingsSpeedLimit5m" xml:space="preserve">
+    <value>5 МБ/с</value>
+  </data>
+  <data name="SettingsSpeedLimit10m" xml:space="preserve">
+    <value>10 МБ/с</value>
+  </data>
+  <data name="SettingsRetryCount" xml:space="preserve">
+    <value>Количество повторных попыток</value>
+  </data>
+  <data name="SettingsAutoResume" xml:space="preserve">
+    <value>Автовозобновление при запуске</value>
+  </data>
+  <data name="SettingsDownloadNotifications" xml:space="preserve">
+    <value>Уведомления о загрузках</value>
+  </data>
+  <data name="SettingsDeletePart" xml:space="preserve">
+    <value>Удалять .part при отмене</value>
+  </data>
+  <data name="SettingsDownloadBehavior" xml:space="preserve">
+    <value>Способ загрузки</value>
+  </data>
+  <data name="SettingsDownloadBehaviorChoose" xml:space="preserve">
+    <value>Показывать выбор качества</value>
+  </data>
+  <data name="SettingsDownloadBehaviorLast" xml:space="preserve">
+    <value>Использовать последнее качество</value>
+  </data>
+  <data name="SettingsDownloadBehaviorMax" xml:space="preserve">
+    <value>Использовать максимальное качество</value>
+  </data>
+  <data name="SettingsNetwork" xml:space="preserve">
+    <value>Сетевые настройки</value>
+  </data>
+  <data name="SettingsUseProxy" xml:space="preserve">
+    <value>Использовать прокси</value>
+  </data>
+  <data name="SettingsProxyAddress" xml:space="preserve">
+    <value>Адрес прокси</value>
+  </data>
+  <data name="SettingsCache" xml:space="preserve">
+    <value>Кэш</value>
+  </data>
+  <data name="SettingsClearImageCache" xml:space="preserve">
+    <value>Очистить кэш изображений</value>
+  </data>
+  <data name="SettingsCacheDesc" xml:space="preserve">
+    <value>Миниатюры и аватары каналов</value>
+  </data>
+  <data name="SettingsClear" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="SettingsClearCacheTitle" xml:space="preserve">
+    <value>Очистить кэш</value>
+  </data>
+  <data name="SettingsClearCacheConfirm" xml:space="preserve">
+    <value>Вы уверены, что хотите очистить кэш изображений?</value>
+  </data>
+  <data name="SettingsAbout" xml:space="preserve">
+    <value>О приложении</value>
+  </data>
+  <data name="SettingsAboutDesc" xml:space="preserve">
+    <value>Бета-версия • Production-ready Windows client for VK Video</value>
+  </data>
+
+  <!-- HomePage -->
+  <data name="HomeEmpty" xml:space="preserve">
+    <value>Нет контента</value>
+  </data>
+  <data name="HomeEmptyDesc" xml:space="preserve">
+    <value>Поищите видео или откройте каналы</value>
+  </data>
+  <data name="HomeLoginRequired" xml:space="preserve">
+    <value>Войдите в VK</value>
+  </data>
+  <data name="HomeLoginRequiredDesc" xml:space="preserve">
+    <value>Войдите в аккаунт VK, чтобы просматривать и смотреть видео</value>
+  </data>
+  <data name="HomeLoginButton" xml:space="preserve">
+    <value>Войти в VK</value>
+  </data>
+  <data name="HomeBannerTitle" xml:space="preserve">
+    <value>Путешествие по России</value>
+  </data>
+  <data name="HomeBannerDesc" xml:space="preserve">
+    <value>Красивые места, которые стоит увидеть. Самые яркие видео</value>
+  </data>
+  <data name="HomeWatch" xml:space="preserve">
+    <value>Смотреть</value>
+  </data>
+  <data name="HomeCollections" xml:space="preserve">
+    <value>+ 8 коллекций</value>
+  </data>
+  <data name="HomeContinueWatching" xml:space="preserve">
+    <value>Продолжить просмотр</value>
+  </data>
+  <data name="HomeRecommendedChannels" xml:space="preserve">
+    <value>Рекомендуемые каналы</value>
+  </data>
+  <data name="HomeRecommendations" xml:space="preserve">
+    <value>Рекомендации для вас</value>
+  </data>
+  <data name="HomeSubscribe" xml:space="preserve">
+    <value>Подписаться</value>
+  </data>
+  <data name="HomeCategoryAll" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="HomeCategoryFeatured" xml:space="preserve">
+    <value>Выборка</value>
+  </data>
+  <data name="HomeCategoryMusic" xml:space="preserve">
+    <value>Музыка</value>
+  </data>
+  <data name="HomeCategoryMovies" xml:space="preserve">
+    <value>Фильмы</value>
+  </data>
+  <data name="HomeCategoryTech" xml:space="preserve">
+    <value>Технологии</value>
+  </data>
+  <data name="HomeCategorySport" xml:space="preserve">
+    <value>Спорт</value>
+  </data>
+  <data name="HomeCategoryGames" xml:space="preserve">
+    <value>Игры</value>
+  </data>
+  <data name="HomeCategoryCooking" xml:space="preserve">
+    <value>Кулинария</value>
+  </data>
+  <data name="HomeCategoryTravel" xml:space="preserve">
+    <value>Путешествия</value>
+  </data>
+  <data name="HomeCategoryHome" xml:space="preserve">
+    <value>Дом</value>
+  </data>
+  <data name="HomePlay" xml:space="preserve">
+    <value>Смотреть</value>
+  </data>
+  <data name="HomeAddToFav" xml:space="preserve">
+    <value>Добавить в избранное</value>
+  </data>
+  <data name="HomeRemoveFromHistory" xml:space="preserve">
+    <value>Удалить из истории</value>
+  </data>
+  <data name="HomeOpenVK" xml:space="preserve">
+    <value>Открыть в VK</value>
+  </data>
+  <data name="HomeDownload" xml:space="preserve">
+    <value>Скачать</value>
+  </data>
+  <data name="HomeAddToQueue" xml:space="preserve">
+    <value>Добавить в очередь</value>
+  </data>
+  <data name="HomeAddToPlaylist" xml:space="preserve">
+    <value>Добавить в плейлист</value>
+  </data>
+  <data name="HomeShare" xml:space="preserve">
+    <value>Поделиться</value>
+  </data>
+
+  <!-- SearchPage -->
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Поиск видео, каналов и авторов...</value>
+  </data>
+  <data name="SearchAll" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="SearchVideos" xml:space="preserve">
+    <value>Видео</value>
+  </data>
+  <data name="SearchChannels" xml:space="preserve">
+    <value>Каналы</value>
+  </data>
+  <data name="SearchAuthors" xml:space="preserve">
+    <value>Авторы</value>
+  </data>
+  <data name="SearchSortRelevance" xml:space="preserve">
+    <value>По релевантности</value>
+  </data>
+  <data name="SearchSortDate" xml:space="preserve">
+    <value>По дате</value>
+  </data>
+  <data name="SearchSortViews" xml:space="preserve">
+    <value>По просмотрам</value>
+  </data>
+  <data name="SearchSortDuration" xml:space="preserve">
+    <value>По длительности</value>
+  </data>
+  <data name="SearchEmpty" xml:space="preserve">
+    <value>Введите запрос для поиска</value>
+  </data>
+  <data name="SearchLoadMore" xml:space="preserve">
+    <value>Загрузить ещё</value>
+  </data>
+
+  <!-- DownloadsPage -->
+  <data name="DownloadsTitle" xml:space="preserve">
+    <value>Загрузки</value>
+  </data>
+  <data name="DownloadsRetryAll" xml:space="preserve">
+    <value>Повторить все</value>
+  </data>
+  <data name="DownloadsClearCompleted" xml:space="preserve">
+    <value>Очистить завершённые</value>
+  </data>
+  <data name="DownloadsActive" xml:space="preserve">
+    <value>Активные</value>
+  </data>
+  <data name="DownloadsEmpty" xml:space="preserve">
+    <value>Нет загрузок</value>
+  </data>
+  <data name="DownloadsEmptyDesc" xml:space="preserve">
+    <value>Скачивайте видео, и они появятся здесь.</value>
+  </data>
+  <data name="DownloadsOpenFile" xml:space="preserve">
+    <value>Открыть файл</value>
+  </data>
+  <data name="DownloadsOpenFolder" xml:space="preserve">
+    <value>Открыть папку</value>
+  </data>
+  <data name="DownloadsCopyPath" xml:space="preserve">
+    <value>Копировать путь</value>
+  </data>
+  <data name="DownloadsDeleteRecord" xml:space="preserve">
+    <value>Удалить запись</value>
+  </data>
+
+  <!-- HistoryPage -->
+  <data name="HistoryTitle" xml:space="preserve">
+    <value>История просмотров</value>
+  </data>
+  <data name="HistoryClear" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="HistoryEmpty" xml:space="preserve">
+    <value>История просмотров пуста</value>
+  </data>
+  <data name="HistoryEmptyDesc" xml:space="preserve">
+    <value>Начните смотреть видео, и они появятся здесь.</value>
+  </data>
+  <data name="HistoryWatch" xml:space="preserve">
+    <value>▶ Смотреть</value>
+  </data>
+  <data name="HistoryDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+
+  <!-- FavoritesPage -->
+  <data name="FavoritesTitle" xml:space="preserve">
+    <value>Избранное</value>
+  </data>
+  <data name="FavoritesClear" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="FavoritesEmpty" xml:space="preserve">
+    <value>Ваш список избранного пуст</value>
+  </data>
+  <data name="FavoritesEmptyDesc" xml:space="preserve">
+    <value>Добавляйте видео в избранное...</value>
+  </data>
+  <data name="FavoritesDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+
+  <!-- PlaylistsPage -->
+  <data name="PlaylistsTitle" xml:space="preserve">
+    <value>Плейлисты</value>
+  </data>
+  <data name="PlaylistsCreate" xml:space="preserve">
+    <value>＋ Создать</value>
+  </data>
+  <data name="PlaylistsEmpty" xml:space="preserve">
+    <value>У вас пока нет плейлистов</value>
+  </data>
+  <data name="PlaylistsEmptyDesc" xml:space="preserve">
+    <value>Создайте плейлист, чтобы группировать видео.</value>
+  </data>
+  <data name="PlaylistsDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+
+  <!-- PlaylistDetailPage -->
+  <data name="PlaylistDetailEmpty" xml:space="preserve">
+    <value>Плейлист пуст</value>
+  </data>
+  <data name="PlaylistDetailDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+
+  <!-- LoginPage -->
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Вход в VK Video</value>
+  </data>
+  <data name="LoginStep1" xml:space="preserve">
+    <value>1. Нажмите кнопку ниже для входа через VK</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>Войти через VK</value>
+  </data>
+  <data name="LoginStep2" xml:space="preserve">
+    <value>2. После авторизации скопируйте URL из браузера</value>
+  </data>
+  <data name="LoginInputPlaceholder" xml:space="preserve">
+    <value>Вставьте URL или токен сюда...</value>
+  </data>
+  <data name="LoginSubmit" xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="LoginChecking" xml:space="preserve">
+    <value>Проверка токена...</value>
+  </data>
+
+  <!-- ProfilePage -->
+  <data name="ProfileMyVideos" xml:space="preserve">
+    <value>Мои видео</value>
+  </data>
+  <data name="ProfileFavorites" xml:space="preserve">
+    <value>Избранное</value>
+  </data>
+  <data name="ProfilePlaylists" xml:space="preserve">
+    <value>Плейлисты</value>
+  </data>
+  <data name="ProfileHistory" xml:space="preserve">
+    <value>История</value>
+  </data>
+  <data name="ProfileSettings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="ProfileLogout" xml:space="preserve">
+    <value>Выйти</value>
+  </data>
+
+  <!-- ChannelPage -->
+  <data name="ChannelSubscribe" xml:space="preserve">
+    <value>Подписаться</value>
+  </data>
+  <data name="ChannelDescription" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="ChannelVideos" xml:space="preserve">
+    <value>Видео</value>
+  </data>
+  <data name="ChannelPlay" xml:space="preserve">
+    <value>Смотреть</value>
+  </data>
+  <data name="ChannelAddToFav" xml:space="preserve">
+    <value>Добавить в избранное</value>
+  </data>
+  <data name="ChannelDownload" xml:space="preserve">
+    <value>Скачать</value>
+  </data>
+  <data name="ChannelOpenVK" xml:space="preserve">
+    <value>Открыть в VK</value>
+  </data>
+
+  <!-- VideoPage -->
+  <data name="VideoRelated" xml:space="preserve">
+    <value>Похожие видео</value>
+  </data>
+  <data name="VideoDescription" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="VideoSubscribe" xml:space="preserve">
+    <value>Подписаться</value>
+  </data>
+  <data name="VideoFavorite" xml:space="preserve">
+    <value>❤️ Избранное</value>
+  </data>
+  <data name="VideoPlaylist" xml:space="preserve">
+    <value>➕ Плейлист</value>
+  </data>
+  <data name="VideoDownload" xml:space="preserve">
+    <value>⬇ Скачать</value>
+  </data>
+  <data name="VideoShare" xml:space="preserve">
+    <value>↗ Поделиться</value>
+  </data>
+  <data name="VideoWebView" xml:space="preserve">
+    <value>🌐 WebView2</value>
+  </data>
+  <data name="VideoSpeedTooltip" xml:space="preserve">
+    <value>Скорость воспроизведения</value>
+  </data>
+  <data name="VideoQualityTooltip" xml:space="preserve">
+    <value>Качество видео</value>
+  </data>
+  <data name="VideoPiPTooltip" xml:space="preserve">
+    <value>Картинка в картинке</value>
+  </data>
+
+  <!-- DownloadItemViewModel -->
+  <data name="DownloadStatusQueued" xml:space="preserve">
+    <value>В очереди</value>
+  </data>
+  <data name="DownloadStatusResolving" xml:space="preserve">
+    <value>Определение источника...</value>
+  </data>
+  <data name="DownloadStatusDownloading" xml:space="preserve">
+    <value>Загрузка...</value>
+  </data>
+  <data name="DownloadStatusPaused" xml:space="preserve">
+    <value>Приостановлено</value>
+  </data>
+  <data name="DownloadStatusCompleted" xml:space="preserve">
+    <value>Завершено</value>
+  </data>
+  <data name="DownloadStatusFailed" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="DownloadStatusCancelled" xml:space="preserve">
+    <value>Отменено</value>
+  </data>
+  <data name="DownloadStatusRetrying" xml:space="preserve">
+    <value>Повторная попытка...</value>
+  </data>
+  <data name="DownloadStatusUnknown" xml:space="preserve">
+    <value>Неизвестно</value>
+  </data>
+
+  <!-- Common -->
+  <data name="CommonOk" xml:space="preserve">
+    <value>ОК</value>
+  </data>
+  <data name="CommonCancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="CommonSave" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="CommonDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="CommonLoading" xml:space="preserve">
+    <value>Загрузка...</value>
+  </data>
+
+  <!-- ErrorHandlerService -->
+  <data name="ErrorAccessDenied" xml:space="preserve">
+    <value>Доступ запрещён. У вас нет прав для просмотра этого контента.</value>
+  </data>
+  <data name="ErrorDownloadUnavailable" xml:space="preserve">
+    <value>Скачивание недоступно для этого видео.</value>
+  </data>
+  <data name="ErrorRateLimit" xml:space="preserve">
+    <value>Слишком много запросов. Подождите немного и попробуйте снова.</value>
+  </data>
+  <data name="ErrorNoSpace" xml:space="preserve">
+    <value>Недостаточно свободного места на диске.</value>
+  </data>
+  <data name="ErrorTimeout" xml:space="preserve">
+    <value>Превышено время ожидания. Проверьте скорость подключения.</value>
+  </data>
+  <data name="ErrorCancelled" xml:space="preserve">
+    <value>Операция отменена.</value>
+  </data>
+  <data name="ErrorUnknown" xml:space="preserve">
+    <value>Произошла неизвестная ошибка. Попробуйте снова.</value>
+  </data>
+
+  <!-- LoginPage -->
+  <data name="LoginErrorEmptyToken" xml:space="preserve">
+    <value>Вставьте URL или токен</value>
+  </data>
+  <data name="LoginErrorExtractFailed" xml:space="preserve">
+    <value>Не удалось извлечь токен. Вставьте полный URL из адресной строки.</value>
+  </data>
+  <data name="LoginErrorAuthFailed" xml:space="preserve">
+    <value>Ошибка авторизации. Проверьте токен и попробуйте снова.</value>
+  </data>
+
+  <!-- VideoPage -->
+  <data name="VideoQualityTitle" xml:space="preserve">
+    <value>Качество видео</value>
+  </data>
+  <data name="VideoDownloadTitle" xml:space="preserve">
+    <value>Скачать видео</value>
+  </data>
+  <data name="CommonClose" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+
+  <!-- ChannelPage -->
+  <data name="ChannelSubscriberCount" xml:space="preserve">
+    <value>{0} подписчиков</value>
+  </data>
+
+  <!-- MainViewModel -->
+  <data name="HomeTab" xml:space="preserve">
+    <value>Главная</value>
+  </data>
+  <data name="HistoryContinueFrom" xml:space="preserve">
+    <value>Продолжить с {0}</value>
+  </data>
+
+  <!-- Views formatting -->
+  <data name="ViewsBillions" xml:space="preserve">
+    <value>{0} млрд</value>
+  </data>
+  <data name="ViewsMillions" xml:space="preserve">
+    <value>{0} млн</value>
+  </data>
+  <data name="ViewsThousands" xml:space="preserve">
+    <value>{0} тыс.</value>
+  </data>
+  <data name="ViewsCount" xml:space="preserve">
+    <value>{0} просмотров</value>
+  </data>
+
+  <!-- ProfileViewModel -->
+  <data name="ProfileDefaultName" xml:space="preserve">
+    <value>Пользователь VK</value>
+  </data>
+
+  <!-- PlaylistsPage -->
+  <data name="PlaylistsNewTitle" xml:space="preserve">
+    <value>Новый плейлист</value>
+  </data>
+  <data name="PlaylistsCreateButton" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="PlaylistsNamePlaceholder" xml:space="preserve">
+    <value>Название плейлиста</value>
+  </data>
+  <data name="PlaylistsDeleteTitle" xml:space="preserve">
+    <value>Удалить плейлист</value>
+  </data>
+  <data name="PlaylistsDeleteConfirm" xml:space="preserve">
+    <value>Вы уверены?</value>
+  </data>
+
+  <!-- HistoryPage -->
+  <data name="HistoryClearTitle" xml:space="preserve">
+    <value>Очистить историю</value>
+  </data>
+  <data name="HistoryClearConfirm" xml:space="preserve">
+    <value>Вы уверены, что хотите очистить всю историю просмотров?</value>
+  </data>
+
+  <!-- FavoritesPage -->
+  <data name="FavoritesClearTitle" xml:space="preserve">
+    <value>Очистить избранное</value>
+  </data>
+  <data name="FavoritesClearConfirm" xml:space="preserve">
+    <value>Вы уверены, что хотите очистить весь список избранного?</value>
+  </data>
+
+  <!-- PlaylistDetailPage -->
+  <data name="PlaylistDetailVideoCount" xml:space="preserve">
+    <value>{0} видео</value>
+  </data>
+
+  <!-- DownloadItemViewModel -->
+  <data name="TimeHoursMinutes" xml:space="preserve">
+    <value>{0}ч {1}м</value>
+  </data>
+  <data name="TimeMinutesSeconds" xml:space="preserve">
+    <value>{0}м {1}с</value>
+  </data>
+
+  <!-- NotificationService -->
+  <data name="NotificationDownloadComplete" xml:space="preserve">
+    <value>Загрузка завершена</value>
+  </data>
+
+  <!-- WebViewVideoPage -->
+  <data name="VideoUnavailableWeb" xml:space="preserve">
+    <value>Видео недоступно</value>
+  </data>
+
+  <!-- PlaylistViewModel -->
+  <data name="PlaylistVideoCount" xml:space="preserve">
+    <value>{0} видео</value>
   </data>
 </root>

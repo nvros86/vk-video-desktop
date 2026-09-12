@@ -9,7 +9,7 @@ public sealed class DownloadTask
     public string Title { get; init; } = string.Empty;
     public string ThumbnailUrl { get; init; } = string.Empty;
     public string SourceUrl { get; set; } = string.Empty;
-    public string DestinationPath { get; init; } = string.Empty;
+    public string DestinationPath { get; set; } = string.Empty;
     public string TemporaryPath { get; init; } = string.Empty;
     public string? Quality { get; init; }
     public string? Format { get; init; }

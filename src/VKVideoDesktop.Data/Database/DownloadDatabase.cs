@@ -11,25 +11,32 @@ public sealed class DownloadDatabase : IDownloadRepository
     private readonly string _connectionString;
     private readonly ILogger<DownloadDatabase> _logger;
 
-    public DownloadDatabase(ILogger<DownloadDatabase> logger)
+    public DownloadDatabase(ILogger<DownloadDatabase> logger) : this(GetDefaultConnectionString(), logger) { }
+
+    public DownloadDatabase(string connectionString, ILogger<DownloadDatabase> logger)
+    {
+        _connectionString = connectionString;
+        _logger = logger;
+        InitializeDatabase();
+    }
+
+    private static string GetDefaultConnectionString()
     {
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var dir = Path.Combine(appData, "VKVideoDesktop");
         Directory.CreateDirectory(dir);
         var dbPath = Path.Combine(dir, "downloads.db");
-        _connectionString = $"Data Source={dbPath}";
-        _logger = logger;
-
-        InitializeDatabase();
+        return $"Data Source={dbPath}";
     }
 
     private void InitializeDatabase()
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
-
-        var command = connection.CreateCommand();
-        command.CommandText = @"
+        SchemaMigration.EnsureMigrationsTable(connection);
+        SchemaMigration.Apply(connection, 1, "Initial Downloads schema", new[]
+        {
+            @"
             CREATE TABLE IF NOT EXISTS Downloads (
                 Id TEXT PRIMARY KEY,
                 VideoId TEXT NOT NULL,
@@ -49,8 +56,8 @@ public sealed class DownloadDatabase : IDownloadRepository
                 CreatedAt TEXT,
                 StartedAt TEXT,
                 CompletedAt TEXT
-            )";
-        command.ExecuteNonQuery();
+            )"
+        });
     }
 
     public async Task<IReadOnlyList<DownloadTask>> GetAllAsync()
@@ -184,9 +191,12 @@ public sealed class DownloadDatabase : IDownloadRepository
             Status = (DownloadStatus)reader.GetInt32(reader.GetOrdinal("Status")),
             TotalBytes = reader.IsDBNull(reader.GetOrdinal("TotalBytes"))
                 ? null : reader.GetInt64(reader.GetOrdinal("TotalBytes")),
-            DownloadedBytes = reader.GetInt64(reader.GetOrdinal("DownloadedBytes")),
-            SpeedBytesPerSecond = reader.GetDouble(reader.GetOrdinal("Speed")),
-            RetryCount = reader.GetInt32(reader.GetOrdinal("RetryCount")),
+            DownloadedBytes = reader.IsDBNull(reader.GetOrdinal("DownloadedBytes"))
+                ? 0 : reader.GetInt64(reader.GetOrdinal("DownloadedBytes")),
+            SpeedBytesPerSecond = reader.IsDBNull(reader.GetOrdinal("Speed"))
+                ? 0 : reader.GetDouble(reader.GetOrdinal("Speed")),
+            RetryCount = reader.IsDBNull(reader.GetOrdinal("RetryCount"))
+                ? 0 : reader.GetInt32(reader.GetOrdinal("RetryCount")),
             ErrorMessage = reader.IsDBNull(reader.GetOrdinal("ErrorMessage"))
                 ? null : reader.GetString(reader.GetOrdinal("ErrorMessage")),
             CreatedAt = DateTime.Parse(reader.GetString(reader.GetOrdinal("CreatedAt"))),

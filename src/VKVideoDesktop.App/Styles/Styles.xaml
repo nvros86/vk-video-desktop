@@ -2,6 +2,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <!-- Filter Pill Button -->
     <Style x:Key="FilterPillStyle" TargetType="RadioButton">
         <Setter Property="Padding" Value="16,8" />
@@ -42,10 +46,19 @@
     </Style>
 
     <!-- Section Header -->
-    <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
-        <Setter Property="Style" Value="{StaticResource SubtitleTextBlockStyle}" />
+    <Style x:Key="SectionHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource SubtitleTextBlockStyle}">
         <Setter Property="Margin" Value="0,0,0,12" />
         <Setter Property="Foreground" Value="{StaticResource VkTextPrimaryBrush}" />
+    </Style>
+
+    <!-- Text Button -->
+    <Style x:Key="TextButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource VkTextSecondaryBrush}" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
     </Style>
 
     <!-- Accent Button -->
@@ -63,6 +76,68 @@
     <!-- VK Themed Page -->
     <Style x:Key="VkPageStyle" TargetType="Page">
         <Setter Property="Background" Value="{StaticResource VkBackgroundBrush}" />
+    </Style>
+
+    <!-- Playlist Sidebar Item -->
+    <Style x:Key="PlaylistSidebarItemStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="CornerRadius" Value="6" />
+    </Style>
+
+    <!-- Video Thumbnail Card -->
+    <Style x:Key="VideoThumbnailCardStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+
+    <!-- Category Tab -->
+    <Style x:Key="CategoryTabStyle" TargetType="RadioButton">
+        <Setter Property="Padding" Value="14,7" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Background" Value="{StaticResource VkCardBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{StaticResource VkCardBorderBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource VkTextSecondaryBrush}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinHeight" Value="28" />
+    </Style>
+
+    <!-- Subscribe Button -->
+    <Style x:Key="SubscribeButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="14,6" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <!-- Mini Player Progress Bar -->
+    <Style x:Key="MiniPlayerProgressStyle" TargetType="ProgressBar">
+        <Setter Property="Height" Value="3" />
+        <Setter Property="Background" Value="{StaticResource VkProgressTrackBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource VkProgressBrush}" />
+        <Setter Property="Minimum" Value="0" />
+        <Setter Property="Maximum" Value="100" />
+    </Style>
+
+    <!-- Download Progress Bar -->
+    <Style x:Key="DownloadProgressStyle" TargetType="ProgressBar">
+        <Setter Property="Height" Value="4" />
+        <Setter Property="Background" Value="{StaticResource VkProgressTrackBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource VkAccentBrush}" />
+        <Setter Property="CornerRadius" Value="2" />
+    </Style>
+
+    <!-- Settings Card -->
+    <Style x:Key="SettingsCardStyle" TargetType="Grid">
+        <Setter Property="Background" Value="{StaticResource VkCardBrush}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Margin" Value="0,0,0,8" />
     </Style>
 
 </ResourceDictionary>

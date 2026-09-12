@@ -41,11 +41,11 @@
                             BorderBrush="{StaticResource VkCardBorderBrush}"
                             BorderThickness="1" CornerRadius="8" />
 
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12"
                         VerticalAlignment="Center">
                 <Button ToolTipService.ToolTip="Загрузки" Click="OnDownloadsClick"
-                        Background="Transparent" BorderThickness="0">
-    <Grid Background="{StaticResource VkBackgroundBrush}">
+                        Background="Transparent" BorderThickness="0" Padding="4">
+                    <Grid>
                         <FontIcon Glyph="&#xE896;" Foreground="{StaticResource VkTextSecondaryBrush}" />
                         <Border x:Name="TopBarDownloadBadge" Background="{StaticResource VkAccentBrush}" CornerRadius="8"
                                 HorizontalAlignment="Right" VerticalAlignment="Top"
@@ -55,25 +55,28 @@
                         </Border>
                     </Grid>
                 </Button>
-                <Button ToolTipService.ToolTip="Настройки" Click="OnSettingsClick"
-                        Background="Transparent" BorderThickness="0">
-                    <FontIcon Glyph="&#xE713;" Foreground="{StaticResource VkTextSecondaryBrush}" />
+                <Button ToolTipService.ToolTip="Уведомления"
+                        Background="Transparent" BorderThickness="0" Padding="4">
+                    <FontIcon Glyph="&#xE7E7;" Foreground="{StaticResource VkTextSecondaryBrush}" />
+                </Button>
+                <Button x:Name="UserAvatarButton" ToolTipService.ToolTip="Профиль"
+                        Background="Transparent" BorderThickness="0" Padding="0"
+                        Click="OnUserAvatarClick">
+                    <Ellipse Width="28" Height="28" HorizontalAlignment="Center">
+                        <Ellipse.Fill>
+                            <ImageBrush x:Name="UserAvatarBrush" Stretch="UniformToFill" />
+                        </Ellipse.Fill>
+                    </Ellipse>
                 </Button>
             </StackPanel>
         </Grid>
 
         <!-- Main Content -->
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
             <!-- Sidebar Navigation -->
-            <NavigationView x:Name="NavView" Grid.Column="0" Width="220"
+            <NavigationView x:Name="NavView"
                             PaneDisplayMode="Left" IsSettingsVisible="False"
                             IsBackButtonVisible="Collapsed"
-                            IsTitleBarAutoPaddingEnabled="False"
                             Background="{StaticResource VkSidebarBrush}"
                             SelectionChanged="OnNavSelectionChanged"
                             Loaded="OnNavViewLoaded"
@@ -115,24 +118,9 @@
                             <FontIcon Glyph="&#xE81C;" />
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
-                    <NavigationViewItem Tag="Downloads" Style="{StaticResource SidebarItemStyle}">
+                    <NavigationViewItem Content="Загрузки" Tag="Downloads" Style="{StaticResource SidebarItemStyle}">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE896;" />
-                        </NavigationViewItem.Icon>
-                        <NavigationViewItem.Content>
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="Загрузки" VerticalAlignment="Center" />
-                                <Border x:Name="DownloadBadge" Background="{StaticResource VkAccentBrush}"
-                                        CornerRadius="8" Padding="6,2" Visibility="Collapsed">
-                                    <TextBlock x:Name="DownloadBadgeCount" Text="0" FontSize="11"
-                                               Foreground="White" FontWeight="SemiBold" />
-                                </Border>
-                            </StackPanel>
-                        </NavigationViewItem.Content>
-                    </NavigationViewItem>
-                    <NavigationViewItem Content="Настройки" Tag="Settings" Style="{StaticResource SidebarItemStyle}">
-                        <NavigationViewItem.Icon>
-                            <FontIcon Glyph="&#xE713;" />
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
                 </NavigationView.MenuItems>
@@ -154,51 +142,79 @@
         </Grid>
 
         <!-- Mini Player Bar -->
-        <Grid x:Name="MiniPlayerBar" Grid.Row="2" Height="52" Padding="16,0"
+        <Grid x:Name="MiniPlayerBar" Grid.Row="2" Height="72" Padding="16,0"
               Background="{StaticResource VkSurfaceBrush}"
               BorderBrush="{StaticResource VkTopBarBorderBrush}"
               BorderThickness="0,1,0,0"
               Visibility="Collapsed">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-            <Border Grid.Column="0" Width="80" Height="46" CornerRadius="4"
-                    Margin="0,0,12,0">
-                <Image x:Name="MiniPlayerThumb"
-                       Stretch="UniformToFill" />
-            </Border>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <TextBlock x:Name="MiniPlayerTitle" Grid.Column="1"
-                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
-                       VerticalAlignment="Center" FontSize="13"
-                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                <Border Grid.Column="0" Width="100" Height="56" CornerRadius="4"
+                        Margin="0,0,12,0">
+                    <Image x:Name="MiniPlayerThumb" Stretch="UniformToFill" />
+                </Border>
 
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
-                        VerticalAlignment="Center">
-                <Button Click="OnMiniPlayerPlayClick" ToolTipService.ToolTip="Воспроизвести/Пауза"
-                        Background="Transparent" BorderThickness="0">
-                    <FontIcon Glyph="&#xE768;" FontSize="14" Foreground="{StaticResource VkTextPrimaryBrush}" />
-                </Button>
-                <Button Click="OnMiniPlayerPrevClick" ToolTipService.ToolTip="Предыдущее"
-                        Background="Transparent" BorderThickness="0">
-                    <FontIcon Glyph="&#xE892;" FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}" />
-                </Button>
-                <Button Click="OnMiniPlayerNextClick" ToolTipService.ToolTip="Следующее"
-                        Background="Transparent" BorderThickness="0">
-                    <FontIcon Glyph="&#xE893;" FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}" />
-                </Button>
-                <Button Click="OnMiniPlayerFullscreenClick" ToolTipService.ToolTip="Полный экран"
-                        Background="Transparent" BorderThickness="0">
-                    <FontIcon Glyph="&#xE740;" FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}" />
-                </Button>
-                <Button Click="OnMiniPlayerCloseClick" ToolTipService.ToolTip="Закрыть"
-                        Background="Transparent" BorderThickness="0">
-                    <FontIcon Glyph="&#xE8BB;" FontSize="14" Foreground="{StaticResource VkTextSecondaryBrush}" />
-                </Button>
-            </StackPanel>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,8,0,0">
+                    <TextBlock x:Name="MiniPlayerTitle" Text="Путешествие по России. Камчатка"
+                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                               FontSize="13" FontWeight="SemiBold"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" />
+                    <TextBlock x:Name="MiniPlayerChannel" Text="Вокруг света • 1.2 млн просмотров"
+                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                               FontSize="11" Foreground="{StaticResource VkTextSecondaryBrush}"
+                               Margin="0,2,0,0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
+                            VerticalAlignment="Center">
+                    <Button Click="OnMiniPlayerPrevClick" ToolTipService.ToolTip="Предыдущее"
+                            Background="Transparent" BorderThickness="0" Padding="8">
+                        <FontIcon Glyph="&#xE892;" FontSize="14" Foreground="{StaticResource VkTextPrimaryBrush}" />
+                    </Button>
+                    <Button Click="OnMiniPlayerPlayClick" ToolTipService.ToolTip="Воспроизвести/Пауза"
+                            Background="Transparent" BorderThickness="0" Padding="8">
+                        <FontIcon x:Name="MiniPlayerPlayIcon" Glyph="&#xE768;" FontSize="18"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}" />
+                    </Button>
+                    <Button Click="OnMiniPlayerNextClick" ToolTipService.ToolTip="Следующее"
+                            Background="Transparent" BorderThickness="0" Padding="8">
+                        <FontIcon Glyph="&#xE893;" FontSize="14" Foreground="{StaticResource VkTextPrimaryBrush}" />
+                    </Button>
+
+                    <TextBlock x:Name="MiniPlayerTime" Text="5:24 / 12:36"
+                               VerticalAlignment="Center" FontSize="11"
+                               Foreground="{StaticResource VkTextSecondaryBrush}" Margin="8,0" />
+
+                    <Button Click="OnMiniPlayerVolumeClick" ToolTipService.ToolTip="Громкость"
+                            Background="Transparent" BorderThickness="0" Padding="6">
+                        <FontIcon x:Name="MiniPlayerVolumeIcon" Glyph="&#xE767;" FontSize="14"
+                                  Foreground="{StaticResource VkTextSecondaryBrush}" />
+                    </Button>
+                    <Button Click="OnMiniPlayerFullscreenClick" ToolTipService.ToolTip="Полный экран"
+                            Background="Transparent" BorderThickness="0" Padding="6">
+                        <FontIcon Glyph="&#xE740;" FontSize="14"
+                                  Foreground="{StaticResource VkTextSecondaryBrush}" />
+                    </Button>
+                    <Button Click="OnMiniPlayerCloseClick" ToolTipService.ToolTip="Закрыть"
+                            Background="Transparent" BorderThickness="0" Padding="6">
+                        <FontIcon Glyph="&#xE8BB;" FontSize="14"
+                                  Foreground="{StaticResource VkTextSecondaryBrush}" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <ProgressBar Grid.Row="1" x:Name="MiniPlayerProgress"
+                         Style="{StaticResource MiniPlayerProgressStyle}" />
         </Grid>
 
         <!-- Error Banner -->
@@ -218,7 +234,7 @@
         </Grid>
 
         <!-- Downloads Panel -->
-        <Grid x:Name="DownloadsPanel" Grid.Row="1" Grid.ColumnSpan="2"
+        <Grid x:Name="DownloadsPanel" Grid.Row="1"
               HorizontalAlignment="Right" VerticalAlignment="Top"
               Width="360" Height="400" Margin="0,0,12,12"
               Background="{StaticResource VkSurfaceBrush}"

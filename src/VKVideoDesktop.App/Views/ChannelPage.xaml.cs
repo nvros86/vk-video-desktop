@@ -3,6 +3,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using VKVideoDesktop.App.ViewModels;
+using VKVideoDesktop.Application.Services;
+using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Core.Interfaces;
 
 namespace VKVideoDesktop.App.Views;
@@ -10,15 +12,21 @@ namespace VKVideoDesktop.App.Views;
 public sealed partial class ChannelPage : Page
 {
     private readonly IVideoProvider _videoProvider;
+    private readonly ILogger<ChannelPage> _logger;
+    private readonly LocalizationService _localization;
 
     public ChannelPage()
     {
+        _logger = App.GetService<ILogger<ChannelPage>>();
+        _logger.LogInformation("[ChannelPage] Constructor");
         InitializeComponent();
         _videoProvider = App.GetService<IVideoProvider>();
+        _localization = App.GetService<LocalizationService>();
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        _logger.LogInformation("[ChannelPage] OnNavigatedTo");
         base.OnNavigatedTo(e);
 
         if (e.Parameter is string channelId)
@@ -27,9 +35,8 @@ public sealed partial class ChannelPage : Page
             if (channel != null)
             {
                 ChannelNameText.Text = channel.Name;
-                ChannelUsernameText.Text = $"@{channel.Username}";
                 DescriptionText.Text = channel.Description;
-                SubscriberCountText.Text = $"{channel.SubscriberCount:N0} подписчиков";
+                SubscriberCountText.Text = string.Format(_localization["ChannelSubscriberCount"], channel.SubscriberCount.ToString("N0"));
 
                 if (!string.IsNullOrEmpty(channel.AvatarUrl))
                 {

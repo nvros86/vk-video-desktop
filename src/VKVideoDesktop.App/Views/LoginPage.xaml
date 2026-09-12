@@ -7,36 +7,36 @@
 
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="500">
         <StackPanel Spacing="24" Margin="24">
-            <TextBlock Text="Вход в VK Video" Style="{StaticResource TitleTextBlockStyle}"
+            <TextBlock x:Uid="LoginTitle" Style="{StaticResource TitleTextBlockStyle}"
                        Foreground="{StaticResource VkTextPrimaryBrush}"
                        HorizontalAlignment="Center" />
 
             <TextBlock x:Name="Step1Text"
-                       Text="1. Нажмите кнопку ниже, чтобы открыть страницу авторизации VK"
+                       x:Uid="LoginStep1"
                        TextWrapping="Wrap" HorizontalAlignment="Center"
                        Foreground="{StaticResource VkTextSecondaryBrush}" />
 
-            <Button x:Name="LoginButton" Content="Войти через VK" HorizontalAlignment="Center"
+            <Button x:Name="LoginButton" x:Uid="LoginButton" HorizontalAlignment="Center"
                     Style="{StaticResource AccentButtonStyle}" Click="OnLoginClick"
                     Padding="32,12" />
 
             <TextBlock x:Name="Step2Text"
-                       Text="2. После авторизации скопируйте URL из адресной строки браузера и вставьте его сюда"
+                       x:Uid="LoginStep2"
                        TextWrapping="Wrap" HorizontalAlignment="Center"
                        Foreground="{StaticResource VkTextSecondaryBrush}"
                        Visibility="Collapsed" />
 
-            <TextBox x:Name="TokenInput" PlaceholderText="Вставьте URL или токен сюда..."
+            <TextBox x:Name="TokenInput" x:Uid="LoginInputPlaceholder"
                      Visibility="Collapsed" />
 
-            <Button x:Name="SubmitTokenButton" Content="Войти" HorizontalAlignment="Center"
+            <Button x:Name="SubmitTokenButton" x:Uid="LoginSubmit" HorizontalAlignment="Center"
                     Style="{StaticResource AccentButtonStyle}" Click="OnSubmitTokenClick"
                     Padding="32,12" Visibility="Collapsed" />
 
             <TextBlock x:Name="ErrorText" Text="" Foreground="Red"
                        HorizontalAlignment="Center" Visibility="Collapsed" />
 
-            <TextBlock x:Name="LoadingText" Text="Проверка токена..."
+            <TextBlock x:Name="LoadingText" x:Uid="LoginChecking"
                        HorizontalAlignment="Center"
                        Foreground="{StaticResource VkTextTertiaryBrush}"
                        Visibility="Collapsed" />

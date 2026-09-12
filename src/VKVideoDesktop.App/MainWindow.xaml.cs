@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -16,10 +17,17 @@ public sealed partial class MainWindow : Window
 {
     public static MainWindow? Instance { get; private set; }
 
+    private readonly ILogger<MainWindow> _logger;
     private bool _isDownloadsPanelOpen;
     private MiniPlayerWindow? _miniPlayerWindow;
     private IAuthenticationService? _authService;
     private PlaybackService? _playbackService;
+
+    public MainWindow(ILogger<MainWindow> logger)
+    {
+        _logger = logger;
+        Instance = this;
+    }
 
     internal void InitServices()
     {
@@ -41,24 +49,7 @@ public sealed partial class MainWindow : Window
         ["Settings"] = typeof(SettingsPage)
     };
 
-    private static void MwLog(string msg)
-    {
-        try
-        {
-            var dir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "VKVideoDesktop", "log");
-            Directory.CreateDirectory(dir);
-            File.AppendAllText(Path.Combine(dir, "debug.log"),
-                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [MainWindow] {msg}\n");
-        }
-        catch { }
-    }
 
-    public MainWindow()
-    {
-        Instance = this;
-    }
 
     internal void SetupUI()
     {
@@ -66,13 +57,21 @@ public sealed partial class MainWindow : Window
         Title = "VK Video Desktop";
         ExtendsContentIntoTitleBar = false;
 
-        var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(
-            Microsoft.UI.Win32Interop.GetWindowIdFromWindow((IntPtr)WinRT.Interop.WindowNative.GetWindowHandle(this)));
-        appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 1400, Height = 900 });
-        var presenter = (Microsoft.UI.Windowing.OverlappedPresenter)appWindow.Presenter;
-        presenter.IsMinimizable = true;
-        presenter.IsMaximizable = true;
-        presenter.IsResizable = true;
+        try
+        {
+            var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(
+                Microsoft.UI.Win32Interop.GetWindowIdFromWindow((IntPtr)WinRT.Interop.WindowNative.GetWindowHandle(this)));
+            appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 1400, Height = 900 });
+            var presenter = (Microsoft.UI.Windowing.OverlappedPresenter)appWindow.Presenter;
+            presenter.IsMinimizable = true;
+            presenter.IsMaximizable = true;
+            presenter.IsResizable = true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "SetupUI AppWindow failed: {ErrorType}: {ErrorMessage}", ex.GetType().Name, ex.Message);
+        }
+
         ContentFrame.Navigated += OnFrameNavigated;
         ContentFrame.KeyDown += OnGlobalKeyDown;
     }
@@ -170,7 +169,25 @@ public sealed partial class MainWindow : Window
 
     private void OnNavViewLoaded(object sender, RoutedEventArgs e)
     {
-        NavView.SelectedItem = NavView.MenuItems[0];
+        try
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                try
+                {
+                    _logger.LogInformation("[MainWindow] OnNavViewLoaded - setting initial selection");
+                    NavView.SelectedItem = NavView.MenuItems[0];
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "[MainWindow] OnNavViewLoaded - failed to set selection");
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[MainWindow] OnNavViewLoaded failed");
+        }
     }
 
     private void OnNavSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -181,7 +198,17 @@ public sealed partial class MainWindow : Window
             {
                 if (ContentFrame.CurrentSourcePageType != pageType)
                 {
-                    ContentFrame.Navigate(pageType);
+                    _logger.LogInformation("Navigate: {From} -> {To}", ContentFrame.CurrentSourcePageType?.Name ?? "None", tag);
+                    try
+                    {
+                        ContentFrame.Navigate(pageType);
+                        _logger.LogInformation("Navigate OK to {Tag}", tag);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Navigate FAILED to {Tag}", tag);
+                        _logger.LogCritical(ex, "Crash: Navigation_{Tag}", tag);
+                    }
                 }
             }
         }
@@ -239,12 +266,12 @@ public sealed partial class MainWindow : Window
 
     private void OnMiniPlayerPlayClick(object sender, RoutedEventArgs e)
     {
-        _playbackService.TogglePlayPause();
+        _playbackService?.TogglePlayPause();
     }
 
     private void OnMiniPlayerPrevClick(object sender, RoutedEventArgs e)
     {
-        var prevId = _playbackService.GetPreviousVideoId();
+        var prevId = _playbackService?.GetPreviousVideoId();
         if (prevId != null)
         {
             ContentFrame.Navigate(typeof(VideoPage), prevId);
@@ -253,7 +280,7 @@ public sealed partial class MainWindow : Window
 
     private void OnMiniPlayerNextClick(object sender, RoutedEventArgs e)
     {
-        var nextId = _playbackService.GetNextVideoId();
+        var nextId = _playbackService?.GetNextVideoId();
         if (nextId != null)
         {
             ContentFrame.Navigate(typeof(VideoPage), nextId);
@@ -268,7 +295,7 @@ public sealed partial class MainWindow : Window
         }
         else
         {
-            ContentFrame.Navigate(typeof(VideoPage), _playbackService.State.CurrentVideoId);
+            ContentFrame.Navigate(typeof(VideoPage), _playbackService?.State.CurrentVideoId);
         }
     }
 
@@ -278,12 +305,25 @@ public sealed partial class MainWindow : Window
         {
             _miniPlayerWindow = new MiniPlayerWindow();
             _miniPlayerWindow.Closed += (_, _) => _miniPlayerWindow = null;
-            _miniPlayerWindow.UpdateTitle(_playbackService.State.CurrentVideoId ?? "VK Video");
+            _miniPlayerWindow.UpdateTitle(_playbackService?.State.CurrentVideoId ?? "VK Video");
             _miniPlayerWindow.Activate();
         }
         else
         {
             _miniPlayerWindow.Activate();
+        }
+    }
+
+    private void OnUserAvatarClick(object sender, RoutedEventArgs e)
+    {
+        ContentFrame.Navigate(typeof(ProfilePage));
+    }
+
+    private void OnMiniPlayerVolumeClick(object sender, RoutedEventArgs e)
+    {
+        if (_playbackService?.State != null)
+        {
+            _playbackService.State.IsMuted = !_playbackService.State.IsMuted;
         }
     }
 
@@ -340,20 +380,24 @@ public sealed partial class MainWindow : Window
     {
         DispatcherQueue.TryEnqueue(() =>
         {
-            ContentFrame.Navigate(typeof(HomePage));
+            try
+            {
+                ContentFrame.Navigate(typeof(HomePage));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[MainWindow] NavigateToHome failed: {ErrorType}: {ErrorMessage}", ex.GetType().Name, ex.Message);
+            }
         });
     }
 
-    internal async Task HandleDeepLinkAsync(DeepLinkResult result)
+    internal Task HandleDeepLinkAsync(DeepLinkResult result)
     {
         switch (result.Type)
         {
             case DeepLinkType.Video:
                 if (string.IsNullOrEmpty(result.VideoId)) break;
-                var videoService = App.Services.GetRequiredService<VideoService>();
-                var video = await videoService.GetVideoAsync(result.VideoId);
-                if (video != null)
-                    ContentFrame.Navigate(typeof(VideoPage), video);
+                ContentFrame.Navigate(typeof(VideoPage), result.VideoId);
                 break;
 
             case DeepLinkType.Search:
@@ -366,5 +410,6 @@ public sealed partial class MainWindow : Window
                 ContentFrame.Navigate(typeof(ChannelPage), result.ChannelId);
                 break;
         }
+        return Task.CompletedTask;
     }
 }

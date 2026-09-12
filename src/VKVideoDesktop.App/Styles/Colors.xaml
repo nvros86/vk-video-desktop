@@ -3,38 +3,39 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Main Background -->
-    <SolidColorBrush x:Key="VkBackgroundBrush" Color="#FF0A1628"/>
-    <SolidColorBrush x:Key="VkSurfaceBrush" Color="#FF0F1F35"/>
-    <SolidColorBrush x:Key="VkCardBrush" Color="#FF142240"/>
-    <SolidColorBrush x:Key="VkCardHoverBrush" Color="#FF1A2D52"/>
+    <SolidColorBrush x:Key="VkBackgroundBrush" Color="#FF080E1C"/>
+    <SolidColorBrush x:Key="VkSurfaceBrush" Color="#FF0D1B30"/>
+    <SolidColorBrush x:Key="VkCardBrush" Color="#FF122240"/>
+    <SolidColorBrush x:Key="VkCardHoverBrush" Color="#FF182E52"/>
     <SolidColorBrush x:Key="VkCardBorderBrush" Color="#FF1E3A5F"/>
 
     <!-- Sidebar -->
-    <SolidColorBrush x:Key="VkSidebarBrush" Color="#FF080E1C"/>
-    <SolidColorBrush x:Key="VkSidebarItemHoverBrush" Color="#FF142240"/>
+    <SolidColorBrush x:Key="VkSidebarBrush" Color="#FF060C18"/>
+    <SolidColorBrush x:Key="VkSidebarItemHoverBrush" Color="#FF122240"/>
     <SolidColorBrush x:Key="VkSidebarItemSelectedBrush" Color="#FF1A3366"/>
 
     <!-- Top Bar -->
-    <SolidColorBrush x:Key="VkTopBarBrush" Color="#FF0D1B30"/>
-    <SolidColorBrush x:Key="VkTopBarBorderBrush" Color="#FF1A2D52"/>
+    <SolidColorBrush x:Key="VkTopBarBrush" Color="#FF0A1428"/>
+    <SolidColorBrush x:Key="VkTopBarBorderBrush" Color="#FF182D52"/>
 
     <!-- Accent -->
-    <SolidColorBrush x:Key="VkAccentBrush" Color="#FF2688EB"/>
-    <SolidColorBrush x:Key="VkAccentHoverBrush" Color="#FF4DA3FF"/>
-    <SolidColorBrush x:Key="VkAccentDarkBrush" Color="#FF1A6BC4"/>
+    <SolidColorBrush x:Key="VkAccentBrush" Color="#FF2979FF"/>
+    <SolidColorBrush x:Key="VkAccentHoverBrush" Color="#FF448AFF"/>
+    <SolidColorBrush x:Key="VkAccentDarkBrush" Color="#FF1565C0"/>
+    <SolidColorBrush x:Key="VkAccentGlowBrush" Color="#332979FF"/>
 
     <!-- Text -->
     <SolidColorBrush x:Key="VkTextPrimaryBrush" Color="#FFFFFFFF"/>
-    <SolidColorBrush x:Key="VkTextSecondaryBrush" Color="#FF8899B3"/>
-    <SolidColorBrush x:Key="VkTextTertiaryBrush" Color="#FF556680"/>
+    <SolidColorBrush x:Key="VkTextSecondaryBrush" Color="#FF7B8FA8"/>
+    <SolidColorBrush x:Key="VkTextTertiaryBrush" Color="#FF4A5C73"/>
 
     <!-- Overlay / Badge -->
     <SolidColorBrush x:Key="VkOverlayBrush" Color="#99000000"/>
-    <SolidColorBrush x:Key="VkBadgeBackgroundBrush" Color="#FF2688EB"/>
+    <SolidColorBrush x:Key="VkBadgeBackgroundBrush" Color="#FF2979FF"/>
 
     <!-- Player -->
-    <SolidColorBrush x:Key="VkPlayerBackgroundBrush" Color="#FF050A12"/>
-    <SolidColorBrush x:Key="VkPlayerControlsBrush" Color="#CC050A12"/>
+    <SolidColorBrush x:Key="VkPlayerBackgroundBrush" Color="#FF040810"/>
+    <SolidColorBrush x:Key="VkPlayerControlsBrush" Color="#CC040810"/>
 
     <!-- Status -->
     <SolidColorBrush x:Key="VkSuccessBrush" Color="#FF2ECC71"/>
@@ -45,7 +46,15 @@
     <SolidColorBrush x:Key="VkSeparatorBrush" Color="#1A1E3A5F"/>
 
     <!-- Progress Bar -->
-    <SolidColorBrush x:Key="VkProgressBrush" Color="#FF2688EB"/>
-    <SolidColorBrush x:Key="VkProgressTrackBrush" Color="#FF142240"/>
+    <SolidColorBrush x:Key="VkProgressBrush" Color="#FF2979FF"/>
+    <SolidColorBrush x:Key="VkProgressTrackBrush" Color="#FF122240"/>
+
+    <!-- Playlist Icons -->
+    <SolidColorBrush x:Key="VkPlaylistRedBrush" Color="#FFE53935"/>
+    <SolidColorBrush x:Key="VkPlaylistGreenBrush" Color="#FF4CAF50"/>
+    <SolidColorBrush x:Key="VkPlaylistBlueBrush" Color="#FF2196F3"/>
+    <SolidColorBrush x:Key="VkPlaylistPurpleBrush" Color="#FF9C27B0"/>
+    <SolidColorBrush x:Key="VkPlaylistOrangeBrush" Color="#FFFF9800"/>
+    <SolidColorBrush x:Key="VkPlaylistTealBrush" Color="#FF00BCD4"/>
 
 </ResourceDictionary>

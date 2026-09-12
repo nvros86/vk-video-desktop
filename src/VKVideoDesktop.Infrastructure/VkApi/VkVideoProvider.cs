@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Interfaces;
+using VKVideoDesktop.Core.Metrics;
 using VKVideoDesktop.Core.Models;
 
 namespace VKVideoDesktop.Infrastructure.VkApi;
@@ -11,18 +13,22 @@ public sealed class VkVideoProvider : IVideoProvider
     private readonly HttpClient _httpClient;
     private readonly ISettingsService _settingsService;
     private readonly ILogger<VkVideoProvider> _logger;
-    private const string BaseUrl = "https://api.vk.com/method";
+    private readonly AppMetrics _metrics;
+    private const string BaseUrl = "https://api.vk.com";
 
-    public VkVideoProvider(HttpClient httpClient, ISettingsService settingsService, ILogger<VkVideoProvider> logger)
+    public VkVideoProvider(HttpClient httpClient, ISettingsService settingsService, ILogger<VkVideoProvider> logger, AppMetrics metrics)
     {
         _httpClient = httpClient;
         _settingsService = settingsService;
         _logger = logger;
+        _metrics = metrics;
     }
 
     private string BuildUrl(string method, Dictionary<string, string> parameters)
     {
-        parameters["access_token"] = _settingsService.Settings.AccessToken ?? string.Empty;
+        var token = _settingsService.Settings.AccessToken;
+        if (!string.IsNullOrEmpty(token))
+            parameters["access_token"] = token;
         parameters["v"] = "5.199";
         var queryString = string.Join("&", parameters.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
         return $"{BaseUrl}/method/{method}?{queryString}";
@@ -35,6 +41,8 @@ public sealed class VkVideoProvider : IVideoProvider
         CancellationToken cancellationToken,
         int offset = 0)
     {
+        var sw = Stopwatch.StartNew();
+        var success = true;
         try
         {
             _logger.LogDebug("Searching VK for '{Query}' offset {Offset}", query, offset);
@@ -58,15 +66,44 @@ public sealed class VkVideoProvider : IVideoProvider
 
             return response.Response.Items.Select(MapVideo).ToList();
         }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            success = false;
+            _logger.LogError(ex, "Auth error in search for '{Query}'", query);
+            return Array.Empty<Video>();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            success = false;
+            _logger.LogWarning(ex, "Rate limited in search for '{Query}'", query);
+            return Array.Empty<Video>();
+        }
+        catch (HttpRequestException ex)
+        {
+            success = false;
+            _logger.LogError(ex, "HTTP error in search for '{Query}'", query);
+            return Array.Empty<Video>();
+        }
         catch (Exception ex)
         {
+            success = false;
             _logger.LogError(ex, "Failed to search VK videos for '{Query}'", query);
             return Array.Empty<Video>();
+        }
+        finally
+        {
+            _metrics.TrackApiCall("video.search", sw.Elapsed, success);
         }
     }
 
     public async Task<Video?> GetVideoAsync(string videoId, CancellationToken cancellationToken)
     {
+        var sw = Stopwatch.StartNew();
+        var success = true;
         try
         {
             var url = BuildUrl("video.get", new Dictionary<string, string>
@@ -77,15 +114,44 @@ public sealed class VkVideoProvider : IVideoProvider
 
             return response?.Response?.Items?.FirstOrDefault()?.MapToVideo();
         }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            success = false;
+            _logger.LogError(ex, "Auth error getting video {VideoId}", videoId);
+            return null;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            success = false;
+            _logger.LogWarning(ex, "Rate limited getting video {VideoId}", videoId);
+            return null;
+        }
+        catch (HttpRequestException ex)
+        {
+            success = false;
+            _logger.LogError(ex, "HTTP error getting video {VideoId}", videoId);
+            return null;
+        }
         catch (Exception ex)
         {
+            success = false;
             _logger.LogError(ex, "Failed to get video {VideoId}", videoId);
             return null;
+        }
+        finally
+        {
+            _metrics.TrackApiCall("video.get", sw.Elapsed, success);
         }
     }
 
     public async Task<Channel?> GetChannelAsync(string channelId, CancellationToken cancellationToken)
     {
+        var sw = Stopwatch.StartNew();
+        var success = true;
         try
         {
             var url = BuildUrl("users.get", new Dictionary<string, string>
@@ -109,10 +175,37 @@ public sealed class VkVideoProvider : IVideoProvider
                 SubscriberCount = user.SubscriptionsCount ?? 0
             };
         }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            success = false;
+            _logger.LogError(ex, "Auth error getting channel {ChannelId}", channelId);
+            return null;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            success = false;
+            _logger.LogWarning(ex, "Rate limited getting channel {ChannelId}", channelId);
+            return null;
+        }
+        catch (HttpRequestException ex)
+        {
+            success = false;
+            _logger.LogError(ex, "HTTP error getting channel {ChannelId}", channelId);
+            return null;
+        }
         catch (Exception ex)
         {
+            success = false;
             _logger.LogError(ex, "Failed to get channel {ChannelId}", channelId);
             return null;
+        }
+        finally
+        {
+            _metrics.TrackApiCall("users.get", sw.Elapsed, success);
         }
     }
 
@@ -123,21 +216,93 @@ public sealed class VkVideoProvider : IVideoProvider
 
     public async Task<IReadOnlyList<Video>> GetPopularAsync(CancellationToken cancellationToken)
     {
+        var sw = Stopwatch.StartNew();
+        var success = true;
         try
         {
-            var url = BuildUrl("video.get", new Dictionary<string, string>
-            {
-                ["count"] = "20"
-            });
-            var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
+            var hasToken = !string.IsNullOrEmpty(_settingsService.Settings.AccessToken);
+            _logger.LogInformation("VK API: popular request (token={Token})", hasToken);
 
-            IReadOnlyList<Video> result = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
+            IReadOnlyList<Video> result;
+
+            if (hasToken)
+            {
+                _logger.LogInformation("VK API video.get: fetching user videos");
+                var url = BuildUrl("video.get", new Dictionary<string, string>
+                {
+                    ["count"] = "20"
+                });
+                var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
+                result = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
+            }
+            else
+            {
+                var allVideos = new List<Video>();
+                var communityIds = new[] { "-22441471", "-1", "-163004656" };
+
+                foreach (var ownerId in communityIds)
+                {
+                    try
+                    {
+                        _logger.LogInformation("VK API video.get: fetching from community {OwnerId}", ownerId);
+                        var url = BuildUrl("video.get", new Dictionary<string, string>
+                        {
+                            ["owner_id"] = ownerId,
+                            ["count"] = "10"
+                        });
+                        var response = await _httpClient.GetFromJsonAsync<VkResponse<VkVideoSearchResult>>(url, cancellationToken);
+                        var videos = response?.Response?.Items?.Select(MapVideo)?.ToList();
+                        if (videos != null && videos.Count > 0)
+                        {
+                            allVideos.AddRange(videos);
+                            _logger.LogInformation("VK API video.get: community {OwnerId} returned {Count} videos", ownerId, videos.Count);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VK API video.get: community {OwnerId} failed", ownerId);
+                    }
+
+                    if (allVideos.Count >= 20) break;
+                }
+
+                result = allVideos.Take(20).ToList();
+            }
+
+            _logger.LogInformation("VK API: popular returned {Count} videos", result.Count);
             return result;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            success = false;
+            _logger.LogError(ex, "Auth error getting popular videos");
+            return Array.Empty<Video>();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            success = false;
+            _logger.LogWarning(ex, "Rate limited getting popular videos");
+            return Array.Empty<Video>();
+        }
+        catch (HttpRequestException ex)
+        {
+            success = false;
+            _logger.LogError(ex, "HTTP error getting popular videos: {Status}", ex.StatusCode);
+            return Array.Empty<Video>();
         }
         catch (Exception ex)
         {
+            success = false;
             _logger.LogError(ex, "Failed to get popular videos");
             return Array.Empty<Video>();
+        }
+        finally
+        {
+            _metrics.TrackApiCall("video.get", sw.Elapsed, success);
         }
     }
 
@@ -145,6 +310,8 @@ public sealed class VkVideoProvider : IVideoProvider
         string channelId,
         CancellationToken cancellationToken)
     {
+        var sw = Stopwatch.StartNew();
+        var success = true;
         try
         {
             var url = BuildUrl("video.get", new Dictionary<string, string>
@@ -157,10 +324,37 @@ public sealed class VkVideoProvider : IVideoProvider
             IReadOnlyList<Video> result2 = response?.Response?.Items?.Select(MapVideo)?.ToList() ?? new List<Video>();
             return result2;
         }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            success = false;
+            _logger.LogError(ex, "Auth error getting videos for channel {ChannelId}", channelId);
+            return Array.Empty<Video>();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            success = false;
+            _logger.LogWarning(ex, "Rate limited getting videos for channel {ChannelId}", channelId);
+            return Array.Empty<Video>();
+        }
+        catch (HttpRequestException ex)
+        {
+            success = false;
+            _logger.LogError(ex, "HTTP error getting videos for channel {ChannelId}", channelId);
+            return Array.Empty<Video>();
+        }
         catch (Exception ex)
         {
+            success = false;
             _logger.LogError(ex, "Failed to get videos for channel {ChannelId}", channelId);
             return Array.Empty<Video>();
+        }
+        finally
+        {
+            _metrics.TrackApiCall("video.get", sw.Elapsed, success);
         }
     }
 

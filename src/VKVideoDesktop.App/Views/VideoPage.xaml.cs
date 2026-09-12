@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using VKVideoDesktop.App.ViewModels;
+using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Models;
 
@@ -12,6 +13,8 @@ public sealed partial class VideoPage : Page
 {
     public VideoViewModel ViewModel { get; }
     private readonly PlaybackService _playbackService;
+    private readonly ILogger<VideoPage> _logger;
+    private readonly LocalizationService _localization;
     private Windows.Media.Playback.MediaPlayer? _mediaPlayer;
     private bool _isPip;
     private Dictionary<string, string> _availableQualities = new();
@@ -22,9 +25,13 @@ public sealed partial class VideoPage : Page
 
     public VideoPage()
     {
+        _logger = App.GetService<ILogger<VideoPage>>();
+        _logger.LogInformation("[VideoPage] Constructor");
         InitializeComponent();
         ViewModel = App.GetService<VideoViewModel>();
+        DataContext = ViewModel;
         _playbackService = App.GetService<PlaybackService>();
+        _localization = App.GetService<LocalizationService>();
         _playbackService.PlaybackCompleted += OnPlaybackCompleted;
     }
 
@@ -85,6 +92,7 @@ public sealed partial class VideoPage : Page
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        _logger.LogInformation("[VideoPage] OnNavigatedTo");
         base.OnNavigatedTo(e);
 
         if (e.Parameter is string videoId)
@@ -145,8 +153,10 @@ public sealed partial class VideoPage : Page
             queueIds.AddRange(ViewModel.RelatedVideos.Select(v => v.Id).Where(id => id != ViewModel.CurrentVideo.Id));
             _playbackService.SetQueue(queueIds, 0);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "[VideoPage] StartPlayback failed");
+            NavigateToWebViewFallback();
         }
     }
 
@@ -313,8 +323,8 @@ public sealed partial class VideoPage : Page
 
         var dialog = new ContentDialog
         {
-            Title = "Качество видео",
-            CloseButtonText = "Закрыть",
+            Title = _localization["VideoQualityTitle"],
+            CloseButtonText = _localization["CommonClose"],
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = XamlRoot
         };
@@ -408,9 +418,9 @@ public sealed partial class VideoPage : Page
     {
         var dialog = new ContentDialog
         {
-            Title = "Скачать видео",
-            PrimaryButtonText = "Скачать",
-            CloseButtonText = "Отмена",
+            Title = _localization["VideoDownloadTitle"],
+            PrimaryButtonText = _localization["Download"],
+            CloseButtonText = _localization["Cancel"],
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = XamlRoot
         };

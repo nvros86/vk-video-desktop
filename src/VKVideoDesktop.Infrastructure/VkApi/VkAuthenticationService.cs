@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Core.Interfaces;
 
+
 namespace VKVideoDesktop.Infrastructure.VkApi;
 
 public sealed class VkAuthenticationService : IAuthenticationService
@@ -29,25 +30,28 @@ public sealed class VkAuthenticationService : IAuthenticationService
         try
         {
             if (string.IsNullOrWhiteSpace(token))
+            {
+                _logger.LogWarning("[AuthService] LoginAsync - empty token");
                 return false;
+            }
 
             _settingsService.Settings.AccessToken = token.Trim();
             _settingsService.Settings.IsAuthorized = true;
             await _settingsService.SaveAsync();
 
-            _logger.LogInformation("User authenticated successfully");
+            _logger.LogInformation("[AuthService] LoginAsync - success");
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to authenticate");
+            _logger.LogError(ex, "[AuthService] LoginAsync failed");
             return false;
         }
     }
 
     Task<bool> IAuthenticationService.LoginAsync(CancellationToken cancellationToken)
     {
-        return Task.FromResult(false);
+        return Task.FromResult(IsAuthenticated);
     }
 
     public async Task LogoutAsync()

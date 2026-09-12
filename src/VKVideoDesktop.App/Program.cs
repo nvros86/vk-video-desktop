@@ -2,9 +2,12 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Serilog;
 
 namespace VKVideoDesktop.App;
 
@@ -16,57 +19,66 @@ static class Program
     [STAThread]
     static void Main(string[] args)
     {
-        WriteDebugLog("Main() entered");
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.File(
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "VKVideoDesktop", "Logs", $"log-{DateTime.Now:yyyyMMdd}.txt"),
+                rollingInterval: RollingInterval.Day,
+                retainedFileCountLimit: 7,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+            .CreateLogger();
+
+        Log.Information("Main() entered");
         try
         {
-            WriteDebugLog("Calling InitializeComWrappers...");
+            Log.Information("Calling InitializeComWrappers...");
             try
             {
                 WinRT.ComWrappersSupport.InitializeComWrappers();
-                WriteDebugLog("InitializeComWrappers done");
+                Log.Information("InitializeComWrappers done");
             }
             catch (Exception ex)
             {
-                WriteDebugLog($"InitializeComWrappers FAILED (continuing): {ex.GetType().Name}: {ex.Message}");
+                Log.Warning("InitializeComWrappers FAILED (continuing): {ExType}: {ExMessage}", ex.GetType().Name, ex.Message);
             }
-            WriteDebugLog("starting Application...");
+            Log.Information("Starting Application...");
 
             Microsoft.UI.Xaml.Application.Start((p) =>
             {
-                WriteDebugLog("Application.Start callback");
+                Log.Information("Application.Start callback");
                 var context = new DispatcherQueueSynchronizationContext(
                     DispatcherQueue.GetForCurrentThread());
                 SynchronizationContext.SetSynchronizationContext(context);
 
-                WriteDebugLog("Creating App and building DI...");
+                Log.Information("Creating App and building DI...");
                 var app = new App();
-                WriteDebugLog("DI ready, creating window synchronously...");
+                Log.Information("DI ready, creating window synchronously...");
 
                 MainWindow? window = null;
                 bool windowOk = false;
 
                 try
                 {
-                    WriteDebugLog("Step 1: new MainWindow()...");
-                    window = new MainWindow();
-                    WriteDebugLog("Step 1 OK");
+                    Log.Information("Step 1: new MainWindow()...");
+                    window = App.Services.GetRequiredService<MainWindow>();
+                    Log.Information("Step 1 OK");
                 }
                 catch (Exception ex)
                 {
-                    WriteDebugLog($"Step 1 FAILED (managed): {ex.GetType().Name}: {ex.Message}");
+                    Log.Error(ex, "Step 1 FAILED (managed): {ExType}: {ExMessage}", ex.GetType().Name, ex.Message);
                 }
 
                 if (window == null)
                 {
-                    WriteDebugLog("MainWindow failed, trying plain Window...");
+                    Log.Warning("MainWindow failed, trying second attempt...");
                     try
                     {
-                        window = new MainWindow();
-                        WriteDebugLog("Second MainWindow attempt OK");
+                        window = App.Services.GetRequiredService<MainWindow>();
+                        Log.Information("Second MainWindow attempt OK");
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        WriteDebugLog("Both MainWindow attempts failed, creating plain Window");
+                        Log.Error(ex, "Both MainWindow attempts failed");
                     }
                 }
 
@@ -74,28 +86,28 @@ static class Program
                 {
                     try
                     {
-                        WriteDebugLog("Step 2: SetupUI...");
+                        Log.Information("Step 2: SetupUI...");
                         window.SetupUI();
-                        WriteDebugLog("Step 2 OK");
+                        Log.Information("Step 2 OK");
 
-                        WriteDebugLog("Step 3: Title...");
+                        Log.Information("Step 3: Title...");
                         window.Title = "VK Video Desktop";
-                        WriteDebugLog("Step 3 OK");
+                        Log.Information("Step 3 OK");
 
-                        WriteDebugLog("Step 4: Activate...");
+                        Log.Information("Step 4: Activate...");
                         window.Activate();
-                        WriteDebugLog("Step 4 OK - MainWindow activated!");
+                        Log.Information("Step 4 OK - MainWindow activated!");
                         windowOk = true;
                     }
                     catch (Exception ex)
                     {
-                        WriteDebugLog($"Setup/Activate FAILED: {ex.GetType().Name}: {ex.Message}");
+                        Log.Error(ex, "Setup/Activate FAILED: {ExType}: {ExMessage}", ex.GetType().Name, ex.Message);
                     }
                 }
 
                 if (!windowOk)
                 {
-                    WriteDebugLog("All window attempts failed. Creating minimal Window...");
+                    Log.Warning("All window attempts failed. Creating minimal Window...");
                     try
                     {
                         var w = new Microsoft.UI.Xaml.Window();
@@ -107,24 +119,24 @@ static class Program
                             VerticalAlignment = VerticalAlignment.Center
                         };
                         w.Activate();
-                        WriteDebugLog("Minimal Window activated!");
+                        Log.Information("Minimal Window activated!");
                     }
                     catch (Exception ex)
                     {
-                        WriteDebugLog($"Minimal Window FAILED: {ex.GetType().Name}: {ex.Message}");
+                        Log.Error(ex, "Minimal Window FAILED: {ExType}: {ExMessage}", ex.GetType().Name, ex.Message);
                     }
                 }
 
-                WriteDebugLog("Starting async host + settings...");
-                if (window != null)
+                Log.Information("Starting async host + settings...");
+                if (windowOk && window != null)
                     _ = app.StartupAsync(window);
-                WriteDebugLog("Application.Start callback done");
+                Log.Information("Application.Start callback done");
             });
         }
         catch (Exception ex)
         {
-            WriteDebugLog($"Exception: {ex.GetType().Name}: {ex.Message}");
-            WriteStartupCrashLog(ex);
+            Log.Fatal(ex, "Exception in Main: {ExType}: {ExMessage}", ex.GetType().Name, ex.Message);
+            Log.Fatal(ex, "Crash: {CrashType}", "Startup");
 
             var isRuntimeMissing = ex is DllNotFoundException
                 || (ex.InnerException is DllNotFoundException)
@@ -134,6 +146,7 @@ static class Program
 
             if (isRuntimeMissing)
             {
+                Log.Fatal("Windows App Runtime is missing or corrupted");
                 MessageBox(IntPtr.Zero,
                     "Windows App Runtime не установлен или повреждён.\n\n" +
                     "VK Video Desktop требует Windows App Runtime 1.7.\n\n" +
@@ -153,61 +166,6 @@ static class Program
             {
                 throw;
             }
-        }
-    }
-
-    private static void WriteDebugLog(string message)
-    {
-        try
-        {
-            var path = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "VKVideoDesktop", "log", "debug.log");
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            File.AppendAllText(path, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}{Environment.NewLine}");
-        }
-        catch { }
-    }
-
-    private static void WriteStartupCrashLog(Exception ex)
-    {
-        try
-        {
-            var logDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "VKVideoDesktop", "log");
-            Directory.CreateDirectory(logDir);
-
-            var crashPath = Path.Combine(logDir, $"startup-crash-{DateTime.Now:yyyy-MM-dd_HHmmss}.log");
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine("=== VK Video Desktop Startup Crash ===");
-            sb.AppendLine($"Дата: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-            sb.AppendLine($"Версия ОС: {Environment.OSVersion}");
-            sb.AppendLine($"64-bit: {Environment.Is64BitOperatingSystem}");
-            sb.AppendLine($"CLR: {Environment.Version}");
-            sb.AppendLine($"Пользователь: {Environment.UserName}");
-            sb.AppendLine();
-            sb.AppendLine($"Исключение: {ex.GetType().FullName}");
-            sb.AppendLine($"Сообщение: {ex.Message}");
-            if (ex.InnerException != null)
-            {
-                sb.AppendLine();
-                sb.AppendLine($"Внутреннее: {ex.InnerException.GetType().FullName}");
-                sb.AppendLine($"Сообщение: {ex.InnerException.Message}");
-                if (ex.InnerException.InnerException != null)
-                {
-                    sb.AppendLine();
-                    sb.AppendLine($"Внутреннее (2): {ex.InnerException.InnerException.GetType().FullName}");
-                    sb.AppendLine($"Сообщение: {ex.InnerException.InnerException.Message}");
-                }
-            }
-            sb.AppendLine();
-            sb.AppendLine($"Стек:");
-            sb.AppendLine(ex.StackTrace);
-            File.WriteAllText(crashPath, sb.ToString());
-        }
-        catch
-        {
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using VKVideoDesktop.App.ViewModels;
 using VKVideoDesktop.Application.Services;
+using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Core.Models;
 
@@ -12,24 +13,51 @@ namespace VKVideoDesktop.App.Views;
 public sealed partial class HomePage : Page
 {
     public MainViewModel ViewModel { get; }
+    private readonly ILogger<HomePage> _logger;
+    private readonly LocalizationService _localization;
 
     public HomePage()
     {
+        _logger = App.GetService<ILogger<HomePage>>();
+        _logger.LogInformation("[HomePage] Constructor");
         InitializeComponent();
         ViewModel = App.GetService<MainViewModel>();
+        _localization = App.GetService<LocalizationService>();
         Loaded += OnLoaded;
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
+        _logger.LogInformation("[HomePage] OnNavigatedTo");
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        await ViewModel.LoadRecommendationsAsync();
-        EmptyState.Visibility = (ViewModel.HistoryEntries.Count == 0 && ViewModel.Recommendations.Count == 0)
-            ? Visibility.Visible : Visibility.Collapsed;
+        _logger.LogInformation("[HomePage] OnLoaded - loading recommendations...");
+        try
+        {
+            await ViewModel.LoadRecommendationsAsync();
+            _logger.LogInformation("[HomePage] Loaded: History={HistoryCount}, Recommendations={RecommendationsCount}", ViewModel.HistoryEntries.Count, ViewModel.Recommendations.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[HomePage] OnLoaded failed");
+        }
+
+        var settings = App.GetService<ISettingsService>();
+        if (!settings.Settings.IsAuthorized)
+        {
+            _logger.LogInformation("[HomePage] User not authorized - showing login prompt");
+            LoginRequiredState.Visibility = Visibility.Visible;
+            EmptyState.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            LoginRequiredState.Visibility = Visibility.Collapsed;
+            EmptyState.Visibility = (ViewModel.HistoryEntries.Count == 0 && ViewModel.Recommendations.Count == 0)
+                ? Visibility.Visible : Visibility.Collapsed;
+        }
     }
 
     private void OnVideoItemClick(object sender, RoutedEventArgs e)
@@ -126,8 +154,18 @@ public sealed partial class HomePage : Page
         }
     }
 
-    private void OnContextHistoryRemove(object sender, RoutedEventArgs e)
+    private async void OnContextHistoryRemove(object sender, RoutedEventArgs e)
     {
+        if (sender is MenuFlyoutItem item && item.Tag is string videoId)
+        {
+            var history = App.GetService<IHistoryService>();
+            var entry = await history.GetByVideoIdAsync(videoId);
+            if (entry != null)
+            {
+                await history.DeleteAsync(entry.Id);
+                await ViewModel.LoadRecommendationsAsync();
+            }
+        }
     }
 
     private async void OnContextHistoryOpenInVk(object sender, RoutedEventArgs e)
@@ -147,6 +185,12 @@ public sealed partial class HomePage : Page
         }
     }
 
+    private void OnLoginButtonClick(object sender, RoutedEventArgs e)
+    {
+        _logger.LogInformation("[HomePage] Login button clicked");
+        Frame.Navigate(typeof(LoginPage));
+    }
+
     private async void OnAddToPlaylistClick(object sender, RoutedEventArgs e)
     {
         if (sender is MenuFlyoutItem item && item.Tag is VideoViewModel video)
@@ -156,7 +200,7 @@ public sealed partial class HomePage : Page
             if (playlists.Count > 0)
             {
                 var dialog = new ContentDialog();
-                dialog.Title = "Добавить в плейлист";
+                dialog.Title = _localization["HomeAddToPlaylist"];
                 var listView = new ListView();
                 foreach (var pl in playlists)
                     listView.Items.Add(new ListViewItem { Content = pl.Title, Tag = pl });
@@ -177,7 +221,7 @@ public sealed partial class HomePage : Page
                     }
                 };
                 dialog.Content = listView;
-                dialog.PrimaryButtonText = "Отмена";
+                dialog.PrimaryButtonText = _localization["Cancel"];
                 await dialog.ShowAsync();
             }
         }

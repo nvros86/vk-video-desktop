@@ -2,7 +2,9 @@ using System.Text.RegularExpressions;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Interfaces;
+using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Infrastructure.VkApi;
 using Windows.System;
 
@@ -11,11 +13,16 @@ namespace VKVideoDesktop.App.Views;
 public sealed partial class LoginPage : Page
 {
     private readonly IAuthenticationService _authService;
+    private readonly ILogger<LoginPage> _logger;
+    private readonly LocalizationService _localization;
 
     public LoginPage()
     {
+        _logger = App.GetService<ILogger<LoginPage>>();
+        _logger.LogInformation("[LoginPage] Constructor");
         InitializeComponent();
         _authService = App.GetService<IAuthenticationService>();
+        _localization = App.GetService<LocalizationService>();
     }
 
     private async void OnLoginClick(object sender, RoutedEventArgs e)
@@ -38,7 +45,7 @@ public sealed partial class LoginPage : Page
         var input = TokenInput.Text?.Trim();
         if (string.IsNullOrEmpty(input))
         {
-            ShowError("Вставьте URL или токен");
+            ShowError(_localization["LoginErrorEmptyToken"]);
             return;
         }
 
@@ -46,7 +53,7 @@ public sealed partial class LoginPage : Page
 
         if (string.IsNullOrEmpty(token))
         {
-            ShowError("Не удалось извлечь токен. Вставьте полный URL из адресной строки.");
+            ShowError(_localization["LoginErrorExtractFailed"]);
             return;
         }
 
@@ -63,7 +70,7 @@ public sealed partial class LoginPage : Page
             }
             else
             {
-                ShowError("Ошибка авторизации. Проверьте токен и попробуйте снова.");
+                ShowError(_localization["LoginErrorAuthFailed"]);
             }
         }
 
@@ -96,6 +103,7 @@ public sealed partial class LoginPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
+        _logger.LogInformation("[LoginPage] OnNavigatedTo");
         base.OnNavigatedTo(e);
         if (e.Parameter is string error && !string.IsNullOrEmpty(error))
         {

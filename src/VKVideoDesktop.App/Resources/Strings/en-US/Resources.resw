@@ -114,9 +114,6 @@
   <data name="Loading" xml:space="preserve">
     <value>Loading...</value>
   </data>
-  <data name="SearchPlaceholder" xml:space="preserve">
-    <value>Search videos...</value>
-  </data>
   <data name="MiniPlayerTitle" xml:space="preserve">
     <value>Mini Player</value>
   </data>
@@ -131,12 +128,6 @@
   </data>
   <data name="LoginSuccess" xml:space="preserve">
     <value>Login successful</value>
-  </data>
-  <data name="LoginStep1" xml:space="preserve">
-    <value>Click the button to login via VK</value>
-  </data>
-  <data name="LoginStep2" xml:space="preserve">
-    <value>Paste the link from browser</value>
   </data>
   <data name="TokenInvalid" xml:space="preserve">
     <value>Invalid token. Please try again.</value>
@@ -167,5 +158,651 @@
   </data>
   <data name="ClearSearch" xml:space="preserve">
     <value>Clear search</value>
+  </data>
+
+  <!-- SettingsPage -->
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingsGeneral" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="SettingsLanguage" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="SettingsTheme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="SettingsThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="SettingsThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="SettingsThemeSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="SettingsStartWithWindows" xml:space="preserve">
+    <value>Start with Windows</value>
+  </data>
+  <data name="SettingsMinimizeToTray" xml:space="preserve">
+    <value>Minimize to tray</value>
+  </data>
+  <data name="SettingsNotifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="SettingsDefaultVolume" xml:space="preserve">
+    <value>Default volume</value>
+  </data>
+  <data name="SettingsPlaybackSpeed" xml:space="preserve">
+    <value>Playback speed</value>
+  </data>
+  <data name="SettingsVideo" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="SettingsDefaultQuality" xml:space="preserve">
+    <value>Default quality</value>
+  </data>
+  <data name="SettingsAutoplay" xml:space="preserve">
+    <value>Autoplay</value>
+  </data>
+  <data name="SettingsDownloads" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="SettingsDownloadFolder" xml:space="preserve">
+    <value>Download folder</value>
+  </data>
+  <data name="SettingsChange" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="SettingsMaxConcurrent" xml:space="preserve">
+    <value>Max concurrent downloads</value>
+  </data>
+  <data name="SettingsSpeedLimit" xml:space="preserve">
+    <value>Speed limit</value>
+  </data>
+  <data name="SettingsSpeedLimitNone" xml:space="preserve">
+    <value>No limit</value>
+  </data>
+  <data name="SettingsSpeedLimit512" xml:space="preserve">
+    <value>512 KB/s</value>
+  </data>
+  <data name="SettingsSpeedLimit1m" xml:space="preserve">
+    <value>1 MB/s</value>
+  </data>
+  <data name="SettingsSpeedLimit2m" xml:space="preserve">
+    <value>2 MB/s</value>
+  </data>
+  <data name="SettingsSpeedLimit5m" xml:space="preserve">
+    <value>5 MB/s</value>
+  </data>
+  <data name="SettingsSpeedLimit10m" xml:space="preserve">
+    <value>10 MB/s</value>
+  </data>
+  <data name="SettingsRetryCount" xml:space="preserve">
+    <value>Retry count</value>
+  </data>
+  <data name="SettingsAutoResume" xml:space="preserve">
+    <value>Auto resume on startup</value>
+  </data>
+  <data name="SettingsDownloadNotifications" xml:space="preserve">
+    <value>Download notifications</value>
+  </data>
+  <data name="SettingsDeletePart" xml:space="preserve">
+    <value>Delete .part on cancel</value>
+  </data>
+  <data name="SettingsDownloadBehavior" xml:space="preserve">
+    <value>Download behavior</value>
+  </data>
+  <data name="SettingsDownloadBehaviorChoose" xml:space="preserve">
+    <value>Show quality picker</value>
+  </data>
+  <data name="SettingsDownloadBehaviorLast" xml:space="preserve">
+    <value>Use last quality</value>
+  </data>
+  <data name="SettingsDownloadBehaviorMax" xml:space="preserve">
+    <value>Use best quality</value>
+  </data>
+  <data name="SettingsNetwork" xml:space="preserve">
+    <value>Network settings</value>
+  </data>
+  <data name="SettingsUseProxy" xml:space="preserve">
+    <value>Use proxy</value>
+  </data>
+  <data name="SettingsProxyAddress" xml:space="preserve">
+    <value>Proxy address</value>
+  </data>
+  <data name="SettingsCache" xml:space="preserve">
+    <value>Cache</value>
+  </data>
+  <data name="SettingsClearImageCache" xml:space="preserve">
+    <value>Clear image cache</value>
+  </data>
+  <data name="SettingsCacheDesc" xml:space="preserve">
+    <value>Thumbnails and channel avatars</value>
+  </data>
+  <data name="SettingsClear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="SettingsClearCacheTitle" xml:space="preserve">
+    <value>Clear cache</value>
+  </data>
+  <data name="SettingsClearCacheConfirm" xml:space="preserve">
+    <value>Are you sure you want to clear the image cache?</value>
+  </data>
+  <data name="SettingsAbout" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="SettingsAboutDesc" xml:space="preserve">
+    <value>Beta • Production-ready Windows client for VK Video</value>
+  </data>
+
+  <!-- HomePage -->
+  <data name="HomeEmpty" xml:space="preserve">
+    <value>No content</value>
+  </data>
+  <data name="HomeEmptyDesc" xml:space="preserve">
+    <value>Search for videos or open channels</value>
+  </data>
+  <data name="HomeLoginRequired" xml:space="preserve">
+    <value>Login to VK</value>
+  </data>
+  <data name="HomeLoginRequiredDesc" xml:space="preserve">
+    <value>Sign in to your VK account to browse and watch videos</value>
+  </data>
+  <data name="HomeLoginButton" xml:space="preserve">
+    <value>Sign in to VK</value>
+  </data>
+  <data name="HomeBannerTitle" xml:space="preserve">
+    <value>Journey through Russia</value>
+  </data>
+  <data name="HomeBannerDesc" xml:space="preserve">
+    <value>Beautiful places worth seeing. The most vivid videos</value>
+  </data>
+  <data name="HomeWatch" xml:space="preserve">
+    <value>Watch</value>
+  </data>
+  <data name="HomeCollections" xml:space="preserve">
+    <value>+ 8 collections</value>
+  </data>
+  <data name="HomeContinueWatching" xml:space="preserve">
+    <value>Continue watching</value>
+  </data>
+  <data name="HomeRecommendedChannels" xml:space="preserve">
+    <value>Recommended channels</value>
+  </data>
+  <data name="HomeRecommendations" xml:space="preserve">
+    <value>Recommendations for you</value>
+  </data>
+  <data name="HomeSubscribe" xml:space="preserve">
+    <value>Subscribe</value>
+  </data>
+  <data name="HomeCategoryAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="HomeCategoryFeatured" xml:space="preserve">
+    <value>Featured</value>
+  </data>
+  <data name="HomeCategoryMusic" xml:space="preserve">
+    <value>Music</value>
+  </data>
+  <data name="HomeCategoryMovies" xml:space="preserve">
+    <value>Movies</value>
+  </data>
+  <data name="HomeCategoryTech" xml:space="preserve">
+    <value>Technology</value>
+  </data>
+  <data name="HomeCategorySport" xml:space="preserve">
+    <value>Sports</value>
+  </data>
+  <data name="HomeCategoryGames" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="HomeCategoryCooking" xml:space="preserve">
+    <value>Cooking</value>
+  </data>
+  <data name="HomeCategoryTravel" xml:space="preserve">
+    <value>Travel</value>
+  </data>
+  <data name="HomeCategoryHome" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="HomePlay" xml:space="preserve">
+    <value>Watch</value>
+  </data>
+  <data name="HomeAddToFav" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="HomeRemoveFromHistory" xml:space="preserve">
+    <value>Remove from history</value>
+  </data>
+  <data name="HomeOpenVK" xml:space="preserve">
+    <value>Open in VK</value>
+  </data>
+  <data name="HomeDownload" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="HomeAddToQueue" xml:space="preserve">
+    <value>Add to queue</value>
+  </data>
+  <data name="HomeAddToPlaylist" xml:space="preserve">
+    <value>Add to playlist</value>
+  </data>
+  <data name="HomeShare" xml:space="preserve">
+    <value>Share</value>
+  </data>
+
+  <!-- SearchPage -->
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search videos, channels and authors...</value>
+  </data>
+  <data name="SearchAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="SearchVideos" xml:space="preserve">
+    <value>Videos</value>
+  </data>
+  <data name="SearchChannels" xml:space="preserve">
+    <value>Channels</value>
+  </data>
+  <data name="SearchAuthors" xml:space="preserve">
+    <value>Authors</value>
+  </data>
+  <data name="SearchSortRelevance" xml:space="preserve">
+    <value>By relevance</value>
+  </data>
+  <data name="SearchSortDate" xml:space="preserve">
+    <value>By date</value>
+  </data>
+  <data name="SearchSortViews" xml:space="preserve">
+    <value>By views</value>
+  </data>
+  <data name="SearchSortDuration" xml:space="preserve">
+    <value>By duration</value>
+  </data>
+  <data name="SearchEmpty" xml:space="preserve">
+    <value>Enter a search query</value>
+  </data>
+  <data name="SearchLoadMore" xml:space="preserve">
+    <value>Load more</value>
+  </data>
+
+  <!-- DownloadsPage -->
+  <data name="DownloadsTitle" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="DownloadsRetryAll" xml:space="preserve">
+    <value>Retry all</value>
+  </data>
+  <data name="DownloadsClearCompleted" xml:space="preserve">
+    <value>Clear completed</value>
+  </data>
+  <data name="DownloadsActive" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="DownloadsEmpty" xml:space="preserve">
+    <value>No downloads</value>
+  </data>
+  <data name="DownloadsEmptyDesc" xml:space="preserve">
+    <value>Download videos, and they will appear here.</value>
+  </data>
+  <data name="DownloadsOpenFile" xml:space="preserve">
+    <value>Open file</value>
+  </data>
+  <data name="DownloadsOpenFolder" xml:space="preserve">
+    <value>Open folder</value>
+  </data>
+  <data name="DownloadsCopyPath" xml:space="preserve">
+    <value>Copy path</value>
+  </data>
+  <data name="DownloadsDeleteRecord" xml:space="preserve">
+    <value>Delete record</value>
+  </data>
+
+  <!-- HistoryPage -->
+  <data name="HistoryTitle" xml:space="preserve">
+    <value>Watch history</value>
+  </data>
+  <data name="HistoryClear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="HistoryEmpty" xml:space="preserve">
+    <value>Watch history is empty</value>
+  </data>
+  <data name="HistoryEmptyDesc" xml:space="preserve">
+    <value>Start watching videos, and they will appear here.</value>
+  </data>
+  <data name="HistoryWatch" xml:space="preserve">
+    <value>▶ Watch</value>
+  </data>
+  <data name="HistoryDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+
+  <!-- FavoritesPage -->
+  <data name="FavoritesTitle" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="FavoritesClear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="FavoritesEmpty" xml:space="preserve">
+    <value>Your favorites list is empty</value>
+  </data>
+  <data name="FavoritesEmptyDesc" xml:space="preserve">
+    <value>Add videos to favorites...</value>
+  </data>
+  <data name="FavoritesDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+
+  <!-- PlaylistsPage -->
+  <data name="PlaylistsTitle" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="PlaylistsCreate" xml:space="preserve">
+    <value>+ Create</value>
+  </data>
+  <data name="PlaylistsEmpty" xml:space="preserve">
+    <value>You don't have any playlists yet</value>
+  </data>
+  <data name="PlaylistsEmptyDesc" xml:space="preserve">
+    <value>Create a playlist to organize videos.</value>
+  </data>
+  <data name="PlaylistsDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+
+  <!-- PlaylistDetailPage -->
+  <data name="PlaylistDetailEmpty" xml:space="preserve">
+    <value>Playlist is empty</value>
+  </data>
+  <data name="PlaylistDetailDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+
+  <!-- LoginPage -->
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Login to VK Video</value>
+  </data>
+  <data name="LoginStep1" xml:space="preserve">
+    <value>1. Click the button below to login via VK</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>Login via VK</value>
+  </data>
+  <data name="LoginStep2" xml:space="preserve">
+    <value>2. After authorization, copy the URL from browser</value>
+  </data>
+  <data name="LoginInputPlaceholder" xml:space="preserve">
+    <value>Paste URL or token here...</value>
+  </data>
+  <data name="LoginSubmit" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="LoginChecking" xml:space="preserve">
+    <value>Checking token...</value>
+  </data>
+
+  <!-- ProfilePage -->
+  <data name="ProfileMyVideos" xml:space="preserve">
+    <value>My videos</value>
+  </data>
+  <data name="ProfileFavorites" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="ProfilePlaylists" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="ProfileHistory" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="ProfileSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="ProfileLogout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+
+  <!-- ChannelPage -->
+  <data name="ChannelSubscribe" xml:space="preserve">
+    <value>Subscribe</value>
+  </data>
+  <data name="ChannelDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ChannelVideos" xml:space="preserve">
+    <value>Videos</value>
+  </data>
+  <data name="ChannelPlay" xml:space="preserve">
+    <value>Watch</value>
+  </data>
+  <data name="ChannelAddToFav" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="ChannelDownload" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="ChannelOpenVK" xml:space="preserve">
+    <value>Open in VK</value>
+  </data>
+
+  <!-- VideoPage -->
+  <data name="VideoRelated" xml:space="preserve">
+    <value>Related videos</value>
+  </data>
+  <data name="VideoDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="VideoSubscribe" xml:space="preserve">
+    <value>Subscribe</value>
+  </data>
+  <data name="VideoFavorite" xml:space="preserve">
+    <value>❤️ Favorite</value>
+  </data>
+  <data name="VideoPlaylist" xml:space="preserve">
+    <value>➕ Playlist</value>
+  </data>
+  <data name="VideoDownload" xml:space="preserve">
+    <value>⬇ Download</value>
+  </data>
+  <data name="VideoShare" xml:space="preserve">
+    <value>↗ Share</value>
+  </data>
+  <data name="VideoWebView" xml:space="preserve">
+    <value>🌐 WebView2</value>
+  </data>
+  <data name="VideoSpeedTooltip" xml:space="preserve">
+    <value>Playback speed</value>
+  </data>
+  <data name="VideoQualityTooltip" xml:space="preserve">
+    <value>Video quality</value>
+  </data>
+  <data name="VideoPiPTooltip" xml:space="preserve">
+    <value>Picture in picture</value>
+  </data>
+
+  <!-- DownloadItemViewModel -->
+  <data name="DownloadStatusQueued" xml:space="preserve">
+    <value>Queued</value>
+  </data>
+  <data name="DownloadStatusResolving" xml:space="preserve">
+    <value>Resolving source...</value>
+  </data>
+  <data name="DownloadStatusDownloading" xml:space="preserve">
+    <value>Downloading...</value>
+  </data>
+  <data name="DownloadStatusPaused" xml:space="preserve">
+    <value>Paused</value>
+  </data>
+  <data name="DownloadStatusCompleted" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="DownloadStatusFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="DownloadStatusCancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="DownloadStatusRetrying" xml:space="preserve">
+    <value>Retrying...</value>
+  </data>
+  <data name="DownloadStatusUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+
+  <!-- Common -->
+  <data name="CommonOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CommonCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CommonSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="CommonDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="CommonLoading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+
+  <!-- ErrorHandlerService -->
+  <data name="ErrorAccessDenied" xml:space="preserve">
+    <value>Access denied. You don't have permission to view this content.</value>
+  </data>
+  <data name="ErrorDownloadUnavailable" xml:space="preserve">
+    <value>Download unavailable for this video.</value>
+  </data>
+  <data name="ErrorRateLimit" xml:space="preserve">
+    <value>Too many requests. Wait a moment and try again.</value>
+  </data>
+  <data name="ErrorNoSpace" xml:space="preserve">
+    <value>Not enough free disk space.</value>
+  </data>
+  <data name="ErrorTimeout" xml:space="preserve">
+    <value>Request timeout. Check your connection speed.</value>
+  </data>
+  <data name="ErrorCancelled" xml:space="preserve">
+    <value>Operation cancelled.</value>
+  </data>
+  <data name="ErrorUnknown" xml:space="preserve">
+    <value>An unknown error occurred. Try again.</value>
+  </data>
+
+  <!-- LoginPage -->
+  <data name="LoginErrorEmptyToken" xml:space="preserve">
+    <value>Paste URL or token</value>
+  </data>
+  <data name="LoginErrorExtractFailed" xml:space="preserve">
+    <value>Failed to extract token. Paste the full URL from the address bar.</value>
+  </data>
+  <data name="LoginErrorAuthFailed" xml:space="preserve">
+    <value>Authorization error. Check your token and try again.</value>
+  </data>
+
+  <!-- VideoPage -->
+  <data name="VideoQualityTitle" xml:space="preserve">
+    <value>Video quality</value>
+  </data>
+  <data name="VideoDownloadTitle" xml:space="preserve">
+    <value>Download video</value>
+  </data>
+  <data name="CommonClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+
+  <!-- ChannelPage -->
+  <data name="ChannelSubscriberCount" xml:space="preserve">
+    <value>{0} subscribers</value>
+  </data>
+
+  <!-- MainViewModel -->
+  <data name="HomeTab" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="HistoryContinueFrom" xml:space="preserve">
+    <value>Continue from {0}</value>
+  </data>
+
+  <!-- Views formatting -->
+  <data name="ViewsBillions" xml:space="preserve">
+    <value>{0}B</value>
+  </data>
+  <data name="ViewsMillions" xml:space="preserve">
+    <value>{0}M</value>
+  </data>
+  <data name="ViewsThousands" xml:space="preserve">
+    <value>{0}K</value>
+  </data>
+  <data name="ViewsCount" xml:space="preserve">
+    <value>{0} views</value>
+  </data>
+
+  <!-- ProfileViewModel -->
+  <data name="ProfileDefaultName" xml:space="preserve">
+    <value>VK User</value>
+  </data>
+
+  <!-- PlaylistsPage -->
+  <data name="PlaylistsNewTitle" xml:space="preserve">
+    <value>New playlist</value>
+  </data>
+  <data name="PlaylistsCreateButton" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="PlaylistsNamePlaceholder" xml:space="preserve">
+    <value>Playlist name</value>
+  </data>
+  <data name="PlaylistsDeleteTitle" xml:space="preserve">
+    <value>Delete playlist</value>
+  </data>
+  <data name="PlaylistsDeleteConfirm" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+
+  <!-- HistoryPage -->
+  <data name="HistoryClearTitle" xml:space="preserve">
+    <value>Clear history</value>
+  </data>
+  <data name="HistoryClearConfirm" xml:space="preserve">
+    <value>Are you sure you want to clear all watch history?</value>
+  </data>
+
+  <!-- FavoritesPage -->
+  <data name="FavoritesClearTitle" xml:space="preserve">
+    <value>Clear favorites</value>
+  </data>
+  <data name="FavoritesClearConfirm" xml:space="preserve">
+    <value>Are you sure you want to clear all favorites?</value>
+  </data>
+
+  <!-- PlaylistDetailPage -->
+  <data name="PlaylistDetailVideoCount" xml:space="preserve">
+    <value>{0} videos</value>
+  </data>
+
+  <!-- DownloadItemViewModel -->
+  <data name="TimeHoursMinutes" xml:space="preserve">
+    <value>{0}h {1}m</value>
+  </data>
+  <data name="TimeMinutesSeconds" xml:space="preserve">
+    <value>{0}m {1}s</value>
+  </data>
+
+  <!-- NotificationService -->
+  <data name="NotificationDownloadComplete" xml:space="preserve">
+    <value>Download complete</value>
+  </data>
+
+  <!-- WebViewVideoPage -->
+  <data name="VideoUnavailableWeb" xml:space="preserve">
+    <value>Video unavailable</value>
+  </data>
+
+  <!-- PlaylistViewModel -->
+  <data name="PlaylistVideoCount" xml:space="preserve">
+    <value>{0} videos</value>
   </data>
 </root>

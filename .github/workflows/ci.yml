@@ -21,6 +21,13 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: ${{ runner.os }}-nuget-
+
     - name: Restore dependencies
       run: dotnet restore VKVideoDesktop.sln
 
@@ -30,11 +37,57 @@ jobs:
     - name: Test
       run: dotnet test VKVideoDesktop.sln -c Release --no-build --verbosity normal
 
-    - name: Publish
-      run: msbuild src/VKVideoDesktop.App/VKVideoDesktop.App.csproj /p:Configuration=Release /p:RuntimeIdentifier=win-x64 /p:SelfContained=true /t:Publish /v:minimal
+    - name: Publish App
+      run: msbuild src/VKVideoDesktop.App/VKVideoDesktop.App.csproj /p:Configuration=Release /p:Platform=x64 /t:Publish /v:minimal
 
-    - name: Upload artifact
+    - name: Copy XBF files
+      run: |
+        $objDir = "src/VKVideoDesktop.App/obj/x64/Release/net9.0-windows10.0.22621.0"
+        $pubDir = "src/VKVideoDesktop.App/bin/x64/Release/net9.0-windows10.0.22621.0/publish"
+        Get-ChildItem $objDir -Recurse -Filter "*.xbf" -File | ForEach-Object {
+          $rel = $_.FullName.Substring("$objDir/".Length)
+          $dest = Join-Path $pubDir $rel
+          $destDir = Split-Path $dest -Parent
+          if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
+          Copy-Item $_.FullName $dest -Force
+        }
+        # Remove WinUI locale folders from WindowsAppSDK (keep runtimes, Microsoft.UI.Xaml, net9.0-*)
+        $keepFolders = @("Microsoft.UI.Xaml", "runtimes", "net9.0-windows10.0.22621.0", "ref")
+        Get-ChildItem $pubDir -Directory | Where-Object {
+          $_.Name -notin $keepFolders
+        } | ForEach-Object {
+          Remove-Item -Recurse -Force $_.FullName
+        }
+
+    - name: Create portable zip
+      run: |
+        Compress-Archive -Path "src/VKVideoDesktop.App/bin/x64/Release/net9.0-windows10.0.22621.0/publish/*" -DestinationPath "VKVideoDesktop-win-x64.zip" -Force
+
+    - name: Build uninstaller
+      run: |
+        dotnet publish src/VKVideoDesktop.Uninstall/VKVideoDesktop.Uninstall.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o src/VKVideoDesktop.Setup/uninstall
+
+    - name: Build installer (single-file)
+      run: |
+        dotnet publish src/VKVideoDesktop.Setup/VKVideoDesktop.Setup.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish/setup
+
+    - name: Smoke test
+      run: |
+        Expand-Archive -Path "VKVideoDesktop-win-x64.zip" -DestinationPath "smoke-test" -Force
+        $proc = Start-Process -FilePath "smoke-test\VKVideoDesktop.App.exe" -PassThru
+        Start-Sleep -Seconds 5
+        $proc.Kill()
+        Write-Host "Smoke test completed with exit code: $($proc.ExitCode)"
+        Remove-Item "smoke-test" -Recurse -Force -ErrorAction SilentlyContinue
+
+    - name: Upload portable
       uses: actions/upload-artifact@v4
       with:
         name: VKVideoDesktop-win-x64
-        path: src/VKVideoDesktop.App/bin/Release/net9.0-windows10.0.22621.0/win-x64/publish/
+        path: VKVideoDesktop-win-x64.zip
+
+    - name: Upload installer
+      uses: actions/upload-artifact@v4
+      with:
+        name: VKVideoDesktopSetup
+        path: publish/setup/VKVideoDesktopSetup.exe

@@ -7,13 +7,20 @@ namespace VKVideoDesktop.Application.Services;
 
 public sealed class NotificationService
 {
+    private readonly LocalizationService _localization;
+
+    public NotificationService(LocalizationService localization)
+    {
+        _localization = localization;
+    }
+
     public void ShowDownloadComplete(string videoTitle, string filePath)
     {
         try
         {
             var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
             var textElements = toastXml.GetElementsByTagName("text");
-            textElements[0].AppendChild(toastXml.CreateTextNode("Загрузка завершена"));
+            textElements[0].AppendChild(toastXml.CreateTextNode(_localization["NotificationDownloadComplete"]));
             textElements[1].AppendChild(toastXml.CreateTextNode(videoTitle));
 
             var toast = new ToastNotification(toastXml);

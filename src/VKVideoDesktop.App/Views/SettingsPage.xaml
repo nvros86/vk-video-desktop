@@ -3,305 +3,396 @@
     x:Class="VKVideoDesktop.App.Views.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VKVideoDesktop.App.Views"
     Background="{StaticResource VkBackgroundBrush}">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="24,16,24,80" Spacing="24" MaxWidth="600" HorizontalAlignment="Center">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Настройки" Style="{StaticResource TitleTextBlockStyle}"
-                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+        <!-- Settings Tabs -->
+        <ListView x:Name="SettingsTabs" Grid.Column="0"
+                  Background="{StaticResource VkSidebarBrush}"
+                  SelectionChanged="OnSettingsTabChanged"
+                  Padding="8,8,8,0">
+            <ListViewItem Content="Основные" Tag="General" IsSelected="True" />
+            <ListViewItem Content="Внешний вид" Tag="Appearance" />
+            <ListViewItem Content="Воспроизведение" Tag="Playback" />
+            <ListViewItem Content="Загрузки" Tag="Downloads" />
+            <ListViewItem Content="Уведомления" Tag="Notifications" />
+            <ListViewItem Content="Аккаунт" Tag="Account" />
+            <ListViewItem Content="Конфиденциальность" Tag="Privacy" />
+            <ListViewItem Content="О приложении" Tag="About" />
+        </ListView>
 
-            <!-- General -->
-            <StackPanel Spacing="16">
-                <TextBlock Text="Общие" Style="{StaticResource SubtitleTextBlockStyle}"
-                           Foreground="{StaticResource VkTextPrimaryBrush}" />
+        <!-- Settings Content -->
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="24,16">
+            <StackPanel Spacing="16" MaxWidth="600">
 
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Язык" VerticalAlignment="Center"
+                <!-- General Settings -->
+                <StackPanel x:Name="GeneralSettings" Spacing="12">
+                    <TextBlock Text="Основные" FontSize="20" FontWeight="Bold"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox Grid.Column="1" x:Name="LanguageCombo" SelectedIndex="0" Width="150"
-                              SelectionChanged="OnSettingChanged_Combo">
-                        <ComboBoxItem Content="Русский" />
-                        <ComboBoxItem Content="English" />
-                    </ComboBox>
-                </Grid>
 
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Тема" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox Grid.Column="1" x:Name="ThemeCombo" SelectedIndex="0" Width="150"
-                              SelectionChanged="OnSettingChanged_Combo">
-                        <ComboBoxItem Content="Тёмная" />
-                        <ComboBoxItem Content="Светлая" />
-                        <ComboBoxItem Content="Системная" />
-                    </ComboBox>
-                </Grid>
+                    <!-- Language -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Язык" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Выберите язык интерфейса" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="0" Width="150"
+                                  Background="{StaticResource VkCardHoverBrush}"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}">
+                            <ComboBoxItem Content="Русский" />
+                            <ComboBoxItem Content="English" />
+                        </ComboBox>
+                    </Grid>
 
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Запуск с Windows" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch Grid.Column="1" x:Name="StartWithWindowsToggle" IsOn="False"
-                                  Toggled="OnSettingChanged_Toggle" />
-                </Grid>
+                    <!-- Theme -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Тема оформления" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Выберите тему интерфейса" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="0" Width="150"
+                                  Background="{StaticResource VkCardHoverBrush}"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}">
+                            <ComboBoxItem Content="Тёмная" />
+                            <ComboBoxItem Content="Светлая" />
+                            <ComboBoxItem Content="Системная" />
+                        </ComboBox>
+                    </Grid>
 
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Сворачивать в трей" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch Grid.Column="1" x:Name="MinimizeToTrayToggle" IsOn="True"
-                                  Toggled="OnSettingChanged_Toggle" />
-                </Grid>
+                    <!-- Startup -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Запуск при входе в Windows" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Автоматически запускать при старте системы" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsOn="False" />
+                    </Grid>
 
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Уведомления" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch Grid.Column="1" x:Name="NotificationsToggle" IsOn="True"
-                                  Toggled="OnSettingChanged_Toggle" />
-                </Grid>
+                    <!-- Minimize to tray -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Свернуть в трей" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="При закрытии сворачивать в системный трей" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsOn="False" />
+                    </Grid>
 
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Громкость по умолчанию" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <Slider Grid.Column="1" x:Name="VolumeSlider" Minimum="0" Maximum="100" Width="200"
-                            ValueChanged="OnVolumeChanged" />
-                </Grid>
+                    <!-- Default Volume -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Громкость по умолчанию" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Начальная громкость воспроизведения" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <Slider Grid.Column="1" Width="150" Minimum="0" Maximum="100"
+                                Value="80"
+                                Foreground="{StaticResource VkAccentBrush}" />
+                    </Grid>
+                </StackPanel>
 
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Скорость воспроизведения" VerticalAlignment="Center"
+                <!-- Appearance Settings -->
+                <StackPanel x:Name="AppearanceSettings" Visibility="Collapsed" Spacing="12">
+                    <TextBlock Text="Внешний вид" FontSize="20" FontWeight="Bold"
                                Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox Grid.Column="1" x:Name="SpeedComboBox" Width="200" SelectionChanged="OnSpeedChanged">
-                        <ComboBoxItem Content="0.5x" Tag="0.5" />
-                        <ComboBoxItem Content="0.75x" Tag="0.75" />
-                        <ComboBoxItem Content="1x" Tag="1" />
-                        <ComboBoxItem Content="1.25x" Tag="1.25" />
-                        <ComboBoxItem Content="1.5x" Tag="1.5" />
-                        <ComboBoxItem Content="2x" Tag="2" />
-                    </ComboBox>
-                </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Качество превью на уменьшенном" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Качество изображений в уменьшенном режиме" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="1" Width="150"
+                                  Background="{StaticResource VkCardHoverBrush}"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}">
+                            <ComboBoxItem Content="480p" />
+                            <ComboBoxItem Content="720p" />
+                            <ComboBoxItem Content="1080p" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Язык интерфейса" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Выберите язык приложения" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="0" Width="150"
+                                  Background="{StaticResource VkCardHoverBrush}"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}">
+                            <ComboBoxItem Content="Русский" />
+                            <ComboBoxItem Content="English" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Тема оформления" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Выберите тему приложения" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="0" Width="150"
+                                  Background="{StaticResource VkCardHoverBrush}"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}">
+                            <ComboBoxItem Content="Тёмная" />
+                            <ComboBoxItem Content="Светлая" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Автоматическое обновление" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Проверять обновления при запуске" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsOn="True" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- Playback Settings -->
+                <StackPanel x:Name="PlaybackSettings" Visibility="Collapsed" Spacing="12">
+                    <TextBlock Text="Воспроизведение" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" />
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Качество по умолчанию" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Стандартное качество видео" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="1" Width="150"
+                                  Background="{StaticResource VkCardHoverBrush}"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}">
+                            <ComboBoxItem Content="240p" />
+                            <ComboBoxItem Content="360p" />
+                            <ComboBoxItem Content="480p" />
+                            <ComboBoxItem Content="720p" />
+                            <ComboBoxItem Content="1080p" />
+                            <ComboBoxItem Content="1440p" />
+                            <ComboBoxItem Content="2160p" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Скорость воспроизведения" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Начальная скорость видео" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="2" Width="150"
+                                  Background="{StaticResource VkCardHoverBrush}"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}">
+                            <ComboBoxItem Content="0.5x" />
+                            <ComboBoxItem Content="0.75x" />
+                            <ComboBoxItem Content="1x" />
+                            <ComboBoxItem Content="1.25x" />
+                            <ComboBoxItem Content="1.5x" />
+                            <ComboBoxItem Content="2x" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Автозамена" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Автоматически выбирать лучшее качество" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsOn="True" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- Download Settings -->
+                <StackPanel x:Name="DownloadSettings" Visibility="Collapsed" Spacing="12">
+                    <TextBlock Text="Загрузки" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" />
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Папка загрузок" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Куда сохранять скачанные видео" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="Изменить" Padding="12,6"
+                                Background="{StaticResource VkCardBrush}"
+                                Foreground="{StaticResource VkTextPrimaryBrush}"
+                                BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                                CornerRadius="6" Click="OnChangeDownloadFolderClick" />
+                    </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Макс. одновременных загрузок" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Количество параллельных загрузок" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="1" Width="150"
+                                  Background="{StaticResource VkCardHoverBrush}"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}">
+                            <ComboBoxItem Content="1" />
+                            <ComboBoxItem Content="2" />
+                            <ComboBoxItem Content="3" />
+                            <ComboBoxItem Content="4" />
+                            <ComboBoxItem Content="5" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Лимит скорости" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Ограничение скорости скачивания" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="0" Width="150"
+                                  Background="{StaticResource VkCardHoverBrush}"
+                                  Foreground="{StaticResource VkTextPrimaryBrush}">
+                            <ComboBoxItem Content="Без лимита" />
+                            <ComboBoxItem Content="512 КБ/с" />
+                            <ComboBoxItem Content="1 МБ/с" />
+                            <ComboBoxItem Content="2 МБ/с" />
+                            <ComboBoxItem Content="5 МБ/с" />
+                            <ComboBoxItem Content="10 МБ/с" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Уведомления о загрузках" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Показывать уведомления о завершении" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsOn="True" />
+                    </Grid>
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Удалять .part файлы" FontWeight="SemiBold"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Удалять незавершённые загрузки при отмене" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsOn="True" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- About Settings -->
+                <StackPanel x:Name="AboutSettings" Visibility="Collapsed" Spacing="12">
+                    <TextBlock Text="О приложении" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" />
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="VK Video Desktop" FontWeight="SemiBold" FontSize="16"
+                                       Foreground="{StaticResource VkTextPrimaryBrush}" />
+                            <TextBlock Text="Бета-версия" FontSize="12"
+                                       Foreground="{StaticResource VkTextSecondaryBrush}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Button Content="Обратная связь" Padding="16,8"
+                            Background="{StaticResource VkCardBrush}"
+                            Foreground="{StaticResource VkTextPrimaryBrush}"
+                            BorderBrush="{StaticResource VkCardBorderBrush}" BorderThickness="1"
+                            CornerRadius="6" HorizontalAlignment="Left" />
+                </StackPanel>
+
             </StackPanel>
-
-            <Border Height="1" Background="{StaticResource VkSeparatorBrush}" />
-
-            <!-- Video -->
-            <StackPanel Spacing="16">
-                <TextBlock Text="Видео" Style="{StaticResource SubtitleTextBlockStyle}"
-                           Foreground="{StaticResource VkTextPrimaryBrush}" />
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Качество по умолчанию" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox Grid.Column="1" x:Name="QualityCombo" SelectedIndex="2" Width="150"
-                              SelectionChanged="OnSettingChanged_Combo">
-                        <ComboBoxItem Content="240p" />
-                        <ComboBoxItem Content="360p" />
-                        <ComboBoxItem Content="480p" />
-                        <ComboBoxItem Content="720p" />
-                        <ComboBoxItem Content="1080p" />
-                        <ComboBoxItem Content="1440p" />
-                        <ComboBoxItem Content="2160p" />
-                    </ComboBox>
-                </Grid>
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Автовоспроизведение" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch Grid.Column="1" x:Name="AutoplayToggle" IsOn="True"
-                                  Toggled="OnSettingChanged_Toggle" />
-                </Grid>
-            </StackPanel>
-
-            <Border Height="1" Background="{StaticResource VkSeparatorBrush}" />
-
-            <!-- Downloads -->
-            <StackPanel Spacing="16">
-                <TextBlock Text="Загрузки" Style="{StaticResource SubtitleTextBlockStyle}"
-                           Foreground="{StaticResource VkTextPrimaryBrush}" />
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Папка загрузок" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                        <TextBlock x:Name="DownloadFolderText" Text="C:\Users\Videos\VK Video"
-                                   VerticalAlignment="Center"
-                                   Foreground="{StaticResource VkTextSecondaryBrush}" />
-                        <Button Content="Изменить" Click="OnChangeFolderClick" />
-                    </StackPanel>
-                </Grid>
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Макс. одновременных загрузок" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox Grid.Column="1" x:Name="MaxDownloadsCombo" SelectedIndex="1" Width="80"
-                              SelectionChanged="OnSettingChanged_Combo">
-                        <ComboBoxItem Content="1" />
-                        <ComboBoxItem Content="2" />
-                        <ComboBoxItem Content="3" />
-                        <ComboBoxItem Content="4" />
-                        <ComboBoxItem Content="5" />
-                    </ComboBox>
-                </Grid>
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Ограничение скорости" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox Grid.Column="1" x:Name="SpeedLimitCombo" SelectedIndex="0" Width="150"
-                              SelectionChanged="OnSettingChanged_Combo">
-                        <ComboBoxItem Content="Без ограничений" />
-                        <ComboBoxItem Content="512 КБ/с" />
-                        <ComboBoxItem Content="1 МБ/с" />
-                        <ComboBoxItem Content="2 МБ/с" />
-                        <ComboBoxItem Content="5 МБ/с" />
-                        <ComboBoxItem Content="10 МБ/с" />
-                    </ComboBox>
-                </Grid>
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Количество повторных попыток" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <NumberBox Grid.Column="1" x:Name="RetryCountBox" Value="3" Minimum="0" Maximum="10" Width="80"
-                               ValueChanged="OnRetryCountChanged" />
-                </Grid>
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Автовозобновление при запуске" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch Grid.Column="1" x:Name="AutoResumeToggle" IsOn="True"
-                                  Toggled="OnSettingChanged_Toggle" />
-                </Grid>
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Уведомления о загрузках" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch Grid.Column="1" IsOn="True" />
-                </Grid>
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Удалять .part при отмене" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ToggleSwitch Grid.Column="1" x:Name="DeletePartToggle" IsOn="True"
-                                  Toggled="OnSettingChanged_Toggle" />
-                </Grid>
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Способ загрузки" VerticalAlignment="Center"
-                               Foreground="{StaticResource VkTextPrimaryBrush}" />
-                    <ComboBox Grid.Column="1" x:Name="QualityBehaviorCombo" SelectedIndex="0" Width="250"
-                              SelectionChanged="OnSettingChanged_Combo">
-                        <ComboBoxItem Content="Показывать выбор качества" />
-                        <ComboBoxItem Content="Использовать последнее качество" />
-                        <ComboBoxItem Content="Использовать максимальное качество" />
-                    </ComboBox>
-                </Grid>
-
-                <TextBlock Text="Сетевые настройки" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,8"
-                           Foreground="{StaticResource VkTextPrimaryBrush}" />
-                <CheckBox x:Name="UseProxyCheckBox" Content="Использовать прокси"
-                          Checked="OnProxyChanged" Unchecked="OnProxyChanged" />
-                <TextBox x:Name="ProxyAddressTextBox" Header="Адрес прокси" Width="300" Margin="0,8,0,0"
-                         PlaceholderText="http://proxy:port" LostFocus="OnProxyAddressChanged" />
-            </StackPanel>
-
-            <Border Height="1" Background="{StaticResource VkSeparatorBrush}" />
-
-            <!-- Cache -->
-            <StackPanel Spacing="16">
-                <TextBlock Text="Кэш" Style="{StaticResource SubtitleTextBlockStyle}"
-                           Foreground="{StaticResource VkTextPrimaryBrush}" />
-
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Очистить кэш изображений"
-                                   Foreground="{StaticResource VkTextPrimaryBrush}" />
-                        <TextBlock Text="Миниатюры и аватары каналов"
-                                   Foreground="{StaticResource VkTextTertiaryBrush}" FontSize="12" />
-                    </StackPanel>
-                    <Button Grid.Column="1" Content="Очистить" Click="OnClearCacheClick" />
-                </Grid>
-            </StackPanel>
-
-            <Border Height="1" Background="{StaticResource VkSeparatorBrush}" />
-
-            <!-- About -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="О приложении" Style="{StaticResource SubtitleTextBlockStyle}"
-                           Foreground="{StaticResource VkTextPrimaryBrush}" />
-                <TextBlock Text="VK Video Desktop v1.0.0-beta"
-                           Foreground="{StaticResource VkTextSecondaryBrush}" />
-                <TextBlock Text="Бета-версия • Production-ready Windows client for VK Video"
-                           Foreground="{StaticResource VkTextTertiaryBrush}" FontSize="12" />
-            </StackPanel>
-
-        </StackPanel>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </Page>

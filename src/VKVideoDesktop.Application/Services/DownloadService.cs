@@ -8,18 +8,18 @@ namespace VKVideoDesktop.Application.Services;
 public sealed class DownloadService
 {
     private readonly IDownloadManager _downloadManager;
-    private readonly IDownloadSourceResolver _sourceResolver;
+    private readonly IVideoDownloadProvider _downloadProvider;
     private readonly ISettingsService _settingsService;
     private readonly ILogger<DownloadService> _logger;
 
     public DownloadService(
         IDownloadManager downloadManager,
-        IDownloadSourceResolver sourceResolver,
+        IVideoDownloadProvider downloadProvider,
         ISettingsService settingsService,
         ILogger<DownloadService> logger)
     {
         _downloadManager = downloadManager;
-        _sourceResolver = sourceResolver;
+        _downloadProvider = downloadProvider;
         _settingsService = settingsService;
         _logger = logger;
     }
@@ -52,7 +52,7 @@ public sealed class DownloadService
     {
         try
         {
-            return await _sourceResolver.ResolveAsync(video, cancellationToken);
+            return await _downloadProvider.GetAvailableDownloadsAsync(video, cancellationToken);
         }
         catch (Exception ex)
         {

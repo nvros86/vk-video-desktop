@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0-windows10.0.22621.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Uninstall</AssemblyName>
+    <RootNamespace>VKVideoDesktop.Uninstall</RootNamespace>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableDefaultItems>true</EnableDefaultItems>
+    <Platforms>x64</Platforms>
+    <NoWarn>NU1603;NU1605</NoWarn>
+    <ApplicationIcon>..\VKVideoDesktop.App\Assets\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+</Project>

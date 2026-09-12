@@ -13,6 +13,7 @@ public sealed class VideoViewModel : ViewModelBase
     private readonly IFavoritesService? _favoritesService;
     private readonly DownloadService? _downloadService;
     private readonly ILogger<VideoViewModel>? _logger;
+    private readonly LocalizationService? _localization;
 
     private Video? _currentVideo;
     private bool _isLoading;
@@ -30,6 +31,7 @@ public sealed class VideoViewModel : ViewModelBase
         _favoritesService = favoritesService;
         _downloadService = downloadService;
         _logger = logger;
+        _localization = App.GetService<LocalizationService>();
     }
 
     public string Id { get; set; } = string.Empty;
@@ -149,11 +151,12 @@ public sealed class VideoViewModel : ViewModelBase
 
     private static string FormatViewCount(long count)
     {
+        var loc = App.GetService<LocalizationService>();
         return count switch
         {
-            >= 1_000_000_000 => $"{count / 1_000_000_000.0:0.#} млрд",
-            >= 1_000_000 => $"{count / 1_000_000.0:0.#} млн",
-            >= 1_000 => $"{count / 1_000.0:0.#} тыс.",
+            >= 1_000_000_000 => string.Format(loc["ViewsBillions"], $"{count / 1_000_000_000.0:0.#}"),
+            >= 1_000_000 => string.Format(loc["ViewsMillions"], $"{count / 1_000_000.0:0.#}"),
+            >= 1_000 => string.Format(loc["ViewsThousands"], $"{count / 1_000.0:0.#}"),
             _ => count.ToString("N0")
         };
     }
@@ -208,10 +211,11 @@ public sealed class VideoDisplayViewModel : ViewModelBase
 
     private static string FormatViewCount(long count)
     {
+        var loc = App.GetService<LocalizationService>();
         if (count >= 1_000_000)
-            return $"{count / 1_000_000.0:F1} млн просмотров";
+            return string.Format(loc["ViewsCount"], string.Format(loc["ViewsMillions"], $"{count / 1_000_000.0:F1}"));
         if (count >= 1_000)
-            return $"{count / 1_000.0:F0} тыс. просмотров";
-        return $"{count} просмотров";
+            return string.Format(loc["ViewsCount"], string.Format(loc["ViewsThousands"], $"{count / 1_000.0:F0}"));
+        return string.Format(loc["ViewsCount"], count.ToString("N0"));
     }
 }

@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text.Json;
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Interfaces;
 using VKVideoDesktop.Core.Models;
@@ -8,6 +9,7 @@ namespace VKVideoDesktop.Application.Services;
 public sealed class SettingsService : ISettingsService
 {
     private readonly string _settingsPath;
+    private readonly SemaphoreSlim _saveLock = new(1, 1);
     private UserSettings _settings = new();
 
     public UserSettings Settings => _settings;
@@ -22,51 +24,107 @@ public sealed class SettingsService : ISettingsService
 
     public async Task LoadAsync()
     {
-        if (File.Exists(_settingsPath))
-        {
-            var json = await File.ReadAllTextAsync(_settingsPath);
-            _settings = System.Text.Json.JsonSerializer.Deserialize<UserSettings>(json) ?? new UserSettings();
-
-            if (!string.IsNullOrEmpty(_settings.AccessToken))
-            {
-                try
-                {
-                    var encryptedBytes = Convert.FromBase64String(_settings.AccessToken);
-                    _settings.AccessToken = DecryptToken(encryptedBytes);
-                }
-                catch
-                {
-                    _settings.AccessToken = "";
-                }
-            }
-        }
-        else
+        if (!File.Exists(_settingsPath))
         {
             _settings = new UserSettings();
+            return;
+        }
+
+        try
+        {
+            var json = await File.ReadAllTextAsync(_settingsPath);
+            _settings = JsonSerializer.Deserialize<UserSettings>(json) ?? new UserSettings();
+        }
+        catch
+        {
+            _settings = new UserSettings();
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(_settings.AccessToken))
+        {
+            try
+            {
+                var encryptedBytes = Convert.FromBase64String(_settings.AccessToken);
+                _settings.AccessToken = DecryptToken(encryptedBytes);
+            }
+            catch
+            {
+                _settings.AccessToken = "";
+            }
         }
     }
 
     public async Task SaveAsync()
     {
-        var plaintext = _settings.AccessToken;
-        if (!string.IsNullOrEmpty(plaintext))
+        await _saveLock.WaitAsync();
+        try
         {
-            _settings.AccessToken = Convert.ToBase64String(EncryptToken(plaintext));
+            var snapshot = new UserSettings
+            {
+                AccessToken = _settings.AccessToken,
+                IsAuthorized = _settings.IsAuthorized,
+                Language = _settings.Language,
+                Theme = _settings.Theme,
+                StartWithWindows = _settings.StartWithWindows,
+                MinimizeToTray = _settings.MinimizeToTray,
+                EnableNotifications = _settings.EnableNotifications,
+                DefaultQuality = _settings.DefaultQuality,
+                Autoplay = _settings.Autoplay,
+                DefaultVolume = _settings.DefaultVolume,
+                DefaultPlaybackSpeed = _settings.DefaultPlaybackSpeed,
+                DownloadFolder = _settings.DownloadFolder,
+                MaxConcurrentDownloads = _settings.MaxConcurrentDownloads,
+                SpeedLimit = _settings.SpeedLimit,
+                RetryCount = _settings.RetryCount,
+                AutoResumeAfterStartup = _settings.AutoResumeAfterStartup,
+                DeletePartOnCancel = _settings.DeletePartOnCancel,
+                AskFolderBeforeDownload = _settings.AskFolderBeforeDownload,
+                DownloadQualityBehavior = _settings.DownloadQualityBehavior,
+                UseProxy = _settings.UseProxy,
+                ProxyAddress = _settings.ProxyAddress
+            };
+
+            if (!string.IsNullOrEmpty(snapshot.AccessToken))
+            {
+                snapshot.AccessToken = Convert.ToBase64String(EncryptToken(snapshot.AccessToken));
+            }
+
+            var json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            var tempPath = _settingsPath + ".tmp";
+            await File.WriteAllTextAsync(tempPath, json);
+            File.Move(tempPath, _settingsPath, overwrite: true);
         }
-
-        var json = System.Text.Json.JsonSerializer.Serialize(_settings, new System.Text.Json.JsonSerializerOptions
+        finally
         {
-            WriteIndented = true
-        });
-        await File.WriteAllTextAsync(_settingsPath, json);
-
-        _settings.AccessToken = plaintext;
+            _saveLock.Release();
+        }
     }
 
-    public Task ResetAsync()
+    public async Task ResetAsync()
     {
-        _settings = new UserSettings();
-        return Task.CompletedTask;
+        await _saveLock.WaitAsync();
+        try
+        {
+            _settings = new UserSettings();
+
+            var json = JsonSerializer.Serialize(_settings, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            var tempPath = _settingsPath + ".tmp";
+            await File.WriteAllTextAsync(tempPath, json);
+            File.Move(tempPath, _settingsPath, overwrite: true);
+        }
+        finally
+        {
+            _saveLock.Release();
+        }
     }
 
     private static byte[] EncryptToken(string token)

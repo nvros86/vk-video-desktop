@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
+using Microsoft.UI.Dispatching;
 using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Enums;
 using VKVideoDesktop.Core.Interfaces;
@@ -10,13 +11,20 @@ namespace VKVideoDesktop.App.ViewModels;
 public sealed class DownloadsViewModel : ViewModelBase
 {
     private readonly DownloadService _downloadService;
+    private readonly IDownloadRepository _downloadRepository;
     private readonly ILogger<DownloadsViewModel> _logger;
+    private readonly DispatcherQueue _dispatcherQueue;
     private bool _hasActiveDownloads;
 
-    public DownloadsViewModel(DownloadService downloadService, ILogger<DownloadsViewModel> logger)
+    public DownloadsViewModel(
+        DownloadService downloadService,
+        IDownloadRepository downloadRepository,
+        ILogger<DownloadsViewModel> logger)
     {
         _downloadService = downloadService;
+        _downloadRepository = downloadRepository;
         _logger = logger;
+        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
         _downloadService.DownloadProgressChanged += OnProgressChanged;
         _downloadService.DownloadCompleted += OnDownloadCompleted;
@@ -39,8 +47,7 @@ public sealed class DownloadsViewModel : ViewModelBase
 
     public async Task LoadDownloadsAsync()
     {
-        var repository = App.GetService<IDownloadRepository>();
-        var tasks = await repository.GetAllAsync();
+        var tasks = await _downloadRepository.GetAllAsync();
         Downloads.Clear();
         foreach (var task in tasks.Where(t => t.Status != DownloadStatus.Completed))
         {
@@ -71,9 +78,17 @@ public sealed class DownloadsViewModel : ViewModelBase
 
     public async Task RemoveDownloadAsync(string downloadId)
     {
+        try
+        {
+            await _downloadService.RemoveAsync(downloadId, deleteFile: false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to remove download {DownloadId}", downloadId);
+        }
+
         var item = Downloads.FirstOrDefault(d => d.DownloadId == downloadId);
         if (item != null) Downloads.Remove(item);
-        await Task.CompletedTask;
     }
 
     public async Task ClearCompletedAsync()
@@ -81,9 +96,17 @@ public sealed class DownloadsViewModel : ViewModelBase
         var completed = Downloads.Where(d => d.Status == DownloadStatus.Completed).ToList();
         foreach (var item in completed)
         {
+            try
+            {
+                await _downloadService.RemoveAsync(item.DownloadId, deleteFile: false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to remove completed download {DownloadId}", item.DownloadId);
+            }
+
             Downloads.Remove(item);
         }
-        await Task.CompletedTask;
     }
 
     public async Task RetryAllFailedAsync()
@@ -97,32 +120,41 @@ public sealed class DownloadsViewModel : ViewModelBase
 
     private void OnProgressChanged(object? sender, DownloadTask task)
     {
-        var item = Downloads.FirstOrDefault(d => d.DownloadId == task.Id);
-        if (item != null)
+        _dispatcherQueue.TryEnqueue(() =>
         {
-            item.UpdateFrom(task);
-        }
+            var item = Downloads.FirstOrDefault(d => d.DownloadId == task.Id);
+            if (item != null)
+            {
+                item.UpdateFrom(task);
+            }
+        });
     }
 
     private void OnDownloadCompleted(object? sender, DownloadTask task)
     {
-        var item = Downloads.FirstOrDefault(d => d.DownloadId == task.Id);
-        if (item != null)
+        _dispatcherQueue.TryEnqueue(() =>
         {
-            item.UpdateFrom(task);
-        }
-        OnPropertyChanged(nameof(ActiveDownloadsCount));
-        HasActiveDownloads = ActiveDownloadsCount > 0;
+            var item = Downloads.FirstOrDefault(d => d.DownloadId == task.Id);
+            if (item != null)
+            {
+                item.UpdateFrom(task);
+            }
+            OnPropertyChanged(nameof(ActiveDownloadsCount));
+            HasActiveDownloads = ActiveDownloadsCount > 0;
+        });
     }
 
     private void OnDownloadFailed(object? sender, DownloadTask task)
     {
-        var item = Downloads.FirstOrDefault(d => d.DownloadId == task.Id);
-        if (item != null)
+        _dispatcherQueue.TryEnqueue(() =>
         {
-            item.UpdateFrom(task);
-        }
-        OnPropertyChanged(nameof(ActiveDownloadsCount));
-        HasActiveDownloads = ActiveDownloadsCount > 0;
+            var item = Downloads.FirstOrDefault(d => d.DownloadId == task.Id);
+            if (item != null)
+            {
+                item.UpdateFrom(task);
+            }
+            OnPropertyChanged(nameof(ActiveDownloadsCount));
+            HasActiveDownloads = ActiveDownloadsCount > 0;
+        });
     }
 }
