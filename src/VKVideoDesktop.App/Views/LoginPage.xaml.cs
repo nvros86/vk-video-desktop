@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -6,7 +5,6 @@ using VKVideoDesktop.Application.Services;
 using VKVideoDesktop.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using VKVideoDesktop.Infrastructure.VkApi;
-using Windows.System;
 
 namespace VKVideoDesktop.App.Views;
 
@@ -15,6 +13,7 @@ public sealed partial class LoginPage : Page
     private readonly IAuthenticationService _authService;
     private readonly ILogger<LoginPage> _logger;
     private readonly LocalizationService _localization;
+    private const string OAuthRedirectPrefix = "https://oauth.vk.com/blank.html";
 
     public LoginPage()
     {
@@ -27,78 +26,147 @@ public sealed partial class LoginPage : Page
 
     private async void OnLoginClick(object sender, RoutedEventArgs e)
     {
-        if (_authService is VkAuthenticationService vkAuth)
-        {
-            await Launcher.LaunchUriAsync(new Uri(vkAuth.GetAuthUrl()));
-        }
+        ShowState(WebViewState);
 
-        Step1Text.Visibility = Visibility.Collapsed;
-        LoginButton.Visibility = Visibility.Collapsed;
-        Step2Text.Visibility = Visibility.Visible;
-        TokenInput.Visibility = Visibility.Visible;
-        SubmitTokenButton.Visibility = Visibility.Visible;
-        TokenInput.Focus(FocusState.Programmatic);
+        try
+        {
+            var authService = _authService as VkAuthenticationService;
+            var authUrl = authService?.GetAuthUrl();
+            if (!string.IsNullOrEmpty(authUrl))
+            {
+                await InitializeWebViewAsync(authUrl);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[LoginPage] Failed to start OAuth");
+            ShowError(_localization["LoginErrorAuthFailed"]);
+        }
     }
 
-    private async void OnSubmitTokenClick(object sender, RoutedEventArgs e)
+    private async System.Threading.Tasks.Task InitializeWebViewAsync(string authUrl)
     {
-        var input = TokenInput.Text?.Trim();
-        if (string.IsNullOrEmpty(input))
+        try
         {
-            ShowError(_localization["LoginErrorEmptyToken"]);
-            return;
+            await LoginWebView.EnsureCoreWebView2Async();
+            LoginWebView.CoreWebView2.NavigationStarting += OnWebViewNavigationStarting;
+            LoginWebView.CoreWebView2.Navigate(authUrl);
         }
-
-        var token = ExtractToken(input);
-
-        if (string.IsNullOrEmpty(token))
+        catch (Exception ex)
         {
-            ShowError(_localization["LoginErrorExtractFailed"]);
-            return;
+            _logger.LogError(ex, "[LoginPage] WebView2 init failed");
+            ShowError(_localization["LoginErrorAuthFailed"]);
         }
+    }
 
-        LoadingText.Visibility = Visibility.Visible;
-        ErrorText.Visibility = Visibility.Collapsed;
+    private async void OnWebViewNavigationStarting(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.Uri))
+            return;
 
-        if (_authService is VkAuthenticationService vkAuth)
+        if (e.Uri.StartsWith(OAuthRedirectPrefix, StringComparison.OrdinalIgnoreCase))
         {
-            var success = await vkAuth.LoginAsync(token);
-            if (success)
+            e.Cancel = true;
+
+            var fragment = e.Uri.Contains('#') ? e.Uri.Substring(e.Uri.IndexOf('#') + 1) : "";
+            var token = ExtractTokenFromFragment(fragment);
+
+            if (!string.IsNullOrEmpty(token))
             {
-                var mainWindow = App.GetService<MainWindow>();
-                mainWindow.NavigateToHome();
+                DispatcherQueue.TryEnqueue(async () =>
+                {
+                    ShowState(LoadingState);
+                    var success = await LoginWithTokenAsync(token);
+                    if (success)
+                    {
+                        ShowState(SuccessState);
+                        await System.Threading.Tasks.Task.Delay(800);
+                        var mainWindow = App.GetService<MainWindow>();
+                        mainWindow.NavigateToHome();
+                    }
+                    else
+                    {
+                        ShowError(_localization["LoginErrorAuthFailed"]);
+                    }
+                });
             }
             else
             {
-                ShowError(_localization["LoginErrorAuthFailed"]);
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    ShowError(_localization["LoginErrorExtractFailed"]);
+                });
             }
         }
-
-        LoadingText.Visibility = Visibility.Collapsed;
     }
 
-    private static string? ExtractToken(string input)
+    private static string? ExtractTokenFromFragment(string fragment)
     {
-        if (string.IsNullOrWhiteSpace(input))
+        if (string.IsNullOrWhiteSpace(fragment))
             return null;
 
-        if (input.Contains("access_token="))
+        var pairs = fragment.Split('&', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var pair in pairs)
         {
-            var match = Regex.Match(input, @"access_token=([^&]+)");
-            if (match.Success)
-                return match.Groups[1].Value;
+            var kv = pair.Split('=', 2);
+            if (kv.Length == 2 && kv[0] == "access_token" && !string.IsNullOrWhiteSpace(kv[1]))
+            {
+                return kv[1];
+            }
         }
-
-        if (input.Length >= 80 && !input.Contains(" "))
-            return input;
-
         return null;
+    }
+
+    private async System.Threading.Tasks.Task<bool> LoginWithTokenAsync(string token)
+    {
+        try
+        {
+            if (_authService is VkAuthenticationService vkAuth)
+            {
+                return await vkAuth.LoginAsync(token);
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[LoginPage] Login failed");
+            return false;
+        }
+    }
+
+    private void OnBackToIntroClick(object sender, RoutedEventArgs e)
+    {
+        if (LoginWebView.CoreWebView2 != null)
+        {
+            LoginWebView.CoreWebView2.NavigationStarting -= OnWebViewNavigationStarting;
+            LoginWebView.CoreWebView2.Navigate("about:blank");
+        }
+        ShowState(IntroState);
+    }
+
+    private async void OnOpenInBrowserClick(object sender, RoutedEventArgs e)
+    {
+        if (_authService is VkAuthenticationService vkAuth)
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri(vkAuth.GetAuthUrl()));
+            Step2Text.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void ShowState(UIElement state)
+    {
+        IntroState.Visibility = Visibility.Collapsed;
+        WebViewState.Visibility = Visibility.Collapsed;
+        LoadingState.Visibility = Visibility.Collapsed;
+        SuccessState.Visibility = Visibility.Collapsed;
+        ErrorState.Visibility = Visibility.Collapsed;
+        state.Visibility = Visibility.Visible;
     }
 
     private void ShowError(string message)
     {
-        ErrorText.Text = message;
-        ErrorText.Visibility = Visibility.Visible;
+        ErrorDetailText.Text = message;
+        ShowState(ErrorState);
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)

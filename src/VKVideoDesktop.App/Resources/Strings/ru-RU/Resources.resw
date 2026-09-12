@@ -126,9 +126,6 @@
   <data name="CacheCleared" xml:space="preserve">
     <value>Кэш очищен</value>
   </data>
-  <data name="LoginSuccess" xml:space="preserve">
-    <value>Вход выполнен успешно</value>
-  </data>
   <data name="TokenInvalid" xml:space="preserve">
     <value>Неверный токен. Попробуйте снова.</value>
   </data>
@@ -523,25 +520,31 @@
 
   <!-- LoginPage -->
   <data name="LoginTitle" xml:space="preserve">
-    <value>Вход в VK Video</value>
+    <value>VK Video Desktop</value>
   </data>
-  <data name="LoginStep1" xml:space="preserve">
-    <value>1. Нажмите кнопку ниже для входа через VK</value>
+  <data name="LoginDesc" xml:space="preserve">
+    <value>Войдите в аккаунт VK, чтобы смотреть видео, управлять плейлистами и синхронизировать историю между устройствами</value>
   </data>
   <data name="LoginButton" xml:space="preserve">
     <value>Войти через VK</value>
   </data>
   <data name="LoginStep2" xml:space="preserve">
-    <value>2. После авторизации скопируйте URL из браузера</value>
+    <value>После авторизации вы будете автоматически перенаправлены обратно</value>
   </data>
-  <data name="LoginInputPlaceholder" xml:space="preserve">
-    <value>Вставьте URL или токен сюда...</value>
-  </data>
-  <data name="LoginSubmit" xml:space="preserve">
-    <value>Войти</value>
+  <data name="LoginWebViewTitle" xml:space="preserve">
+    <value>Авторизация VK</value>
   </data>
   <data name="LoginChecking" xml:space="preserve">
-    <value>Проверка токена...</value>
+    <value>Завершение авторизации...</value>
+  </data>
+  <data name="LoginSuccess" xml:space="preserve">
+    <value>Добро пожаловать в VK Video!</value>
+  </data>
+  <data name="LoginErrorTitle" xml:space="preserve">
+    <value>Ошибка авторизации</value>
+  </data>
+  <data name="LoginRetryButton" xml:space="preserve">
+    <value>Попробовать снова</value>
   </data>
 
   <!-- ProfilePage -->
@@ -561,7 +564,16 @@
     <value>Настройки</value>
   </data>
   <data name="ProfileLogout" xml:space="preserve">
-    <value>Выйти</value>
+    <value>Выйти из аккаунта</value>
+  </data>
+  <data name="ProfileSubscribers" xml:space="preserve">
+    <value>Подписчики</value>
+  </data>
+  <data name="ProfileVideos" xml:space="preserve">
+    <value>Видео</value>
+  </data>
+  <data name="ProfileMenuTitle" xml:space="preserve">
+    <value>УПРАВЛЕНИЕ</value>
   </data>
 
   <!-- ChannelPage -->

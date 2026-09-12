@@ -5,41 +5,102 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Background="{StaticResource VkBackgroundBrush}">
 
-    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="500">
-        <StackPanel Spacing="24" Margin="24">
-            <TextBlock x:Uid="LoginTitle" Style="{StaticResource TitleTextBlockStyle}"
+    <Grid>
+        <!-- Intro State -->
+        <StackPanel x:Name="IntroState" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MaxWidth="480" Spacing="20" Padding="32">
+            <Grid Width="80" Height="80" HorizontalAlignment="Center">
+                <Ellipse Fill="{StaticResource VkAccentGlowBrush}" />
+                <FontIcon Glyph="&#xE72B;" FontSize="36" Foreground="{StaticResource VkAccentBrush}"
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+
+            <TextBlock x:Uid="LoginTitle" FontSize="28" FontWeight="Bold"
+                       Foreground="{StaticResource VkTextPrimaryBrush}"
+                       HorizontalAlignment="Center" TextAlignment="Center" />
+
+            <TextBlock x:Uid="LoginDesc" FontSize="14" TextWrapping="Wrap"
+                       Foreground="{StaticResource VkTextSecondaryBrush}"
+                       HorizontalAlignment="Center" TextAlignment="Center" />
+
+            <Button x:Uid="LoginButton" HorizontalAlignment="Center"
+                    Style="{StaticResource AccentButtonStyle}" Click="OnLoginClick"
+                    Padding="40,14" CornerRadius="24" FontSize="15" Margin="0,8,0,0" />
+
+            <TextBlock x:Uid="LoginStep2" FontSize="13" TextWrapping="Wrap"
+                       Foreground="{StaticResource VkTextTertiaryBrush}"
+                       HorizontalAlignment="Center" TextAlignment="Center"
+                       Visibility="Collapsed" x:Name="Step2Text" />
+        </StackPanel>
+
+        <!-- WebView2 OAuth State -->
+        <Grid x:Name="WebViewState" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Padding="16,10" Background="{StaticResource VkSurfaceBrush}"
+                  BorderBrush="{StaticResource VkTopBarBorderBrush}" BorderThickness="0,0,0,1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button x:Name="BackToIntroButton" Content="&#xE72B;"
+                            FontFamily="Segoe MDL2 Assets" Style="{StaticResource TextButtonStyle}"
+                            Click="OnBackToIntroClick" />
+                    <TextBlock Text="VK Video Desktop" FontSize="14" FontWeight="SemiBold"
+                               Foreground="{StaticResource VkTextPrimaryBrush}" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" x:Uid="LoginWebViewTitle" FontSize="13"
+                           Foreground="{StaticResource VkTextSecondaryBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                <Button Grid.Column="2" Content="&#xE774;" FontFamily="Segoe MDL2 Assets"
+                        Style="{StaticResource TextButtonStyle}" Click="OnOpenInBrowserClick" />
+            </Grid>
+
+            <WebView2 x:Name="LoginWebView" Grid.Row="1" />
+        </Grid>
+
+        <!-- Loading State -->
+        <StackPanel x:Name="LoadingState" Visibility="Collapsed"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+            <ProgressRing IsActive="True" Width="48" Height="48"
+                          Foreground="{StaticResource VkAccentBrush}" />
+            <TextBlock x:Uid="LoginChecking" FontSize="14"
+                       Foreground="{StaticResource VkTextSecondaryBrush}"
+                       HorizontalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Success State -->
+        <StackPanel x:Name="SuccessState" Visibility="Collapsed"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+            <FontIcon Glyph="&#xE73E;" FontSize="64" Foreground="{StaticResource VkSuccessBrush}" />
+            <TextBlock x:Uid="LoginSuccess" FontSize="20" FontWeight="SemiBold"
                        Foreground="{StaticResource VkTextPrimaryBrush}"
                        HorizontalAlignment="Center" />
+        </StackPanel>
 
-            <TextBlock x:Name="Step1Text"
-                       x:Uid="LoginStep1"
-                       TextWrapping="Wrap" HorizontalAlignment="Center"
-                       Foreground="{StaticResource VkTextSecondaryBrush}" />
-
-            <Button x:Name="LoginButton" x:Uid="LoginButton" HorizontalAlignment="Center"
-                    Style="{StaticResource AccentButtonStyle}" Click="OnLoginClick"
-                    Padding="32,12" />
-
-            <TextBlock x:Name="Step2Text"
-                       x:Uid="LoginStep2"
-                       TextWrapping="Wrap" HorizontalAlignment="Center"
+        <!-- Error State -->
+        <StackPanel x:Name="ErrorState" Visibility="Collapsed"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16"
+                    MaxWidth="400" Padding="32">
+            <FontIcon Glyph="&#xEA39;" FontSize="64" Opacity="0.6"
+                      Foreground="{StaticResource VkErrorBrush}" />
+            <TextBlock x:Uid="LoginErrorTitle" FontSize="20" FontWeight="SemiBold"
+                       Foreground="{StaticResource VkTextPrimaryBrush}"
+                       HorizontalAlignment="Center" />
+            <TextBlock x:Name="ErrorDetailText" FontSize="13" TextWrapping="Wrap"
                        Foreground="{StaticResource VkTextSecondaryBrush}"
-                       Visibility="Collapsed" />
-
-            <TextBox x:Name="TokenInput" x:Uid="LoginInputPlaceholder"
-                     Visibility="Collapsed" />
-
-            <Button x:Name="SubmitTokenButton" x:Uid="LoginSubmit" HorizontalAlignment="Center"
-                    Style="{StaticResource AccentButtonStyle}" Click="OnSubmitTokenClick"
-                    Padding="32,12" Visibility="Collapsed" />
-
-            <TextBlock x:Name="ErrorText" Text="" Foreground="Red"
-                       HorizontalAlignment="Center" Visibility="Collapsed" />
-
-            <TextBlock x:Name="LoadingText" x:Uid="LoginChecking"
-                       HorizontalAlignment="Center"
-                       Foreground="{StaticResource VkTextTertiaryBrush}"
-                       Visibility="Collapsed" />
+                       HorizontalAlignment="Center" TextAlignment="Center" />
+            <Button x:Uid="LoginRetryButton" HorizontalAlignment="Center"
+                    Style="{StaticResource AccentButtonStyle}" Click="OnLoginClick"
+                    Padding="32,10" CornerRadius="20" Margin="0,8,0,0" />
         </StackPanel>
     </Grid>
 </Page>

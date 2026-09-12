@@ -126,9 +126,6 @@
   <data name="CacheCleared" xml:space="preserve">
     <value>Cache cleared</value>
   </data>
-  <data name="LoginSuccess" xml:space="preserve">
-    <value>Login successful</value>
-  </data>
   <data name="TokenInvalid" xml:space="preserve">
     <value>Invalid token. Please try again.</value>
   </data>
@@ -523,25 +520,31 @@
 
   <!-- LoginPage -->
   <data name="LoginTitle" xml:space="preserve">
-    <value>Login to VK Video</value>
+    <value>VK Video Desktop</value>
   </data>
-  <data name="LoginStep1" xml:space="preserve">
-    <value>1. Click the button below to login via VK</value>
+  <data name="LoginDesc" xml:space="preserve">
+    <value>Sign in to your VK account to watch videos, manage playlists, and sync history across devices</value>
   </data>
   <data name="LoginButton" xml:space="preserve">
-    <value>Login via VK</value>
+    <value>Sign in to VK</value>
   </data>
   <data name="LoginStep2" xml:space="preserve">
-    <value>2. After authorization, copy the URL from browser</value>
+    <value>After authorization, you will be redirected back automatically</value>
   </data>
-  <data name="LoginInputPlaceholder" xml:space="preserve">
-    <value>Paste URL or token here...</value>
-  </data>
-  <data name="LoginSubmit" xml:space="preserve">
-    <value>Login</value>
+  <data name="LoginWebViewTitle" xml:space="preserve">
+    <value>VK Authorization</value>
   </data>
   <data name="LoginChecking" xml:space="preserve">
-    <value>Checking token...</value>
+    <value>Completing authorization...</value>
+  </data>
+  <data name="LoginSuccess" xml:space="preserve">
+    <value>Welcome to VK Video!</value>
+  </data>
+  <data name="LoginErrorTitle" xml:space="preserve">
+    <value>Authorization failed</value>
+  </data>
+  <data name="LoginRetryButton" xml:space="preserve">
+    <value>Try again</value>
   </data>
 
   <!-- ProfilePage -->
@@ -561,7 +564,16 @@
     <value>Settings</value>
   </data>
   <data name="ProfileLogout" xml:space="preserve">
-    <value>Logout</value>
+    <value>Sign out</value>
+  </data>
+  <data name="ProfileSubscribers" xml:space="preserve">
+    <value>Subscribers</value>
+  </data>
+  <data name="ProfileVideos" xml:space="preserve">
+    <value>Videos</value>
+  </data>
+  <data name="ProfileMenuTitle" xml:space="preserve">
+    <value>MANAGE</value>
   </data>
 
   <!-- ChannelPage -->
